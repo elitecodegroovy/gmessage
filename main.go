@@ -66,7 +66,7 @@ Common Options:
 
 
 func msgFlagSet(opts *message.Options) *flag.FlagSet {
-	flagSet := flag.NewFlagSet("nsqd", flag.ExitOnError)
+	flagSet := flag.NewFlagSet("gMessage", flag.ExitOnError)
 
 	flagSet.IntVar(&opts.Port, "port", 0, "Port to listen on.")
 	flagSet.IntVar(&opts.Port, "p", 0, "Port to listen on.")
@@ -282,7 +282,7 @@ func (p *program) Start() error {
 	//if showTLSHelp {
 	//	server.PrintTLSHelpAndDie()
 	//}
-	if flagSet.Lookup("Debug").Value.(flag.Getter).Get().(bool) {
+	if flagSet.Lookup("debug").Value.(flag.Getter).Get().(bool) {
 		opts.Trace = true
 	}
 	//signal
