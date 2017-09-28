@@ -77,7 +77,6 @@ func msgFlagSet(opts *message.Options) *flag.FlagSet {
 	flagSet.BoolVar(&opts.Debug, "debug", false, "Enable Debug logging.")
 	flagSet.BoolVar(&opts.Trace, "V", false, "Enable Trace logging.")
 	flagSet.BoolVar(&opts.Trace, "trace", false, "Enable Trace logging.")
-	//flagSet.BoolVar(&debugAndTrace, "DV", false, "Enable Debug and Trace logging.")
 
 	flagSet.BoolVar(&opts.Logtime, "T", true, "Timestamp log entries.")
 	flagSet.BoolVar(&opts.Logtime, "logtime", true, "Timestamp log entries.")
@@ -90,7 +89,7 @@ func msgFlagSet(opts *message.Options) *flag.FlagSet {
 	flagSet.IntVar(&opts.HTTPSPort, "https_port", 0, "HTTPS Port for /varz, /connz endpoints.")
 	flagSet.String("configFile", "", "Configuration file.")
 
-	//flagSet.StringVar(&configFile, "config", "", "Configuration file.")
+	flagSet.String("config", "", "Configuration file.")
 	flagSet.String("sl", "", "Send signal to g-message process (stop, quit, reopen, reload)")
 	flagSet.String("signal", "", "Send signal to g-message process (stop, quit, reopen, reload)")
 	flagSet.StringVar(&opts.PidFile, "P", "", "File to store process pid.")
@@ -296,7 +295,7 @@ func (p *program) Start() error {
 	if  sl != "" {
 		processSignal(sl)
 	}
-	configFile := flagSet.Lookup("configFile").Value.(flag.Getter).Get().(string)
+	configFile := flagSet.Lookup("config").Value.(flag.Getter).Get().(string)
 	if configFile != "" {
 		fileOpts, err := message.ProcessConfigFile(configFile)
 		if err != nil {
