@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/judwhite/go-svc/svc/internal/test"
+	"svc/internal/test"
 	wsvc "golang.org/x/sys/windows/svc"
 )
 

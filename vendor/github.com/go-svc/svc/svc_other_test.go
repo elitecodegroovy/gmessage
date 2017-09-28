@@ -7,7 +7,7 @@ import (
 	"syscall"
 	"testing"
 
-	"github.com/judwhite/go-svc/svc/internal/test"
+	"svc/internal/test"
 )
 
 func TestDefaultSignalHandling(t *testing.T) {

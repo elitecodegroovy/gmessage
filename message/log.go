@@ -6,7 +6,7 @@ import (
 	"os"
 	"sync/atomic"
 
-	"nats-io/gnatsd/logger"
+	"github.com/elitecodegroovy/gmessage/logger"
 )
 
 // Logger interface of the NATS Server
@@ -38,8 +38,8 @@ func (s *Server) ConfigureLogger() {
 	)
 
 	syslog := opts.Syslog
-	//if isWindowsService() && opts.LogFile == "" {
-	if opts.LogFile == "" {
+	if isWindowsService() && opts.LogFile == "" {
+	//if opts.LogFile == "" {
 		// Enable syslog if no log file is specified and we're running as a
 		// Windows service so that logs are written to the Windows event log.
 		syslog = true

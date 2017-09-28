@@ -74,7 +74,7 @@ func msgFlagSet(opts *message.Options) *flag.FlagSet {
 	flagSet.StringVar(&opts.Host, "a", "", "Network host to listen on.")
 	flagSet.StringVar(&opts.Host, "net", "", "Network host to listen on.")
 	flagSet.BoolVar(&opts.Debug, "D", false, "Enable Debug logging.")
-	flagSet.BoolVar(&opts.Debug, "debug", false, "Enable Debug logging.")
+	flagSet.BoolVar(&opts.Debug,"debug", false, "Enable Debug logging.")
 	flagSet.BoolVar(&opts.Trace, "V", false, "Enable Trace logging.")
 	flagSet.BoolVar(&opts.Trace, "trace", false, "Enable Trace logging.")
 
@@ -87,9 +87,9 @@ func msgFlagSet(opts *message.Options) *flag.FlagSet {
 	flagSet.IntVar(&opts.HTTPPort, "http_port", 0, "HTTP Port for /varz, /connz endpoints.")
 	flagSet.IntVar(&opts.HTTPSPort, "ms", 0, "HTTPS Port for /varz, /connz endpoints.")
 	flagSet.IntVar(&opts.HTTPSPort, "https_port", 0, "HTTPS Port for /varz, /connz endpoints.")
-	flagSet.String("configFile", "", "Configuration file.")
+	flagSet.StringVar(&opts.ConfigFile,"c", "", "Configuration file.")
+	flagSet.StringVar(&opts.ConfigFile,"config", "", "Configuration file.")
 
-	flagSet.String("config", "", "Configuration file.")
 	flagSet.String("sl", "", "Send signal to g-message process (stop, quit, reopen, reload)")
 	flagSet.String("signal", "", "Send signal to g-message process (stop, quit, reopen, reload)")
 	flagSet.StringVar(&opts.PidFile, "P", "", "File to store process pid.")
@@ -279,15 +279,18 @@ func (p *program) Start() error {
 	}else if showHelp {
 		showUsageInfoNExit()
 	}
+	// Snapshot flag options.
+	message.FlagSnapshot = opts.Clone()
+
 	//if showTLSHelp {
 	//	server.PrintTLSHelpAndDie()
 	//}
-	if flagSet.Lookup("debug").Value.(flag.Getter).Get().(bool) {
-		opts.Trace = true
+	if opts.Debug {
+		opts.Trace, opts.Debug = true, true
 	}
 	//signal
-	signal := flagSet.Lookup("signal").Value.(flag.Getter).Get().(string)
-	sl := flagSet.Lookup("sl").Value.(flag.Getter).Get().(string)
+	signal := flagSet.Lookup("signal").Value.String()
+	sl := flagSet.Lookup("sl").Value.String()
 	if signal != "" {
 		sl = signal
 	}
@@ -295,9 +298,9 @@ func (p *program) Start() error {
 	if  sl != "" {
 		processSignal(sl)
 	}
-	configFile := flagSet.Lookup("config").Value.(flag.Getter).Get().(string)
-	if configFile != "" {
-		fileOpts, err := message.ProcessConfigFile(configFile)
+	//configFile := flagSet.Lookup("config").Value.(flag.Getter).Get().(string)
+	if opts.ConfigFile!= "" {
+		fileOpts, err := message.ProcessConfigFile(opts.ConfigFile)
 		if err != nil {
 			message.PrintNExit(err.Error())
 		}
@@ -326,6 +329,7 @@ func (p *program) Start() error {
 	// Configure the logger based on the flags
 	msg.ConfigureLogger()
 
+	// Start things up. Block here until done.
 	msg.Start()
 	p.msg = msg
 	return nil
