@@ -11,10 +11,10 @@ import (
 	"time"
 	"math/rand"
 	"fmt"
-	"internal/version"
 	"strings"
 	"net/url"
 	"net"
+	"nats-io/gnatsd/server"
 )
 
 
@@ -187,10 +187,10 @@ func configureTLS(opts *message.Options) {
 		return
 	}
 	if opts.TLSCert == "" {
-		server.PrintNExit("TLS Server certificate must be present and valid.")
+		message.PrintNExit("TLS Server certificate must be present and valid.")
 	}
 	if opts.TLSKey == "" {
-		server.PrintNExit("TLS Server private key must be present and valid.")
+		message.PrintNExit("TLS Server private key must be present and valid.")
 	}
 
 	tc := server.TLSConfigOpts{}
@@ -203,7 +203,7 @@ func configureTLS(opts *message.Options) {
 	}
 	var err error
 	if opts.TLSConfig, err = server.GenTLSConfig(&tc); err != nil {
-		server.PrintNExit(err.Error())
+		message.PrintNExit(err.Error())
 	}
 }
 
@@ -298,9 +298,9 @@ func (p *program) Start() error {
 	}
 	configFile := flagSet.Lookup("configFile").Value.(flag.Getter).Get().(string)
 	if configFile != "" {
-		fileOpts, err := server.ProcessConfigFile(configFile)
+		fileOpts, err := message.ProcessConfigFile(configFile)
 		if err != nil {
-			server.PrintNExit(err.Error())
+			message.PrintNExit(err.Error())
 		}
 		opts = message.MergeOptions(fileOpts, opts)
 	}
@@ -308,7 +308,7 @@ func (p *program) Start() error {
 	// Remove any host/ip that points to itself in Route
 	newroutes, err := message.RemoveSelfReference(opts.Cluster.Port, opts.Routes)
 	if err != nil {
-		server.PrintNExit(err.Error())
+		message.PrintNExit(err.Error())
 	}
 	opts.Routes = newroutes
 
@@ -318,7 +318,7 @@ func (p *program) Start() error {
 	// Configure cluster opts if explicitly set via flags.
 	err = configureClusterOpts(opts)
 	if err != nil {
-		server.PrintNExit(err.Error())
+		message.PrintNExit(err.Error())
 	}
 
 	// Create the server with appropriate options.
