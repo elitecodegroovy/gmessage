@@ -207,7 +207,7 @@ func configureTLS(opts *message.Options) {
 	}
 }
 
-func configureClusterOpts(opts *server.Options) error {
+func configureClusterOpts(opts *message.Options) error {
 	// If we don't have cluster defined in the configuration
 	// file and no cluster listen string override, but we do
 	// have a routes override, we need to report misconfiguration.
