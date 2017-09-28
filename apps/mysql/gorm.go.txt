@@ -1,0 +1,136 @@
+package main
+
+import (
+	"gorp"
+	"database/sql"
+	"log"
+	"time"
+	_ "mysql"
+	"os"
+	"fmt"
+)
+
+type Category struct {
+	 // db tag lets you specify the column name if it differs from the struct field
+	Id      	int64  		`db:"id"`
+	Category 	string  	`db:"category, size:10"`		 // Column size set to 50
+	Status   	int 		`db:"status"`
+	Created_time    time.Time 		`db:"created_time"` 	// Set both column name and size
+}
+
+func initDb() *gorp.DbMap {
+	// connect to db using standard Go database/sql API
+	// use whatever database/sql driver you wish
+	db, err := sql.Open("mysql", "swisse:swisse@tcp(10.50.115.114:16052)/swisse?charset=utf8&&readTimeout=5s&timeout=3s&loc=Local&autocommit=true&parseTime=true")
+	checkErr(err, "sql.Open failed")
+
+	// construct a gorp DbMap
+	dbmap := &gorp.DbMap{Db: db, Dialect: gorp.MySQLDialect{"InnoDB", "UTF8"}}
+
+	dbmap.AddTableWithName(Category{}, "bw_category").SetKeys(true, "id")
+
+	// add a table, setting the table name to 'posts' and
+	// specifying that the Id property is an auto incrementing PK
+	//dbmap.AddTableWithName(Post{}, "posts").SetKeys(true, "Id")
+	//
+	//// create the table. in a production system you'd generally
+	//// use a migration tool, or create the tables via scripts
+	//err = dbmap.CreateTablesIfNotExists()
+	//checkErr(err, "Create tables failed")
+	dbmap.TraceOn("[gorp]", log.New(os.Stdout, "sql:", log.Lmicroseconds))
+	return dbmap
+}
+
+func checkErr(err error, msg string) {
+	if err != nil {
+		log.Fatalln(msg, err)
+	}
+
+}
+
+func newCategory(category string ,status int) Category{
+	return Category{
+		Category:category,
+		Status : status,
+		Created_time:time.Now(),
+	}
+}
+
+func DoCategory(){
+	// initialize the DbMap
+	dbmap := initDb()
+	defer dbmap.Db.Close()
+
+	c1 := newCategory("Swisse", 1)
+	c2 := newCategory("Swisse营销", 0)
+
+	err := dbmap.Insert(&c1, &c2)
+	checkErr(err, "Insert failed")
+
+	fmt.Println(" c1.Id:", c1.Id, ", c2.Id: ", c2.Id)
+
+	// count is the # of rows updated, which should be 1 in this example
+	c1.Category = "妈妈100"
+	count, err := dbmap.Update(&c1)
+	checkErr(err, "Update failed c1")
+	fmt.Println( " update c1 ,affected row :", count, "id:", c1.Id)
+
+	//deletion opt
+	affectedD, err := dbmap.Delete(&c1)
+	checkErr(err, "deletion failed c1")
+	fmt.Println( " deletion c1 ,affected row :", affectedD, "id:", c1.Id)
+
+
+	// fetch Invoice with Id=99
+	obj, err := dbmap.Get(Category{}, 20)
+	checkErr(err, "query failed for id 20")
+	cc := obj.(*Category)
+	fmt.Println(" category id 20: ", cc)
+	log.Println("Done!")
+
+	//hoc SQL
+	var categories []Category
+	_, errHoc := dbmap.Select(&categories, "select * from bw_category order by id")
+	checkErr(errHoc, "errHoc select all failed ")
+
+	//for i, c := range categories {
+	//	fmt.Println("select all index ", i, ", category :", c)
+	//}
+
+	fmt.Println("category size: ", len(categories))
+
+	//select one
+	var category Category
+	errHoc = dbmap.SelectOne(&category, "select * from bw_category where id=?", 22)
+	checkErr(errHoc, "errHoc select one failed ")
+	fmt.Println("category one: ", category)
+
+	//
+	swisseCount, err := dbmap.SelectInt("select count(*) from bw_category where category=?", "Swisse营销")
+	checkErr(err, "errHoc select count failed ")
+	fmt.Println("count :", swisseCount)
+
+	//Named bind parameters
+	var dest []Category
+	_, bErr := dbmap.Select(&dest, "select * from bw_category where category = :name and status = :age", map[string]interface{}{
+		"name": "Swisse营销",
+		"age": 0,
+	})
+	checkErr(bErr, "errHoc 'Named bind parameters' failed ")
+	fmt.Println(" query 'Named bind parameters' capacity :", len(dest))
+	//for i, cDest := range dest {
+	//	fmt.Println(" index ", i, ", category :", cDest)
+	//}
+
+	//delete exe method
+	res, err := dbmap.Exec("delete from bw_category where category=?", "Swisse营销")
+	checkErr(err, "errHoc 'delete exe method' failed ")
+	affectedRows , err := res.RowsAffected()
+	checkErr(err, "errHoc 'RowsAffected' failed ")
+	fmt.Println("Affect row :", affectedRows)
+}
+
+
+func main() {
+	DoCategory()
+}
