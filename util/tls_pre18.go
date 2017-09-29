@@ -1,4 +1,4 @@
-// Copyright 2017 Apcera Inc. All rights reserved.
+//  All rights reserved.
 // +build go1.7,!go1.8
 
 package util

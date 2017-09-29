@@ -1,4 +1,4 @@
-// Copyright 2012-2017 Apcera Inc. All rights reserved.
+// All rights reserved.
 
 package message
 
@@ -83,7 +83,7 @@ loop:
 	return false, 0
 }
 
-// Run starts the NATS server as a Windows service.
+// Run starts the gMessage server as a Windows service.
 func Run(server *Server) error {
 	if dockerized {
 		server.Start()
@@ -100,7 +100,7 @@ func Run(server *Server) error {
 	return run(serviceName, &winServiceWrapper{server})
 }
 
-// isWindowsService indicates if NATS is running as a Windows service.
+// isWindowsService indicates if gMessage is running as a Windows service.
 func isWindowsService() bool {
 	if dockerized {
 		return false

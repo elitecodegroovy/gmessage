@@ -1,4 +1,4 @@
-// Copyright 2016 Apcera Inc. All rights reserved.
+
 // +build windows
 
 package logger
@@ -14,7 +14,7 @@ import (
 // Skips testing if we do not have privledges to run this test.
 // This lets us skip the tests for general (non admin/system) users.
 func checkPrivledges(t *testing.T) {
-	src := "NATS-eventlog-testsource"
+	src := "GMessage-eventlog-testsource"
 	defer eventlog.Remove(src)
 	if err := eventlog.InstallAsEventCreate(src, eventlog.Info|eventlog.Error|eventlog.Warning); err != nil {
 		if strings.Contains(err.Error(), "Access is denied") {
@@ -25,7 +25,7 @@ func checkPrivledges(t *testing.T) {
 }
 
 // lastLogEntryContains reads the last entry (/c:1 /rd:true) written
-// to the event log by the NATS-Server source, returning true if the
+// to the event log by the gMessage-Server source, returning true if the
 // passed text was found, false otherwise.
 func lastLogEntryContains(t *testing.T, text string) bool {
 	var output []byte

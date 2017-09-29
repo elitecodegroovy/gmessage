@@ -1,6 +1,6 @@
 // Copyright 2012-2015 Apcera Inc. All rights reserved.
 
-//Package logger provides logging facilities for the NATS server
+//Package logger provides logging facilities for the gMessage server
 package logger
 
 import (

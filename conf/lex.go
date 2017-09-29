@@ -1,4 +1,3 @@
-// Copyright 2013-2016 Apcera Inc. All rights reserved.
 
 // Customized heavily from
 // https://github.com/BurntSushi/toml/blob/master/lex.go, which is based on

@@ -1,5 +1,4 @@
 
-
 package message
 
 import (

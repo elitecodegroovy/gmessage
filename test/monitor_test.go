@@ -1,4 +1,3 @@
-// Copyright 2012-2015 Apcera Inc. All rights reserved.
 
 package test
 
@@ -94,7 +93,7 @@ func TestNoMonitorPort(t *testing.T) {
 // testEndpointDataRace tests a monitoring endpoint for data races by polling
 // while client code acts to ensure statistics are updated. It is designed to
 // run under the -race flag to catch  violations. The caller must start the
-// NATS server.
+// gMessage server.
 func testEndpointDataRace(endpoint string, t *testing.T) {
 	var doneWg sync.WaitGroup
 

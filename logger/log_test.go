@@ -1,4 +1,4 @@
-// Copyright 2014-2015 Apcera Inc. All rights reserved.
+
 package logger
 
 import (

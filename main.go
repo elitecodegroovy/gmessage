@@ -111,7 +111,7 @@ func msgFlagSet(opts *message.Options) *flag.FlagSet {
 	flagSet.StringVar(&opts.Cluster.ListenStr, "cluster_listen", "", "Cluster url from which members can solicit routes.")
 	flagSet.BoolVar(&opts.Cluster.NoAdvertise, "no_advertise", false, "Advertise known cluster IPs to clients.")
 	flagSet.IntVar(&opts.Cluster.ConnectRetries, "connect_retries", 0, "For implicit routes, number of connect retries")
-	//flagSet.BoolVar(&showTLSHelp, "help_tls", false, "TLS help.")
+	flagSet.Bool( "help_tls", false, "TLS help.")
 
 	flagSet.BoolVar(&opts.TLS, "tls", false, "Enable TLS.")
 	flagSet.BoolVar(&opts.TLSVerify, "tlsverify", false, "Enable TLS with client verification.")
@@ -282,9 +282,11 @@ func (p *program) Start() error {
 	// Snapshot flag options.
 	message.FlagSnapshot = opts.Clone()
 
-	//if showTLSHelp {
-	//	server.PrintTLSHelpAndDie()
-	//}
+	showTLSHelp :=flagSet.Lookup("help_tls").Value.(flag.Getter).Get().(bool)
+	//help_tls
+	if showTLSHelp {
+		message.PrintTLSHelpNExit()
+	}
 	if opts.Debug {
 		opts.Trace, opts.Debug = true, true
 	}

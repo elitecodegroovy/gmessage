@@ -1,4 +1,3 @@
-// Copyright 2014 Apcera Inc. All rights reserved.
 
 package test
 

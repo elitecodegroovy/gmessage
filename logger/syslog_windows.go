@@ -1,4 +1,4 @@
-// Copyright 2012-2016 Apcera Inc. All rights reserved.
+
 
 // Package logger logs to the windows event log
 package logger

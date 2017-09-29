@@ -1,4 +1,3 @@
-// Copyright 2013-2016 Apcera Inc. All rights reserved.
 
 // Package conf supports a configuration file format used by gnatsd. It is
 // a flexible format that combines the best of traditional

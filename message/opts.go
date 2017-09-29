@@ -1,4 +1,4 @@
-// Copyright 2012-2017 Apcera Inc. All rights reserved.
+
 
 package message
 
@@ -520,7 +520,7 @@ func checkSubjectArray(sa []string) ([]string, error) {
 }
 
 // PrintTLSHelpAndDie prints TLS usage and exits.
-func PrintTLSHelpAndDie() {
+func PrintTLSHelpNExit() {
 	fmt.Printf("%s", tlsUsage)
 	for k := range cipherMap {
 		fmt.Printf("    %s\n", k)

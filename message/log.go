@@ -9,7 +9,7 @@ import (
 	"github.com/elitecodegroovy/gmessage/logger"
 )
 
-// Logger interface of the NATS Server
+// Logger interface of the gMessage Server
 type Logger interface {
 
 	// Log a notice statement

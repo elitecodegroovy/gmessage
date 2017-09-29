@@ -1,4 +1,3 @@
-// Copyright 2013-2014 Apcera Inc. All rights reserved.
 
 package test
 
@@ -97,7 +96,7 @@ func TestServerRestartReSliceIssue(t *testing.T) {
 	// exectue first, which would cause clients that have reconnected to
 	// it to try to reconnect (causing delays on Windows). So let's
 	// explicitly close them here.
-	// NOTE: With fix of NATS GO client (reconnect loop yields to Close()),
+	// NOTE: With fix of gMessage GO client (reconnect loop yields to Close()),
 	//       this change would not be required, however, it still speeeds up
 	//       the test, from more than 7s to less than one.
 	for i := 0; i < numClients; i++ {

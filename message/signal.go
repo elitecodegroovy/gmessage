@@ -1,5 +1,5 @@
 // +build !windows
-// Copyright 2012-2017 Apcera Inc. All rights reserved.
+// All rights reserved.
 
 package message
 
