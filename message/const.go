@@ -22,7 +22,7 @@ const (
 	VERSION = "0.1.0"
 
 	// DEFAULT_PORT is the default port for client connections.
-	DEFAULT_PORT = 4222
+	DEFAULT_PORT = 5150
 
 	// RANDOM_PORT is the value for port that, when supplied, will cause the
 	// server to listen on a randomly-chosen available port. The resolved port
@@ -65,7 +65,7 @@ const (
 	DEFAULT_FLUSH_DEADLINE = 2 * time.Second
 
 	// DEFAULT_HTTP_PORT is the default monitoring port.
-	DEFAULT_HTTP_PORT = 8222
+	DEFAULT_HTTP_PORT = 5159
 
 	// ACCEPT_MIN_SLEEP is the minimum acceptable sleep times on temporary errors.
 	ACCEPT_MIN_SLEEP = 10 * time.Millisecond

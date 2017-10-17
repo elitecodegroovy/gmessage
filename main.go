@@ -14,7 +14,6 @@ import (
 	"strings"
 	"net/url"
 	"net"
-	"nats-io/gnatsd/server"
 )
 
 
@@ -23,7 +22,7 @@ Usage: gnatsd [options]
 
 Server Options:
     -a, --addr <host>                Bind to host address (default: 0.0.0.0)
-    -p, --client_port <port>         Use port for clients (default: 5000)
+    -p, --client_port <port>         Use port for clients (default: 5150)
     -P, --pid <file>                 File to store PID
     -m, --m_http_port <port>         Use port for http monitoring
     -ms,--m_https_port <port>        Use port for https monitoring
@@ -69,6 +68,7 @@ func msgFlagSet(opts *message.Options) *flag.FlagSet {
 	flagSet := flag.NewFlagSet("gMessage", flag.ExitOnError)
 
 	flagSet.IntVar(&opts.Port, "port", 0, "Port to listen on.")
+	flagSet.IntVar(&opts.Port, "client_port", 0, "Port to listen on.")
 	flagSet.IntVar(&opts.Port, "p", 0, "Port to listen on.")
 	flagSet.StringVar(&opts.Host, "addr", "", "Network host to listen on.")
 	flagSet.StringVar(&opts.Host, "a", "", "Network host to listen on.")
@@ -83,10 +83,13 @@ func msgFlagSet(opts *message.Options) *flag.FlagSet {
 	flagSet.StringVar(&opts.Username, "user", "", "Username required for connection.")
 	flagSet.StringVar(&opts.Password, "pass", "", "Password required for connection.")
 	flagSet.StringVar(&opts.Authorization, "auth", "", "Authorization token required for connection.")
+	//m_http_port
 	flagSet.IntVar(&opts.HTTPPort, "m", 0, "HTTP Port for /varz, /connz endpoints.")
 	flagSet.IntVar(&opts.HTTPPort, "http_port", 0, "HTTP Port for /varz, /connz endpoints.")
+	flagSet.IntVar(&opts.HTTPPort, "m_http_port", 0, "HTTP Port for /varz, /connz endpoints.")
 	flagSet.IntVar(&opts.HTTPSPort, "ms", 0, "HTTPS Port for /varz, /connz endpoints.")
 	flagSet.IntVar(&opts.HTTPSPort, "https_port", 0, "HTTPS Port for /varz, /connz endpoints.")
+	flagSet.IntVar(&opts.HTTPSPort, "m_https_port", 0, "HTTPS Port for /varz, /connz endpoints.")
 	flagSet.StringVar(&opts.ConfigFile,"c", "", "Configuration file.")
 	flagSet.StringVar(&opts.ConfigFile,"config", "", "Configuration file.")
 
@@ -156,8 +159,7 @@ func (p *program) Stop() error {
 	// This method may block, but it's a good idea to finish quickly or your process may be killed by
 	// Windows during a shutdown/reboot. As a general rule you shouldn't rely on graceful shutdown.
 
-
-
+	//TODO ....stop app
 	return nil
 }
 
@@ -192,7 +194,7 @@ func configureTLS(opts *message.Options) {
 		message.PrintNExit("TLS Server private key must be present and valid.")
 	}
 
-	tc := server.TLSConfigOpts{}
+	tc := message.TLSConfigOpts{}
 	tc.CertFile = opts.TLSCert
 	tc.KeyFile = opts.TLSKey
 	tc.CaFile = opts.TLSCaCert
@@ -201,7 +203,7 @@ func configureTLS(opts *message.Options) {
 		tc.Verify = true
 	}
 	var err error
-	if opts.TLSConfig, err = server.GenTLSConfig(&tc); err != nil {
+	if opts.TLSConfig, err = message.GenTLSConfig(&tc); err != nil {
 		message.PrintNExit(err.Error())
 	}
 }
@@ -253,7 +255,7 @@ func configureClusterOpts(opts *message.Options) error {
 
 	// If we have routes but no config file, fill in here.
 	if opts.RoutesStr != "" && opts.Routes == nil {
-		opts.Routes = server.RoutesFromStr(opts.RoutesStr)
+		opts.Routes = message.RoutesFromStr(opts.RoutesStr)
 	}
 
 	return nil
@@ -325,7 +327,7 @@ func (p *program) Start() error {
 		message.PrintNExit(err.Error())
 	}
 
-	// Create the server with appropriate options.
+	// Create the message server with appropriate options.
 	msg := message.New(opts)
 
 	// Configure the logger based on the flags
