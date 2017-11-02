@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"strconv"
 	"util"
+	"os"
+	"path/filepath"
+	"log"
 )
 
 func makeCakeAndSend(cs chan string, flavor string, count int) {
@@ -61,8 +64,17 @@ func sendReceiveChan(){
 	fmt.Println("end select and channel ....")
 }
 
+func testPathJoin(){
+	cwd, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+	gopath := filepath.Clean(filepath.Join(cwd, "../../../../"))
+	log.Println("GOPATH is", gopath)
+}
 func main() {
 	//sendReceiveChan
-	ExeFibonacci()
-	receiveMsg()
+	//ExeFibonacci()
+	//receiveMsg()
+	testPathJoin()
 }

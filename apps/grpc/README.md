@@ -10,3 +10,7 @@
 In order to working with gRPC in Go, you must install Go implementation of gRPC:
 
     go get google.golang.org/grpc
+    
+Finally ,build ouput go file with following command:
+
+    protoc -I customer/ customer/customer.proto --go_out=plugins=grpc:customer
