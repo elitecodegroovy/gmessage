@@ -1,15 +1,6 @@
 package main
 
 import (
-	"log"
-	"sync"
-	"github.com/go-svc/svc"
-
-)
-
-
-
-import (
 	"github.com/go-svc/svc"
 	"syscall"
 	"log"
