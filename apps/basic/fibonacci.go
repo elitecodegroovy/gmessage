@@ -18,6 +18,7 @@ func fibonacci(c, quit chan int) {
 			return
 		}
 	}
+	fmt.Println("fibonacci x :", x)
 }
 
 func ExeFibonacci(){

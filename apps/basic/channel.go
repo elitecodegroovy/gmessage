@@ -64,6 +64,15 @@ func sendReceiveChan(){
 	fmt.Println("end select and channel ....")
 }
 
+const (
+	c1 = imag(2i)                    // imag(2i) = 2.0 is a constant
+	c2 = len([10]float64{2})         // [10]float64{2} contains no function calls
+	c3 = len([10]float64{c1})        // [10]float64{c1} contains no function calls
+	c4 = len([10]float64{imag(2i)})  // imag(2i) is a constant and no function call is issued
+	//c5 = len([10]float64{imag(z)})   // invalid: imag(z) is a (non-constant) function call
+)
+
+
 func testPathJoin(){
 	cwd, err := os.Getwd()
 	if err != nil {
@@ -71,10 +80,13 @@ func testPathJoin(){
 	}
 	gopath := filepath.Clean(filepath.Join(cwd, "../../../../"))
 	log.Println("GOPATH is", gopath)
+
+	log.Println("c2", c2, ", c3:", c3, "c4: ", c4)
+
 }
-func main() {
-	//sendReceiveChan
-	//ExeFibonacci()
-	//receiveMsg()
-	testPathJoin()
-}
+//func main() {
+//	//sendReceiveChan
+//	//ExeFibonacci()
+//	//receiveMsg()
+//	testPathJoin()
+//}
