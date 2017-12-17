@@ -49,25 +49,10 @@ func (job Job) Do(lineRx *regexp.Regexp) {
 	}
 }
 
-func main() {
 
-	if len(os.Args) < 2 || os.Args[1] == "-h" || os.Args[1] == "--help" {
-		fmt.Printf("usage: %s <regexp> <files>\n",
-			filepath.Base(os.Args[0]))
-		os.Exit(1)
-	}
-
-	if lineRx, err := regexp.Compile(os.Args[1]); err != nil {
-		log.Fatalf("invalid regexp: %s\n", err)
-	} else if len(os.Args)  ==  2 {
-		//current file directory files
-		grep(lineRx, ExecSearch())
-	}else {
-		grep(lineRx, commandLineFiles(os.Args[2:]))
-	}
-}
 
 func commandLineFiles(files []string) []string {
+	//do match for windows platform
 	if runtime.GOOS == "windows" {
 		args := make([]string, 0, len(files))
 		for _, name := range files {
@@ -131,3 +116,28 @@ func minimum(x int, ys ...int) int {
 	return x
 }
 
+func doStartup(){
+	if len(os.Args) < 2 || os.Args[1] == "-h" || os.Args[1] == "--help" {
+		fmt.Printf("usage: %s <regexp> <files>, e.g. channel.exe main .\\ \n",
+			filepath.Base(os.Args[0]))
+		os.Exit(1)
+	}
+
+	if lineRx, err := regexp.Compile(os.Args[1]); err != nil {
+		log.Fatalf("invalid regexp: %s\n", err)
+	} else if len(os.Args)  ==  2 {
+		//current file directory files
+		// channel.exe doGrep
+		grep(lineRx, ExecSearch())
+	}else {
+		grep(lineRx, commandLineFiles(os.Args[2:]))
+		/**
+		e.g. windows platform
+		channel.exe doGrep "D:\githubRepo\go\goapp\src\github.com\elitecodegroovy\gmessage\apps\basic\*.go"
+		 */
+	}
+}
+
+//func main() {
+//	doStartup()
+//}
