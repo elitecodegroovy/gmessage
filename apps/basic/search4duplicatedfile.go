@@ -121,9 +121,7 @@ func commas(x int64) string {
 	return value
 }
 
-
-
-func main() {
+func doStartSearchDupFiles(){
 	t1 := time.Now()
 	if len(os.Args) > 1 &&  (os.Args[1] == "-h" || os.Args[1] == "--help") {
 		fmt.Printf("usage: %s <path>\n", filepath.Base(os.Args[0]))
@@ -141,3 +139,8 @@ func main() {
 	outputDupFileInfos(pathData)
 	fmt.Printf("time elapses %d ms", time.Since(t1).Nanoseconds()/1000000)
 }
+
+
+//func main() {
+//	doStartSearchDupFiles()
+//}
