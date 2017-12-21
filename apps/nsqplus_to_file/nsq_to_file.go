@@ -19,11 +19,11 @@ import (
 	"syscall"
 	"time"
 
-	"nsqio/go-nsq"
 	"internal/app"
 	"internal/clusterinfo"
 	"internal/http_api"
 	"internal/version"
+	"nsqio/go-nsq"
 )
 
 var (

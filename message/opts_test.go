@@ -1,5 +1,3 @@
-
-
 package message
 
 import (
@@ -54,18 +52,18 @@ func TestOptions_RandomPort(t *testing.T) {
 
 func TestConfigFile(t *testing.T) {
 	golden := &Options{
-		ConfigFile:     "./configs/test.conf",
-		Host:           "localhost",
-		Port:           4242,
-		Username:       "derek",
-		Password:       "bella",
-		AuthTimeout:    1.0,
-		Debug:          false,
-		Trace:          true,
-		Logtime:        false,
-		HTTPPort:       8222,
+		ConfigFile:  "./configs/test.conf",
+		Host:        "localhost",
+		Port:        4242,
+		Username:    "derek",
+		Password:    "bella",
+		AuthTimeout: 1.0,
+		Debug:       false,
+		Trace:       true,
+		Logtime:     false,
+		HTTPPort:    8222,
 		//PidFile:        "/tmp/gnatsd.pid",
-		PidFile: 		"D:\\develop",
+		PidFile:        "D:\\develop",
 		ProfPort:       6543,
 		Syslog:         true,
 		RemoteSyslog:   "udp://foo.com:33",
@@ -792,9 +790,9 @@ func TestMalformedClusterAddress(t *testing.T) {
 	}
 }
 
-func TestGetURLIP(t *testing.T){
+func TestGetURLIP(t *testing.T) {
 	//ipList, err:= getURLIP("nats://10.50.115.15")
-	ipList, err:= getURLIP("localhost")
+	ipList, err := getURLIP("localhost")
 	if err != nil {
 		t.Fatal("iplist: ", err)
 	}

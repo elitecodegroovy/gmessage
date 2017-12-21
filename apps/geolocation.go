@@ -24,16 +24,16 @@ type GeoIP struct {
 }
 
 type IpInfo struct {
-	Ret 		int  	`json:"ret"`
-	Atart           int  	`json:"start"`
-	End 		int  	`json:"end"`
-	Country  	string 	`json:"country"`
-	Province 	string  `json:"province"`
-	City 		string 	`json:"city"`
-	District 	string  `json:"district"`
-	Isp 		string  `json:"isp"`
-	T_type           string `json:"type"`
-	Desc 		string  `json:"desc"`
+	Ret      int    `json:"ret"`
+	Atart    int    `json:"start"`
+	End      int    `json:"end"`
+	Country  string `json:"country"`
+	Province string `json:"province"`
+	City     string `json:"city"`
+	District string `json:"district"`
+	Isp      string `json:"isp"`
+	T_type   string `json:"type"`
+	Desc     string `json:"desc"`
 }
 
 var (
@@ -46,7 +46,7 @@ var (
 )
 
 func showIpInfo(ip string) IpInfo {
-	go func(){
+	go func() {
 		time.Sleep(time.Second * 1)
 	}()
 
@@ -69,14 +69,14 @@ func showIpInfo(ip string) IpInfo {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("ipInfo country :", ipInfo.Country )
+	fmt.Println("ipInfo country :", ipInfo.Country)
 	fmt.Println("ipInfo province", ipInfo.Province)
 	fmt.Println("ipInfo city", ipInfo.City)
 	fmt.Println("ip info :", ipInfo)
 	return ipInfo
 }
 
-func goLocation(){
+func goLocation() {
 	// Provide a domain name or IP address
 	address = "www.ifeng.com"
 	// address = "2600:3c00::f03c:91ff:fe98:c0f5"
@@ -117,6 +117,7 @@ func goLocation(){
 	fmt.Println("Area Code:\t", geo.AreaCode)
 	showIpInfo(geo.Ip)
 }
+
 //func main() {
 //	goLocation()
 //}

@@ -10,14 +10,14 @@ import (
 	"syscall"
 	"time"
 
-	"nsqio/go-nsq"
 	"internal/app"
 	"internal/version"
+	"nsqio/go-nsq"
 	"strings"
 )
 
 var (
-	flagSet 		= flag.NewFlagSet("nsqplus-tail", flag.ExitOnError)
+	flagSet     = flag.NewFlagSet("nsqplus-tail", flag.ExitOnError)
 	showVersion = flagSet.Bool("version", false, "print version string")
 
 	topic         = flagSet.String("topic", "", "NSQ topic")

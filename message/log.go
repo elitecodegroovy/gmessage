@@ -1,5 +1,3 @@
-
-
 package message
 
 import (
@@ -39,7 +37,7 @@ func (s *Server) ConfigureLogger() {
 
 	syslog := opts.Syslog
 	if isWindowsService() && opts.LogFile == "" {
-	//if opts.LogFile == "" {
+		//if opts.LogFile == "" {
 		// Enable syslog if no log file is specified and we're running as a
 		// Windows service so that logs are written to the Windows event log.
 		syslog = true
@@ -152,6 +150,7 @@ func (s *Server) Tracef(format string, v ...interface{}) {
 		logger.Tracef(format, v...)
 	}, format, v...)
 }
+
 //sync write log
 func (s *Server) executeLogCall(f func(logger Logger, format string, v ...interface{}), format string, args ...interface{}) {
 	s.logging.RLock()

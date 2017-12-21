@@ -33,14 +33,14 @@ func main() {
 	defer nc.Close()
 
 	subj := "NATS"
-	for i:=0; i < 10; i++ {
+	for i := 0; i < 10; i++ {
 		currentTime := time.Now().Local()
 		newFormat := currentTime.Format("2006-01-02 15:04:05.000")
-		nc.Publish(subj, []byte("i++"+ strconv.Itoa(i)+ " time/"+newFormat))
-		if i %100 == 0 {
+		nc.Publish(subj, []byte("i++"+strconv.Itoa(i)+" time/"+newFormat))
+		if i%100 == 0 {
 			nc.Flush()
 		}
- 	}
+	}
 	nc.Flush()
 	if err := nc.LastError(); err != nil {
 		log.Fatal(err)

@@ -1,4 +1,3 @@
-
 // Package conf supports a configuration file format used by gnatsd. It is
 // a flexible format that combines the best of traditional
 // configuration formats and newer styles such as JSON and YAML.

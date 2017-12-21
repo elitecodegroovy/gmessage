@@ -1,9 +1,9 @@
 package main
 
 import (
-	"os"
 	"flag"
 	"fmt"
+	"os"
 	"path/filepath"
 	"sync"
 )
@@ -21,14 +21,13 @@ func ReadDirNumSort(dirname string, reverse bool) ([]os.FileInfo, error) {
 	return list, nil
 }
 
-
-func getCmdDirName()(dirname string){
+func getCmdDirName() (dirname string) {
 	flag.StringVar(&dirname, "dirname", "./", "maximum file size (-1 means no maximum)")
 	flag.Parse()
 	return dirname
 }
 
-func searchFile(searchDir string)([]string){
+func searchFile(searchDir string) []string {
 	fileNamePaths := []string{}
 	err := filepath.Walk(searchDir, func(path string, f os.FileInfo, err error) error {
 		if !f.IsDir() {
@@ -58,24 +57,24 @@ func (w *WaitGroupWrapper) Wrap(cb func()) {
 	}()
 }
 
-func ExecSearch() []string{
+func ExecSearch() []string {
 	dirname := getCmdDirName()
 	fmt.Println("input dirname:", dirname)
-	absPath, err:= filepath.Abs(dirname)
+	absPath, err := filepath.Abs(dirname)
 	if err != nil {
 		panic(err)
 	}
 	return searchFile(absPath)
 }
 
-func execConcurrentSearch(){
+func execConcurrentSearch() {
 	var f *os.File
 	var t WaitGroupWrapper
 	fileNames := []interface{}{}
 	fileNameChan := make(chan string)
 	dirname := getCmdDirName()
 	fmt.Println("input dirname:", dirname)
-	absPath, err:= filepath.Abs(dirname)
+	absPath, err := filepath.Abs(dirname)
 	if err != nil {
 		panic(err)
 	}
@@ -87,21 +86,21 @@ func execConcurrentSearch(){
 	defer f.Close()
 	for _, fPath := range list {
 		if fPath.IsDir() {
-			t.Wrap(func(){
+			t.Wrap(func() {
 				fileNames = append(fileNames, searchFile(fPath.Name()))
 			})
-		}else {
+		} else {
 			fileNameChan <- fPath.Name()
 			fmt.Println(fPath.Name())
 		}
 	}
 	stop := false
-	for{
+	for {
 		if stop {
 			break
 		}
 		select {
-		case  o, e := <- fileNameChan :
+		case o, e := <-fileNameChan:
 			if !e {
 				stop = true
 			}

@@ -2,12 +2,12 @@ package main
 
 import (
 	"container/list"
-	"strings"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
-func doList(){
+func doList() {
 	a := "ABCDEFGH"
 	items := list.New()
 	for _, x := range strings.Split(a, "") {
@@ -28,8 +28,7 @@ func doList(){
 	fmt.Println() // prints: H G F E D B A 9
 }
 
-
-func convert(){
+func convert() {
 	i := 10
 	fmt.Printf("i convert string : %s", strconv.Itoa(i))
 
@@ -37,9 +36,9 @@ func convert(){
 	// The bitSize argument specifies the integer type
 	// that the result must fit into. Bit sizes 0, 8, 16, 32, and 64
 	// correspond to int, int8, int16, int32, and int64.
-	if v , err := strconv.ParseInt(s, 10, 0); err != nil {
+	if v, err := strconv.ParseInt(s, 10, 0); err != nil {
 		fmt.Errorf("\n strconv.ParseInt %s\n", err.Error())
-	}else {
+	} else {
 		fmt.Printf("string s convert int64 : %d", v)
 	}
 

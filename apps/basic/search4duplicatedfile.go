@@ -1,20 +1,21 @@
 package main
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
-	"sort"
-	"crypto/sha256"
-	"util"
-	"time"
 	"runtime"
+	"sort"
+	"time"
+	"util"
 )
 
 //define the small file size
 const maxSizeOfSmallFile = 1024 * 512
+
 //allow max goroutine
 const maxGoroutines = 50000
 
@@ -29,7 +30,6 @@ type fileInfo struct {
 	path string
 }
 
-
 func searchDupFile(infoChan chan fileInfo, dirname string) {
 	var runSync util.WaitGroupWrapper
 	filepath.Walk(dirname, doDeeplyWalkFunc(infoChan, &runSync))
@@ -39,14 +39,14 @@ func searchDupFile(infoChan chan fileInfo, dirname string) {
 
 func doDeeplyWalkFunc(infoChan chan fileInfo, runSync *util.WaitGroupWrapper) func(string, os.FileInfo, error) error {
 	return func(path string, info os.FileInfo, err error) error {
-		if err == nil && info.Size() > 0 && (info.Mode()&os.ModeType == 0) { 
+		if err == nil && info.Size() > 0 && (info.Mode()&os.ModeType == 0) {
 			//It defines the limit to the usage of the device's resources.
 			if info.Size() < maxSizeOfSmallFile ||
 				runtime.NumGoroutine() > maxGoroutines {
 				checkFile(path, info, infoChan, nil)
 			} else {
-				runSync.Wrap(func(){
-					checkFile(path, info, infoChan,nil)
+				runSync.Wrap(func() {
+					checkFile(path, info, infoChan, nil)
 				})
 			}
 		}
@@ -65,8 +65,7 @@ func checkFile(filename string, info os.FileInfo, infoChan chan fileInfo, done f
 	}
 	defer file.Close()
 	hash := sha256.New()
-	if size, err := io.Copy(hash, file);
-		size != info.Size() || err != nil {
+	if size, err := io.Copy(hash, file); size != info.Size() || err != nil {
 		if err != nil {
 			log.Println("error:", err)
 		} else {
@@ -121,9 +120,9 @@ func commas(x int64) string {
 	return value
 }
 
-func doStartSearchDupFiles(){
+func doStartSearchDupFiles() {
 	t1 := time.Now()
-	if len(os.Args) > 1 &&  (os.Args[1] == "-h" || os.Args[1] == "--help") {
+	if len(os.Args) > 1 && (os.Args[1] == "-h" || os.Args[1] == "--help") {
 		fmt.Printf("usage: %s <path>\n", filepath.Base(os.Args[0]))
 		os.Exit(1)
 	}
@@ -131,7 +130,7 @@ func doStartSearchDupFiles(){
 	infoChan := make(chan fileInfo, maxGoroutines*2)
 	if len(os.Args) == 1 {
 		go searchDupFile(infoChan, "./")
-	}else {
+	} else {
 		go searchDupFile(infoChan, os.Args[1])
 	}
 
@@ -139,7 +138,6 @@ func doStartSearchDupFiles(){
 	outputDupFileInfos(pathData)
 	fmt.Printf("time elapses %d ms", time.Since(t1).Nanoseconds()/1000000)
 }
-
 
 //func main() {
 //	doStartSearchDupFiles()

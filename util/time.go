@@ -26,7 +26,7 @@ func FormatTime() {
 
 	//TODO Changing time layout(form)
 	form := "2006-01-02 15:04:05"
-	time , err := time.Parse(form, "2017-03-02 19:04:05")
+	time, err := time.Parse(form, "2017-03-02 19:04:05")
 	if err != nil {
 		fmt.Println("parsing time error", err)
 	}
@@ -43,6 +43,6 @@ func StartCac() {
 	fmt.Println("App elapsed: ", elapsed)
 }
 
-func main(){
+func main() {
 	FormatTime()
 }

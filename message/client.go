@@ -1,5 +1,3 @@
-
-
 package message
 
 import (
@@ -83,6 +81,7 @@ func (cf *clientFlag) setIfNotSet(c clientFlag) bool {
 func (cf *clientFlag) clear(c clientFlag) {
 	*cf &= ^c
 }
+
 //pcd pending client
 type client struct {
 	// Here first because of use of atomics, and memory alignment.
@@ -537,11 +536,11 @@ func (c *client) sendProto(info []byte, doFlush bool) error {
 	var err error
 	if c.bw != nil && c.nc != nil {
 		deadlineSet := false
-		if doFlush || c.bw.Available() < len(info) {																	//Available returns how many bytes are unused in the buffer.
+		if doFlush || c.bw.Available() < len(info) { //Available returns how many bytes are unused in the buffer.
 			c.nc.SetWriteDeadline(time.Now().Add(c.srv.getOpts().WriteDeadline))
 			deadlineSet = true
 		}
-		_, err = c.bw.Write(info)                                                                                       //??? how to understand the code
+		_, err = c.bw.Write(info) //??? how to understand the code
 		if err == nil && doFlush {
 			//Flush writes any buffered data to the underlying io.Writer.
 			err = c.bw.Flush()

@@ -1,5 +1,3 @@
-
-
 // Package logger logs to the windows event log
 package logger
 

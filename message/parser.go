@@ -1,5 +1,3 @@
-
-
 package message
 
 import (

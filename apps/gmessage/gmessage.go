@@ -1,21 +1,20 @@
 package main
 
 import (
-	"github.com/go-svc/svc"
-	"syscall"
-	"log"
-	"path/filepath"
-	"os"
 	"flag"
-	"github.com/elitecodegroovy/gmessage/message"
-	"time"
-	"math/rand"
 	"fmt"
-	"strings"
-	"net/url"
+	"github.com/elitecodegroovy/gmessage/message"
+	"github.com/go-svc/svc"
+	"log"
+	"math/rand"
 	"net"
+	"net/url"
+	"os"
+	"path/filepath"
+	"strings"
+	"syscall"
+	"time"
 )
-
 
 var tipsMsg = `
 Usage: gnatsd [options]
@@ -63,7 +62,6 @@ Common Options:
         --help_tls                   TLS help
 `
 
-
 func msgFlagSet(opts *message.Options) *flag.FlagSet {
 	flagSet := flag.NewFlagSet("gMessage", flag.ExitOnError)
 
@@ -74,7 +72,7 @@ func msgFlagSet(opts *message.Options) *flag.FlagSet {
 	flagSet.StringVar(&opts.Host, "a", "", "Network host to listen on.")
 	flagSet.StringVar(&opts.Host, "net", "", "Network host to listen on.")
 	flagSet.BoolVar(&opts.Debug, "D", false, "Enable Debug logging.")
-	flagSet.BoolVar(&opts.Debug,"debug", false, "Enable Debug logging.")
+	flagSet.BoolVar(&opts.Debug, "debug", false, "Enable Debug logging.")
 	flagSet.BoolVar(&opts.Trace, "V", false, "Enable Trace logging.")
 	flagSet.BoolVar(&opts.Trace, "trace", false, "Enable Trace logging.")
 
@@ -90,8 +88,8 @@ func msgFlagSet(opts *message.Options) *flag.FlagSet {
 	flagSet.IntVar(&opts.HTTPSPort, "ms", 0, "HTTPS Port for /varz, /connz endpoints.")
 	flagSet.IntVar(&opts.HTTPSPort, "https_port", 0, "HTTPS Port for /varz, /connz endpoints.")
 	flagSet.IntVar(&opts.HTTPSPort, "m_https_port", 0, "HTTPS Port for /varz, /connz endpoints.")
-	flagSet.StringVar(&opts.ConfigFile,"c", "", "Configuration file.")
-	flagSet.StringVar(&opts.ConfigFile,"config", "", "Configuration file.")
+	flagSet.StringVar(&opts.ConfigFile, "c", "", "Configuration file.")
+	flagSet.StringVar(&opts.ConfigFile, "config", "", "Configuration file.")
 
 	flagSet.String("sl", "", "Send signal to g-message process (stop, quit, reopen, reload)")
 	flagSet.String("signal", "", "Send signal to g-message process (stop, quit, reopen, reload)")
@@ -104,7 +102,7 @@ func msgFlagSet(opts *message.Options) *flag.FlagSet {
 	flagSet.StringVar(&opts.RemoteSyslog, "r", "", "Syslog server addr (udp://localhost:514).")
 
 	flagSet.StringVar(&opts.RemoteSyslog, "remote_syslog", "", "Syslog server addr (udp://localhost:514).")
-	flagSet.Bool( "version", false, "Print version information.")
+	flagSet.Bool("version", false, "Print version information.")
 	flagSet.Bool("v", false, "Print version information.")
 
 	flagSet.Bool("help", false, "show usage information.")
@@ -114,7 +112,7 @@ func msgFlagSet(opts *message.Options) *flag.FlagSet {
 	flagSet.StringVar(&opts.Cluster.ListenStr, "cluster_listen", "", "Cluster url from which members can solicit routes.")
 	flagSet.BoolVar(&opts.Cluster.NoAdvertise, "no_advertise", false, "Advertise known cluster IPs to clients.")
 	flagSet.IntVar(&opts.Cluster.ConnectRetries, "connect_retries", 0, "For implicit routes, number of connect retries")
-	flagSet.Bool( "help_tls", false, "TLS help.")
+	flagSet.Bool("help_tls", false, "TLS help.")
 
 	flagSet.BoolVar(&opts.TLS, "tls", false, "Enable TLS.")
 	flagSet.BoolVar(&opts.TLSVerify, "tlsverify", false, "Enable TLS with client verification.")
@@ -125,17 +123,14 @@ func msgFlagSet(opts *message.Options) *flag.FlagSet {
 	return flagSet
 }
 
-func showUsageInfoNExit(){
+func showUsageInfoNExit() {
 	fmt.Printf("%s\n", tipsMsg)
 	os.Exit(0)
 }
 
-
 type program struct {
 	msg *message.Server
 }
-
-
 
 func main() {
 	prg := &program{}
@@ -163,7 +158,6 @@ func (p *program) Stop() error {
 	return nil
 }
 
-
 //process input command signal (stop, quit, reopen, reload)
 func processSignal(signal string) {
 	var (
@@ -180,7 +174,6 @@ func processSignal(signal string) {
 	}
 	os.Exit(0)
 }
-
 
 func configureTLS(opts *message.Options) {
 	// If no trigger flags, ignore the others
@@ -275,16 +268,16 @@ func (p *program) Start() error {
 
 	if err != nil {
 		message.PrintNExit(err.Error() + tipsMsg)
-	}else if showVersion {
+	} else if showVersion {
 		fmt.Println(message.VersionInfo("g-message"))
 		os.Exit(0)
-	}else if showHelp {
+	} else if showHelp {
 		showUsageInfoNExit()
 	}
 	// Snapshot flag options.
 	message.FlagSnapshot = opts.Clone()
 
-	showTLSHelp :=flagSet.Lookup("help_tls").Value.(flag.Getter).Get().(bool)
+	showTLSHelp := flagSet.Lookup("help_tls").Value.(flag.Getter).Get().(bool)
 	//help_tls
 	if showTLSHelp {
 		message.PrintTLSHelpNExit()
@@ -299,11 +292,11 @@ func (p *program) Start() error {
 		sl = signal
 	}
 
-	if  sl != "" {
+	if sl != "" {
 		processSignal(sl)
 	}
 	//configFile := flagSet.Lookup("config").Value.(flag.Getter).Get().(string)
-	if opts.ConfigFile!= "" {
+	if opts.ConfigFile != "" {
 		fileOpts, err := message.ProcessConfigFile(opts.ConfigFile)
 		if err != nil {
 			message.PrintNExit(err.Error())

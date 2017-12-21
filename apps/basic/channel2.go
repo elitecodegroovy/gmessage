@@ -8,10 +8,10 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"time"
-	"path/filepath"
 )
 
 var cores = runtime.NumCPU()
@@ -23,8 +23,8 @@ type LineInfo struct {
 }
 
 type Task struct {
-	filename string
-	LineInfos  chan<- LineInfo
+	filename  string
+	LineInfos chan<- LineInfo
 }
 
 func (task Task) Do(lineRx *regexp.Regexp) {
@@ -50,12 +50,11 @@ func (task Task) Do(lineRx *regexp.Regexp) {
 	}
 }
 
-func scheduleTasks(done chan <- struct{}, lineRx *regexp.Regexp, tasks <- chan Task){
+func scheduleTasks(done chan<- struct{}, lineRx *regexp.Regexp, tasks <-chan Task) {
 	for i := 0; i < cores; i++ {
 		go doTasks(done, lineRx, tasks)
 	}
 }
-
 
 func doGrep(timeout int64, lineRx *regexp.Regexp, filenames []string) {
 	tasks := make(chan Task, cores)
@@ -117,7 +116,7 @@ func min(x int, ys ...int) int {
 	return x
 }
 
-func startChannelPattern(){
+func startChannelPattern() {
 	var timeoutOpt *int64 = flag.Int64("timeout", 0, "seconds (0 means no timeout)")
 	flag.Parse()
 	if *timeoutOpt < 0 || *timeoutOpt > 240 {
@@ -134,10 +133,10 @@ func startChannelPattern(){
 	}
 	if lineRx, err := regexp.Compile(os.Args[1]); err != nil {
 		log.Fatalf("invalid regexp: %s\n", err)
-	} else if len(os.Args)  ==  2 {
+	} else if len(os.Args) == 2 {
 		//current file directory files
 		doGrep(timeout, lineRx, ExecSearch())
-	}else {
+	} else {
 		doGrep(timeout, lineRx, commandLineFiles(os.Args[2:]))
 	}
 }

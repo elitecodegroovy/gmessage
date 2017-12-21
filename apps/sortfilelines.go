@@ -1,4 +1,5 @@
 package main
+
 import (
 	"bytes"
 	"io/ioutil"
@@ -29,5 +30,3 @@ func SortFile(name string) error {
 //func main() {
 //	SortFile("web2.txt")
 //}
-
-

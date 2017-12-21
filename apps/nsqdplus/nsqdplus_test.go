@@ -5,11 +5,11 @@ import (
 	"os"
 	"testing"
 
-	"toml"
+	"fmt"
 	"go-options"
 	"nsqd"
-	"fmt"
 	"strings"
+	"toml"
 )
 
 func TestConfigFlagParsing(t *testing.T) {

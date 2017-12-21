@@ -1,12 +1,12 @@
 package main
 
 import (
-	"testing"
-	"nsqplus"
 	"encoding/json"
 	"fmt"
-	"time"
 	c "nsqio/go-nsq"
+	"nsqplus"
+	"testing"
+	"time"
 )
 
 type MyHandler struct {
@@ -17,13 +17,13 @@ type MyHandler struct {
 	messagesFailed   int
 }
 
-
 func (h *MyHandler) LogFailedMessage(message *c.Message) {
 	h.messagesFailed++
 	h.q.Stop()
 }
 
 var totalCount int64 = 0
+
 func (h *MyHandler) HandleMessage(message *c.Message) error {
 	data := nsqplus.Event{}
 	err := json.Unmarshal(message.Body, &data)
@@ -38,8 +38,7 @@ func (h *MyHandler) HandleMessage(message *c.Message) error {
 	return nil
 }
 
-
-func TestMyConsumer(t *testing.T){
+func TestMyConsumer(t *testing.T) {
 	doMyConsumerTest(t, func(c *c.Config) {
 		c.Snappy = true
 	})

@@ -1,13 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"nsq"
-	"fmt"
 )
 
-
-func doSimpleConsumerTask(){
+func doSimpleConsumerTask() {
 
 	config := nsq.NewConfig()
 	q, _ := nsq.NewConsumer("a-test", "ch", config)
@@ -16,7 +15,7 @@ func doSimpleConsumerTask(){
 		message.Finish()
 		return nil
 	}))
-	lookupAddr := []string {
+	lookupAddr := []string{
 		"192.168.234.77:4161",
 		"192.168.234.36:4161",
 		"192.168.234.39:4161",
@@ -30,6 +29,7 @@ func doSimpleConsumerTask(){
 	stats := q.Stats()
 	fmt.Sprintf("message received %d, finished %d", stats.MessagesReceived, stats.MessagesFinished)
 }
+
 //func main(){
 //	doSimpleConsumerTask()
 //}

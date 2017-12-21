@@ -1,5 +1,3 @@
-
-
 package message
 
 // SortOpt is a helper type to sort by ConnInfo values

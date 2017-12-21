@@ -39,7 +39,6 @@ func todo_js() ([]byte, error) {
 	)
 }
 
-
 // Asset loads and returns the asset for the given name.
 // It returns an error if the asset could not be found or
 // could not be loaded.
@@ -63,9 +62,10 @@ func AssetNames() []string {
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() ([]byte, error){
 	"index.html": index_html,
-	"todo.css": todo_css,
-	"todo.js": todo_js,
+	"todo.css":   todo_css,
+	"todo.js":    todo_js,
 }
+
 // AssetDir returns the file names below a certain
 // directory embedded in the file by go-bindata.
 // For example if you run go-bindata on data/... and data contains the
@@ -102,14 +102,12 @@ func AssetDir(name string) ([]string, error) {
 }
 
 type _bintree_t struct {
-	Func func() ([]byte, error)
+	Func     func() ([]byte, error)
 	Children map[string]*_bintree_t
 }
+
 var _bintree = &_bintree_t{nil, map[string]*_bintree_t{
-	"index.html": &_bintree_t{index_html, map[string]*_bintree_t{
-	}},
-	"todo.css": &_bintree_t{todo_css, map[string]*_bintree_t{
-	}},
-	"todo.js": &_bintree_t{todo_js, map[string]*_bintree_t{
-	}},
+	"index.html": &_bintree_t{index_html, map[string]*_bintree_t{}},
+	"todo.css":   &_bintree_t{todo_css, map[string]*_bintree_t{}},
+	"todo.js":    &_bintree_t{todo_js, map[string]*_bintree_t{}},
 }}

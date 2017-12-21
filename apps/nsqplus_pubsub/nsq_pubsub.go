@@ -16,10 +16,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"nsqio/go-nsq"
 	"internal/app"
 	"internal/http_api"
 	"internal/version"
+	"nsqio/go-nsq"
 )
 
 var (

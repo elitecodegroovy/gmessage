@@ -1,6 +1,5 @@
 package main
 
-
 import (
 	"bufio"
 	"bytes"
@@ -48,8 +47,6 @@ func (job Job) Do(lineRx *regexp.Regexp) {
 		}
 	}
 }
-
-
 
 func commandLineFiles(files []string) []string {
 	//do match for windows platform
@@ -116,7 +113,7 @@ func minimum(x int, ys ...int) int {
 	return x
 }
 
-func doStartup(){
+func doStartup() {
 	if len(os.Args) < 2 || os.Args[1] == "-h" || os.Args[1] == "--help" {
 		fmt.Printf("usage: %s <regexp> <files>, e.g. channel.exe main .\\ \n",
 			filepath.Base(os.Args[0]))
@@ -125,16 +122,16 @@ func doStartup(){
 
 	if lineRx, err := regexp.Compile(os.Args[1]); err != nil {
 		log.Fatalf("invalid regexp: %s\n", err)
-	} else if len(os.Args)  ==  2 {
+	} else if len(os.Args) == 2 {
 		//current file directory files
 		// channel.exe doGrep
 		grep(lineRx, ExecSearch())
-	}else {
+	} else {
 		grep(lineRx, commandLineFiles(os.Args[2:]))
 		/**
 		e.g. windows platform
 		channel.exe doGrep "D:\githubRepo\go\goapp\src\github.com\elitecodegroovy\gmessage\apps\basic\*.go"
-		 */
+		*/
 	}
 }
 

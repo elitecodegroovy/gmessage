@@ -4,7 +4,7 @@ import "fmt"
 
 type FuzzyBool struct{ value float32 }
 
-func New(value interface{}) ( * FuzzyBool, error) {
+func New(value interface{}) (*FuzzyBool, error) {
 	amount, err := float32ForValue(value)
 	return &FuzzyBool{amount}, err
 }
@@ -34,24 +34,24 @@ func float32ForValue(value interface{}) (fuzzy float32, err error) {
 	return fuzzy, nil
 }
 
-func (fuzzy * FuzzyBool) String() string {
-	return fmt.Sprintf("%.0f%%", 100 * fuzzy.value)
+func (fuzzy *FuzzyBool) String() string {
+	return fmt.Sprintf("%.0f%%", 100*fuzzy.value)
 }
 
-func (fuzzy * FuzzyBool) Set(value interface{}) (err error) {
+func (fuzzy *FuzzyBool) Set(value interface{}) (err error) {
 	fuzzy.value, err = float32ForValue(value)
 	return err
 }
 
-func (fuzzy * FuzzyBool) Copy() * FuzzyBool {
+func (fuzzy *FuzzyBool) Copy() *FuzzyBool {
 	return &FuzzyBool{fuzzy.value}
 }
 
-func (fuzzy * FuzzyBool) Not() * FuzzyBool {
+func (fuzzy *FuzzyBool) Not() *FuzzyBool {
 	return &FuzzyBool{1 - fuzzy.value}
 }
 
-func (fuzzy * FuzzyBool) And(first * FuzzyBool, rest ... * FuzzyBool) * FuzzyBool {
+func (fuzzy *FuzzyBool) And(first *FuzzyBool, rest ...*FuzzyBool) *FuzzyBool {
 	minimum := fuzzy.value
 	rest = append(rest, first)
 	for _, other := range rest {
@@ -62,7 +62,7 @@ func (fuzzy * FuzzyBool) And(first * FuzzyBool, rest ... * FuzzyBool) * FuzzyBoo
 	return &FuzzyBool{minimum}
 }
 
-func (fuzzy * FuzzyBool) Or(first * FuzzyBool, rest ... * FuzzyBool) * FuzzyBool {
+func (fuzzy *FuzzyBool) Or(first *FuzzyBool, rest ...*FuzzyBool) *FuzzyBool {
 	max := fuzzy.value
 	rest = append(rest, first)
 	for _, other := range rest {
@@ -73,23 +73,22 @@ func (fuzzy * FuzzyBool) Or(first * FuzzyBool, rest ... * FuzzyBool) * FuzzyBool
 	return &FuzzyBool{max}
 }
 
-func (fuzzy * FuzzyBool) Less(other * FuzzyBool) bool {
+func (fuzzy *FuzzyBool) Less(other *FuzzyBool) bool {
 	return fuzzy.value < other.value
 }
 
-func (fuzzy * FuzzyBool) Equal(other * FuzzyBool) bool {
+func (fuzzy *FuzzyBool) Equal(other *FuzzyBool) bool {
 	return fuzzy.value == other.value
 }
 
-func (fuzzy * FuzzyBool) Bool() bool {
+func (fuzzy *FuzzyBool) Bool() bool {
 	return fuzzy.value >= .5
 }
-func (fuzzy * FuzzyBool) Float() float64 {
+func (fuzzy *FuzzyBool) Float() float64 {
 	return float64(fuzzy.value)
 }
 
-
-func process(a, b, c, d * FuzzyBool) {
+func process(a, b, c, d *FuzzyBool) {
 	fmt.Println("Original:", a, b, c, d)
 	fmt.Println("Not: ", a.Not(), b.Not(), c.Not(), d.Not())
 	fmt.Println("Not Not: ", a.Not().Not(), b.Not().Not(), c.Not().Not(),
@@ -103,8 +102,8 @@ func process(a, b, c, d * FuzzyBool) {
 	fmt.Println("Float: ", a.Float(), b.Float(), c.Float(), d.Float())
 }
 
-func doFuzzy(){
-	a, _ := New(0) // Safe to ignore err value when using
+func doFuzzy() {
+	a, _ := New(0)   // Safe to ignore err value when using
 	b, _ := New(.25) // known valid values; must check if using
 	c, _ := New(.75) // variables though.
 	d := c.Copy()
@@ -112,7 +111,7 @@ func doFuzzy(){
 		fmt.Println(err)
 	}
 	process(a, b, c, d)
-	s := [] * FuzzyBool{a, b, c, d}
+	s := []*FuzzyBool{a, b, c, d}
 	fmt.Println(s)
 }
 

@@ -72,9 +72,9 @@ func TestReverseInParallel(t *testing.T) {
 	}
 }
 
-func TestParsingTime(t *testing.T){
+func TestParsingTime(t *testing.T) {
 	form := "2006-01-02 15:04:05"
-	time , err := time.Parse(form, "2017-03-02 19:04:05")
+	time, err := time.Parse(form, "2017-03-02 19:04:05")
 	if err != nil {
 		fmt.Println("parsing time error", err)
 	}

@@ -1,13 +1,13 @@
 package main
 
 import (
-	"testing"
-	"regexp"
 	"fmt"
+	"regexp"
+	"testing"
 )
 
 //Compile/MustCompile , MatchString
-func TestBasicRegExp(t *testing.T){
+func TestBasicRegExp(t *testing.T) {
 	r := regexp.MustCompile(`Hello`)
 	// Will print 'Match'
 	if r.MatchString("Hello Regular Expression.") == true {
@@ -48,7 +48,7 @@ func TestBasicRegExp(t *testing.T){
 	fmt.Println("\n match :", r.FindString(test))
 }
 
-func TestAdvanceRegExp(t *testing.T){
+func TestAdvanceRegExp(t *testing.T) {
 	//[[cat] [sat] [mat]]
 	re, _ := regexp.Compile(`.at`)
 	res := re.FindAllStringSubmatch("The cat sat on the mat.", -1)

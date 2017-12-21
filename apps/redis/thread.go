@@ -1,18 +1,17 @@
 package main
 
-
 import (
-	"sync"
-	"runtime"
-	"time"
+	"fmt"
 	"io/ioutil"
 	"os"
-	"fmt"
+	"runtime"
+	"sync"
+	"time"
 )
 
 type JobFunc func(int, interface{}, chan interface{})
 
-func threadMain(id int, queue chan interface {}, wg *sync.WaitGroup, job JobFunc) chan bool {
+func threadMain(id int, queue chan interface{}, wg *sync.WaitGroup, job JobFunc) chan bool {
 	quitCommand := make(chan bool, 1)
 	go func() {
 		for {
@@ -30,14 +29,14 @@ func threadMain(id int, queue chan interface {}, wg *sync.WaitGroup, job JobFunc
 	return quitCommand
 }
 
-func Concurrent(queue chan interface {}, job JobFunc) {
+func Concurrent(queue chan interface{}, job JobFunc) {
 	var wg sync.WaitGroup
 	cpuCount := runtime.NumCPU()
 	runtime.GOMAXPROCS(cpuCount)
 
 	quitCommands := make([]chan bool, cpuCount)
 	for i := 0; i < cpuCount; i++ {
-		quitCommands[i] = threadMain(i + 1, queue, &wg, job)
+		quitCommands[i] = threadMain(i+1, queue, &wg, job)
 	}
 
 	ticker := time.Tick(time.Millisecond * 10)

@@ -1,25 +1,26 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"strings"
-	"time"
-	"math"
-	"errors"
-	"strconv"
-	"sync/atomic"
-	"runtime"
-	"sync"
-	"math/rand"
-	"sort"
-	"regexp"
-	"encoding/json"
-	"bytes"
 	"bufio"
-	"io/ioutil"
+	"bytes"
+	"encoding/json"
+	"errors"
 	"flag"
+	"fmt"
+	"io/ioutil"
+	"math"
+	"math/rand"
+	"os"
+	"regexp"
+	"runtime"
+	"sort"
+	"strconv"
+	"strings"
+	"sync"
+	"sync/atomic"
+	"time"
 )
+
 const (
 	win            = 100 // The winning score in a game of Pig
 	gamesPerSeries = 10  // The number of games per series to simulate
@@ -118,10 +119,8 @@ func ratioString(vals ...int) string {
 	return s
 }
 
-
-
 // play ping game
-func playPigGame(){
+func playPigGame() {
 	strategies := make([]strategy, win)
 	for k := range strategies {
 		strategies[k] = stayAtK(k + 1)
@@ -133,12 +132,13 @@ func playPigGame(){
 			k+1, ratioString(wins[k], games-wins[k]))
 	}
 }
+
 //Go’s mechanism for grouping and naming related sets of methods: interfaces.
 
 type user struct {
 	name string
 
-	age int                     //Omitted fields will be zero-valued.
+	age int //Omitted fields will be zero-valued.
 }
 
 type geometry interface {
@@ -154,7 +154,7 @@ func (c circle) area() float64 {
 	return math.Pi * c.radius * c.radius
 }
 
-func (c circle) perim()float64 {
+func (c circle) perim() float64 {
 	return 2 * math.Pi * c.radius
 }
 
@@ -165,11 +165,12 @@ type rect struct {
 func (r rect) area() float64 {
 	return r.width * r.height
 }
+
 /*
 Go automatically handles conversion between values and pointers for method calls.
 You may want to use a pointer receiver type to avoid copying on method calls
 or to allow the method to mutate the receiving struct.
- */
+*/
 func (r rect) perim() float64 {
 	return 2*r.width + 2*r.height
 }
@@ -180,17 +181,16 @@ func measure(g geometry) {
 	fmt.Println(g.perim())
 }
 
-func doInterface(){
+func doInterface() {
 	r := rect{width: 20, height: 40}
-	c := circle{radius : 15}
+	c := circle{radius: 15}
 
 	measure(r)
 	measure(c)
 }
 
-
-func ferror(n int)(int, error){
-	if n== 99 {
+func ferror(n int) (int, error) {
+	if n == 99 {
 		return -1, errors.New("can't reach the point 99")
 	}
 	return n + 3, nil
@@ -212,13 +212,13 @@ func f2(arg int) (int, error) {
 	return arg + 3, nil
 }
 
-func doError(){
+func doError() {
 
 	for _, i := range []int{7, 99} {
 		if c, e := ferror(i); e != nil {
 			fmt.Println("f1 failed:", e)
-		}else {
-			fmt.Println("value i ", c )
+		} else {
+			fmt.Println("value i ", c)
 		}
 	}
 
@@ -237,9 +237,9 @@ func doError(){
 }
 
 // define the const string variable.
-const GOOD_FAQ string= "How do you know that？"
+const GOOD_FAQ string = "How do you know that？"
 
-func plus(x, y int) int{
+func plus(x, y int) int {
 	return x + y
 }
 
@@ -247,43 +247,43 @@ func plusPlus(x, y, z int) int {
 	return x + y + z
 }
 
-func vals()(int, int ){
+func vals() (int, int) {
 	return 100, 200
 }
 
-func increaseInt()func() int{
+func increaseInt() func() int {
 	i := 0
-	return func() int{
+	return func() int {
 		i += 1
 		return i
 	}
 }
 
-func initNplus2() func()int {
+func initNplus2() func() int {
 	i := 0
-	return  func() int{
+	return func() int {
 		i += 2
 		return i
 	}
 }
 
 //Go supports recursive functions. Here’s a classic factorial example.
-func multipleN(n int) int{
-	if n== 1 {
+func multipleN(n int) int {
+	if n == 1 {
 		return 1
 	}
-	return n * multipleN(n -1)
+	return n * multipleN(n-1)
 }
 
-func zeroVal(val int){
+func zeroVal(val int) {
 	val = 1000
 }
 
-func zeroOpr(opr *int){
+func zeroOpr(opr *int) {
 	*opr = 1000
 }
 
-func doPoints(){
+func doPoints() {
 	i := 0
 	zeroVal(i)
 	fmt.Println("current zereVal value i= ", i)
@@ -312,7 +312,7 @@ func doPoints(){
 	doError()
 }
 
-func doCloure(){
+func doCloure() {
 	nextInt := increaseInt()
 	fmt.Println("nextInt", nextInt())
 	fmt.Println("nextInt", nextInt())
@@ -322,13 +322,13 @@ func doCloure(){
 	fmt.Println("nextPlus2: ", nextPlus2())
 	fmt.Println("nextPlus2: ", nextPlus2())
 	//recursive func
-	fmt.Println("recursive func 10*9*8...1 ", multipleN( 10))
+	fmt.Println("recursive func 10*9*8...1 ", multipleN(10))
 
 }
 
 // Variadic functions can be called with any number of trailing arguments.
 // For example, fmt.Println is a common variadic function.\
-func sum(nums ...int)int {
+func sum(nums ...int) int {
 	total := 0
 	fmt.Println("input", nums)
 	for _, v := range nums {
@@ -337,11 +337,11 @@ func sum(nums ...int)int {
 	return total
 }
 
-func doArrange(){
-	num := []int{1 ,3, 5, 7}
+func doArrange() {
+	num := []int{1, 3, 5, 7}
 	total := 0
 	for _, v := range num {
-		total += v;
+		total += v
 	}
 	fmt.Println("sume: ", total)
 
@@ -367,7 +367,7 @@ func doArrange(){
 	z := plusPlus(20, 40, 80)
 	fmt.Println("plus(20, 40)= ", s, "plusPlus(20, 40 ,80)=", z)
 	a, b := vals()
-	fmt.Println("multiple return case:",a, b )
+	fmt.Println("multiple return case:", a, b)
 	fmt.Println("sum(10, 100, 1000)", sum(10, 100, 1000))
 	nums := []int{1, 10, 100, 1000, 10000}
 	//If you already have multiple args in a slice,
@@ -376,7 +376,7 @@ func doArrange(){
 
 }
 
-func doMaps(){
+func doMaps() {
 	m := make(map[string]int)
 	m["ok"] = 1
 	m["failed"] = 0
@@ -397,13 +397,12 @@ func doMaps(){
 	fmt.Println("result search for a key 'success':", pros)
 
 	//init values
-	x := map[string]int{"return": 1, "rssult":0}
+	x := map[string]int{"return": 1, "rssult": 0}
 	fmt.Println("map init:", x)
 
-
 }
-func doSlice(){
-	s:= make([]string, 3)
+func doSlice() {
+	s := make([]string, 3)
 	fmt.Println("string slice", s)
 
 	s[0] = "0"
@@ -436,20 +435,20 @@ func doSlice(){
 
 }
 
-func doArray(){
+func doArray() {
 	var a [5]int
-	fmt.Println("emp",a )
+	fmt.Println("emp", a)
 
 	//assign value
 	a[4] = 100
-	fmt.Println("set ", a, ", value: a[4]:", a[4] )
+	fmt.Println("set ", a, ", value: a[4]:", a[4])
 
-	b := [5]int{12, 13, 14, 15,17}
+	b := [5]int{12, 13, 14, 15, 17}
 	fmt.Println("b  value:", b)
 	doArrange()
 }
 
-func doStr(){
+func doStr() {
 	who := "World!"
 	if len(os.Args) > 1 {
 		/* os.Args[0] is "hello" or "hello.exe" */
@@ -471,30 +470,30 @@ func doStr(){
 	compareStringAppend4ArrayStr()
 }
 
-func compareStringAppend4Buffer(){
+func compareStringAppend4Buffer() {
 	var buffer bytes.Buffer
-	for i:=0 ; i < 1000; i++ {
-		if i % 2 == 0 {
+	for i := 0; i < 1000; i++ {
+		if i%2 == 0 {
 			buffer.WriteString("0")
 		} else {
 			buffer.WriteString("1")
 		}
 	}
-	fmt.Println("\n"+ buffer.String())
+	fmt.Println("\n" + buffer.String())
 }
 
-func compareStringAppend4ArrayStr(){
+func compareStringAppend4ArrayStr() {
 	s := []string{}
 	for i := 0; i < 1000; i++ {
-		if i % 2 == 0 {
+		if i%2 == 0 {
 			s = append(s, "0")
 		} else {
 			s = append(s, "1")
 		}
 	}
-	fmt.Println("\n"+ strings.Join(s, ""))
+	fmt.Println("\n" + strings.Join(s, ""))
 }
-func doSimple(){
+func doSimple() {
 	doStr()
 	doArray()
 	doSlice()
@@ -505,14 +504,14 @@ func doSimple(){
 
 // A goroutine is a lightweight thread of execution.
 
-func pIndex(form string){
-	for i:=0 ; i < 3; i++ {
-		fmt.Println(form, ":",  i)
+func pIndex(form string) {
+	for i := 0; i < 3; i++ {
+		fmt.Println(form, ":", i)
 	}
 }
 
-func doGo(){
-	go func(msg string){
+func doGo() {
+	go func(msg string) {
 		fmt.Println("msg:", msg)
 	}("golang")
 
@@ -523,62 +522,64 @@ func doGo(){
 	//fmt.Scanln(&input)
 	//fmt.Println("done")
 }
+
 //Channels are the pipes that connect concurrent goroutines.
 // You can send values into channels from one goroutine and
 // receive those values into another goroutine.
-func doChan(){
+func doChan() {
 	message := make(chan string)
 
-	go func(){message <- "ping!"}()
+	go func() { message <- "ping!" }()
 
 	//This property allowed us to wait at the end of our program for the "ping"
 	// message without having to use any other synchronization.
-	msg := <- message
+	msg := <-message
 	fmt.Println("received msg: ", msg)
 
 	/*
-	By default channels are unbuffered, meaning that they will only accept
-	 sends (chan <-) if there is a corresponding receive (<- chan) ready
-	 to receive the sent value. Buffered channels accept a limited number
-	 of values without a corresponding receiver for those values.
-	 */
+		By default channels are unbuffered, meaning that they will only accept
+		 sends (chan <-) if there is a corresponding receive (<- chan) ready
+		 to receive the sent value. Buffered channels accept a limited number
+		 of values without a corresponding receiver for those values.
+	*/
 	message2 := make(chan string, 2)
 	message2 <- "ping2"
 	message2 <- "pong2"
-	fmt.Println("received one ", <- message2)
-	fmt.Println("received two ", <- message2)
+	fmt.Println("received one ", <-message2)
+	fmt.Println("received two ", <-message2)
 
 	doChanSync()
 	doChanDirection()
 }
+
 //This is the function we’ll run in a goroutine. The done channel will be used to
 // notify another goroutine that this function’s work is done.
-func doChanSync(){
+func doChanSync() {
 	done := make(chan bool, 1)
 	go doAsWorker(done)
 
 	//sync until it has been done.
-	<- done
+	<-done
 }
 
-func doAsWorker(done chan bool){
+func doAsWorker(done chan bool) {
 	fmt.Println("start to work ...")
 	time.Sleep(time.Second)
 	fmt.Println("done!")
 	done <- true
 }
 
-func p(ping chan string, msg string){
+func p(ping chan string, msg string) {
 	ping <- msg
 }
 
-func q(ping chan string, pong chan string){
-	msg := <- ping
+func q(ping chan string, pong chan string) {
+	msg := <-ping
 	pong <- msg
 }
 
 //The pong function accepts one channel for receives (pings) and a second for sends (pongs).
-func doChanDirection(){
+func doChanDirection() {
 	pings := make(chan string, 1)
 	pongs := make(chan string, 1)
 	p(pings, "go channel direction")
@@ -588,26 +589,26 @@ func doChanDirection(){
 
 // Go’s select lets you wait on multiple channel operations.
 //Combining goroutines and channels with select is a powerful feature of Go.
-func doSelect(){
+func doSelect() {
 	t1 := time.Now() // get current time
 
-	x1 := make(chan string )
+	x1 := make(chan string)
 	x2 := make(chan string)
 
-	go func(){
+	go func() {
 		time.Sleep(time.Second * 1)
 		x1 <- "ping"
 	}()
 
-	go func(){
+	go func() {
 		time.Sleep(time.Second * 2)
 		x2 <- "pong"
 	}()
-	for i:= 0; i < 2; i++ {
+	for i := 0; i < 2; i++ {
 		select {
-		case msg := <- x1:
+		case msg := <-x1:
 			fmt.Println("msg x1:", msg)
-		case msg := <- x2:
+		case msg := <-x2:
 			fmt.Println("msg x2:", msg)
 		}
 	}
@@ -615,40 +616,41 @@ func doSelect(){
 	//Note that the total execution time is only ~2 seconds since both the 1 and 2 second Sleeps execute concurrently.
 	fmt.Println("App elapsed: ", elapsed)
 }
+
 //Using this select timeout pattern requires communicating results over channels. This is a good idea in general because
 // other important Go features are based on channels and select.
-func doTimeout(){
+func doTimeout() {
 	x1 := make(chan string, 1)
-	go func(){
+	go func() {
 		time.Sleep(time.Second * 1)
 		x1 <- "get resource x1"
 	}()
 	select {
-	case msg := <- x1:
+	case msg := <-x1:
 		fmt.Println("get result ", msg)
-	case <- time.After(time.Second * 1):
+	case <-time.After(time.Second * 1):
 		fmt.Println("get timeout after 1 second")
 	}
 
-	x2 := make(chan string ,1)
-	go func(){
+	x2 := make(chan string, 1)
+	go func() {
 		time.Sleep(time.Second * 2)
 		x2 <- "get resource x2"
 	}()
 	select {
-	case msg := <- x2:
+	case msg := <-x2:
 		fmt.Println("get result x2:", msg)
-	case <- time.After(time.Second * 3):
+	case <-time.After(time.Second * 3):
 		fmt.Println("get timeout after 3 seconds")
 	}
 }
 
-func doNotblockChan(){
+func doNotblockChan() {
 	messages := make(chan string)
 	signals := make(chan bool)
 
 	select {
-	case msg := <- messages:
+	case msg := <-messages:
 		fmt.Println("received message :", msg)
 	default:
 		fmt.Println("no message received")
@@ -672,13 +674,13 @@ func doNotblockChan(){
 	}
 }
 
-func closeChan(){
+func closeChan() {
 	jobs := make(chan int, 5)
 	done := make(chan bool)
 
-	go func(){
+	go func() {
 		for {
-			job, more := <- jobs
+			job, more := <-jobs
 			if more {
 				fmt.Println("received job", job)
 			} else {
@@ -689,25 +691,25 @@ func closeChan(){
 		}
 	}()
 
-	for i :=1; i <= 3; i++ {
+	for i := 1; i <= 3; i++ {
 		jobs <- i
 		fmt.Println("sent msg:", i)
 	}
 	close(jobs)
-	<- done
+	<-done
 }
 
-func doChanRange(){
+func doChanRange() {
 	queue := make(chan string, 2)
 	queue <- "two"
 	queue <- "three"
 	close(queue)
-	for elem:= range queue {
+	for elem := range queue {
 		fmt.Println("e in queue :", elem)
 	}
 }
 
-func doConcurrent(){
+func doConcurrent() {
 	doGo()
 	doChan()
 	doSelect()
@@ -720,14 +722,14 @@ func doConcurrent(){
 //If you just wanted to wait, you could have used time.Sleep.
 // One reason a timer may be useful is that you can cancel
 // the timer before it expires. Here’s an example of that.
-func doTime(){
+func doTime() {
 	timer1 := time.NewTimer(time.Second * 1)
-	<- timer1.C
+	<-timer1.C
 	fmt.Println("Timer 1 expired")
 
 	timer2 := time.NewTimer(time.Second * 2)
-	go func(){
-		<- timer2.C
+	go func() {
+		<-timer2.C
 		fmt.Println("timer2 expired!")
 	}()
 
@@ -736,12 +738,13 @@ func doTime(){
 		fmt.Println("Timer 2 stopped")
 	}
 }
+
 // Timers are for when you want to do something once in the future - tickers are for
 // when you want to do something repeatedly at regular intervals.
-func doTicker(){
+func doTicker() {
 	ticker := time.NewTicker(time.Millisecond * 500)
 
-	go func(){
+	go func() {
 		for t := range ticker.C {
 			fmt.Println("ticker transaction :", t.Format("2006-01-02 15:00:00.0000"))
 		}
@@ -751,7 +754,7 @@ func doTicker(){
 	fmt.Println("ticker stopped!")
 }
 
-func doTask(id int, jobs <- chan int, results chan <-  int){
+func doTask(id int, jobs <-chan int, results chan<- int) {
 	for j := range jobs {
 		fmt.Println("worker", id, "processing job", j)
 		//time.Sleep(time.Millisecond * 100)
@@ -759,8 +762,8 @@ func doTask(id int, jobs <- chan int, results chan <-  int){
 	}
 }
 
-func doWorkerPool(){
-	jobs := make(chan int , 100)
+func doWorkerPool() {
+	jobs := make(chan int, 100)
 	results := make(chan int, 100)
 
 	for i := 0; i < 3; i++ {
@@ -778,15 +781,15 @@ func doWorkerPool(){
 
 //Rate limiting is an important mechanism for controlling resource utilization and maintaining
 // quality of service. Go elegantly supports rate limiting with goroutines, channels, and tickers.
-func doRateLimiting(){
+func doRateLimiting() {
 	requests := make(chan string, 3)
-	for i:=1; i < 4; i++ {
+	for i := 1; i < 4; i++ {
 		requests <- strconv.Itoa(i)
 	}
 	close(requests)
 	limiter := time.Tick(time.Millisecond * 200)
 	for req := range requests {
-		<- limiter
+		<-limiter
 		fmt.Println("req", req, ", time:", time.Now().Local().Format("2006-01-02 15:04:05.0000"))
 	}
 
@@ -815,13 +818,13 @@ func doRateLimiting(){
 	}
 }
 
-func doMutex(){
+func doMutex() {
 	state := make(map[int]int)
-	var mutex  = &sync.Mutex{}
+	var mutex = &sync.Mutex{}
 	var ops uint64 = 0
 
-	for i:=0; i < 100; i++ {
-		go func(){
+	for i := 0; i < 100; i++ {
+		go func() {
 			total := 0
 			key := rand.Intn(5)
 			mutex.Lock()
@@ -832,8 +835,8 @@ func doMutex(){
 
 		}()
 	}
-	for w:=0; w < 10; w++ {
-		go func(){
+	for w := 0; w < 10; w++ {
+		go func() {
 			key := rand.Intn(5)
 			val := rand.Intn(10)
 			mutex.Lock()
@@ -850,10 +853,10 @@ func doMutex(){
 	mutex.Unlock()
 	fmt.Println("show me count :", atomic.LoadUint64(&ops))
 }
-func doSyncCount(){
+func doSyncCount() {
 	var op uint64 = 0
-	for i:= 0; i < 60; i++ {
-		go func(){
+	for i := 0; i < 60; i++ {
+		go func() {
 			atomic.AddUint64(&op, 1)
 			runtime.Gosched()
 		}()
@@ -863,63 +866,65 @@ func doSyncCount(){
 
 	doMutex()
 }
+
 //Stateful Goroutines
 // This channel-based approach aligns with Go’s ideas of sharing memory
 // by communicating and having each piece of data owned by exactly 1 goroutine.
 
 type readOp struct {
-	key int
+	key  int
 	resp chan int
 }
 
 type writeOp struct {
-	key int
-	val int
+	key  int
+	val  int
 	resp chan bool
 }
-func doStatefulGorutines(){
+
+func doStatefulGorutines() {
 	var ops uint64 = 0
 	reads := make(chan *readOp)
 	writes := make(chan *writeOp)
 
-	go func(){
+	go func() {
 		var state = make(map[int]int)
 		for {
 			select {
-			case read := <- reads:
+			case read := <-reads:
 				read.resp <- state[read.key]
-			case write := <- writes:
+			case write := <-writes:
 				state[write.key] = write.val
 				write.resp <- true
 			}
 		}
 	}()
 	// 100 reads
-	for r:=0 ; r < 10; r++ {
-		go func(){
+	for r := 0; r < 10; r++ {
+		go func() {
 			for {
 				read := &readOp{
-					key: rand.Intn(5),
+					key:  rand.Intn(5),
 					resp: make(chan int),
 				}
 				reads <- read
-				fmt.Println("get read chan response :", <- read.resp)
+				fmt.Println("get read chan response :", <-read.resp)
 				atomic.AddUint64(&ops, 1)
 			}
 		}()
 	}
 
 	//10 writers
-	for w :=0; w < 1; w++ {
-		go func(){
-			for{
-				write := &writeOp {
-					key: rand.Intn(5),
-					val: rand.Intn(1000),
-					resp:make(chan bool),
+	for w := 0; w < 1; w++ {
+		go func() {
+			for {
+				write := &writeOp{
+					key:  rand.Intn(5),
+					val:  rand.Intn(1000),
+					resp: make(chan bool),
 				}
 				writes <- write
-				<- write.resp
+				<-write.resp
 				atomic.AddUint64(&ops, 1)
 			}
 
@@ -928,7 +933,7 @@ func doStatefulGorutines(){
 	time.Sleep(time.Millisecond * 10)
 	fmt.Println("ops:", atomic.LoadUint64(&ops))
 }
-func doTimer(){
+func doTimer() {
 	doTime()
 	doTicker()
 	doWorkerPool()
@@ -936,14 +941,13 @@ func doTimer(){
 	doSyncCount()
 	doStatefulGorutines()
 }
-func doSimpleSort(){
+func doSimpleSort() {
 	strs := []string{"c", "a", "z"}
 	sort.Strings(strs)
 	fmt.Println("sorting []strings", strs)
 
-	ints := []int {3, 1, 9, 12, 0}
+	ints := []int{3, 1, 9, 12, 0}
 	sort.Ints(ints)
-
 
 	s := sort.IntsAreSorted(ints)
 	fmt.Println("soring []ints", ints, ", sorted :", s)
@@ -951,24 +955,24 @@ func doSimpleSort(){
 
 type ByLength []string
 
-func (s ByLength)Len() int{
+func (s ByLength) Len() int {
 	return len(s)
 }
 
-func (s ByLength)Swap(i, j int) {
+func (s ByLength) Swap(i, j int) {
 	s[i], s[j] = s[j], s[j]
 }
 
-func (s ByLength)Less(i, j int)bool {
+func (s ByLength) Less(i, j int) bool {
 	return len(s[i]) > len(s[j])
 }
 
-func sortByLength(){
+func sortByLength() {
 	fruits := []string{"peach", "banana", "kiwi"}
 	sort.Sort(ByLength(fruits))
 	fmt.Println(fruits)
 }
-func doSort(){
+func doSort() {
 	doSimpleSort()
 	sortByLength()
 	doPanic()
@@ -977,7 +981,7 @@ func doSort(){
 }
 
 //A panic typically means something went unexpectedly wrong.
-func doPanic(){
+func doPanic() {
 	//panic("a problem")
 	//_, err := os.Create("/tmp/file")
 	//if err != nil {
@@ -987,7 +991,7 @@ func doPanic(){
 
 //defer is often used where e.g. ensure and finally would be used in other languages.
 
-func doDefer(){
+func doDefer() {
 	f := createFile("./defer.txt")
 	defer closeFile(f)
 	writeFile(f)
@@ -1000,10 +1004,10 @@ func createFile(p string) *os.File {
 	return f
 }
 func writeFile(f *os.File) {
-	for i := 1; i <101; i++ {
-		if i % 10 == 0 {
+	for i := 1; i < 101; i++ {
+		if i%10 == 0 {
 			fmt.Fprint(f, "*\n")
-		}else {
+		} else {
 			fmt.Fprint(f, "*")
 		}
 
@@ -1029,16 +1033,16 @@ func include(vs []string, t string) bool {
 	return index(vs, t) > -1
 }
 
-func any(vs []string, f func(string)bool) bool {
+func any(vs []string, f func(string) bool) bool {
 	for _, v := range vs {
-		if f(v){
+		if f(v) {
 			return true
 		}
 	}
 	return false
 }
 
-func all(vs []string, f func(string)bool) bool {
+func all(vs []string, f func(string) bool) bool {
 	for _, v := range vs {
 		if !f(v) {
 			return false
@@ -1047,7 +1051,7 @@ func all(vs []string, f func(string)bool) bool {
 	return true
 }
 
-func filter(vs []string, f func(string)bool) []string {
+func filter(vs []string, f func(string) bool) []string {
 	vsf := make([]string, 0)
 	for _, v := range vs {
 		if f(v) {
@@ -1057,7 +1061,7 @@ func filter(vs []string, f func(string)bool) []string {
 	return vsf
 }
 
-func doMap(vs []string, f func(string)string) []string {
+func doMap(vs []string, f func(string) string) []string {
 	vsm := make([]string, len(vs))
 	for i, v := range vs {
 		vsm[i] = f(v)
@@ -1066,26 +1070,25 @@ func doMap(vs []string, f func(string)string) []string {
 }
 
 //collect function
-func doCollectionFunc(){
+func doCollectionFunc() {
 	var strs = []string{"peach", "apple", "pear", "plum"}
 
 	fmt.Println("get index 'pear'", index(strs, "pear"))
 	fmt.Println("inclue 'grape':", include(strs, "grape"))
-	fmt.Println("any hasPrefix ," , any(strs, func(v string )bool{
+	fmt.Println("any hasPrefix ,", any(strs, func(v string) bool {
 		return strings.HasPrefix(v, "p")
 	}))
-	fmt.Println("...", all(strs, func(v string)bool {
+	fmt.Println("...", all(strs, func(v string) bool {
 		return strings.HasPrefix(v, "p")
 	}))
-	fmt.Println("...filter", filter(strs,  func(v string) bool {
+	fmt.Println("...filter", filter(strs, func(v string) bool {
 		return strings.Contains(v, "e")
 	}))
 	fmt.Println("map string, ", doMap(strs, strings.ToUpper))
 	opString()
 }
 
-
-func opString(){
+func opString() {
 	fmt.Println("Contains:  ", strings.Contains("test", "es"))
 	fmt.Println("Count:     ", strings.Count("test", "t"))
 	fmt.Println("HasPrefix: ", strings.HasPrefix("test", "te"))
@@ -1105,7 +1108,7 @@ type point struct {
 	x, y int
 }
 
-func opStringFormat(){
+func opStringFormat() {
 	p := point{1, 2}
 	fmt.Printf("%v\n", p)
 	//If the value is a struct, the %+v variant will include the struct’s field names.
@@ -1176,12 +1179,12 @@ func opStringFormat(){
 }
 
 // Go offers built-in support for regular expressions. Here are some examples of common regexp-related tasks in Go.
-func doMatch(){
+func doMatch() {
 	isMatch, _ := regexp.MatchString("p([a-z]+)ch", "peach")
 	fmt.Println("go match, ", isMatch)
 }
 
-func doCompile(){
+func doCompile() {
 	r, _ := regexp.Compile("p([a-z]+)ch")
 	fmt.Println("r.FindString", r.FindString("paech punch"))
 
@@ -1204,12 +1207,12 @@ func doCompile(){
 	//_out = r.ReplaceAllFunc(_in, bytes.ToUpper)
 	//fmt.Println(string(_out))
 }
-func doRegexp(){
+func doRegexp() {
 	doMatch()
 	doCompile()
 }
 
-func doBasicTime(){
+func doBasicTime() {
 	now := time.Now()
 	secs := now.Unix()
 	nanos := now.UnixNano()
@@ -1228,12 +1231,12 @@ func doBasicTime(){
 	doRandom()
 }
 
-func doRandom(){
+func doRandom() {
 	fmt.Println("rand int 1: ", rand.Intn(100))
 	fmt.Println("rand int 2:", rand.Intn(100))
 
 	fmt.Println("rand float 1: ", rand.Float64())
-	fmt.Println("rand float 1: ", rand.Float64()* 5 + 5)
+	fmt.Println("rand float 1: ", rand.Float64()*5+5)
 
 	//The default number generator is deterministic, so it’ll produce the same sequence of numbers
 	//each time by default. To produce varying sequences, give it a seed that changes. Note that
@@ -1257,6 +1260,7 @@ func doRandom(){
 	fmt.Print(r3.Intn(100))
 
 }
+
 type Response1 struct {
 	Page   int
 	Fruits []string
@@ -1265,8 +1269,9 @@ type Response2 struct {
 	Page   int      `json:"page"`
 	Fruits []string `json:"fruits"`
 }
-func doJson(){
-	bValue, _:= json.Marshal(true)
+
+func doJson() {
+	bValue, _ := json.Marshal(true)
 	fmt.Println("bool value:", string(bValue))
 
 	intB, _ := json.Marshal(1)
@@ -1321,7 +1326,7 @@ func doJson(){
 func grep(re, filename string) error {
 	regex, err := regexp.Compile(re)
 	if err != nil {
-		return  err// there was a problem with the regular expression.
+		return err // there was a problem with the regular expression.
 	}
 
 	fh, err := os.Open(filename)
@@ -1334,10 +1339,10 @@ func grep(re, filename string) error {
 
 	buf := make([]byte, 1024)
 	for {
-		buf, _ , err = f.ReadLine()
+		buf, _, err = f.ReadLine()
 		if err != nil && err.Error() == "EOF" {
 			return nil
-		}else if err != nil && err.Error() != "EOF" {
+		} else if err != nil && err.Error() != "EOF" {
 			return err
 		}
 
@@ -1349,13 +1354,13 @@ func grep(re, filename string) error {
 	return nil
 }
 
-func replace(fileName string , re string, replaceTxt string , newFile string) error{
+func replace(fileName string, re string, replaceTxt string, newFile string) error {
 	input, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		return err
 	}
 
-	output := bytes.Replace(input, []byte(re), []byte( replaceTxt), -1)
+	output := bytes.Replace(input, []byte(re), []byte(replaceTxt), -1)
 
 	if err = ioutil.WriteFile(newFile, output, 0666); err != nil {
 		return err
@@ -1363,11 +1368,11 @@ func replace(fileName string , re string, replaceTxt string , newFile string) er
 	return nil
 }
 
-func rexexpExample(){
+func rexexpExample() {
 	flag.Parse()
 	if flag.NArg() == 2 {
 		err := grep(flag.Arg(0), flag.Arg(1))
-		if err != nil  {
+		if err != nil {
 			fmt.Println(err)
 		}
 	} else if flag.NArg() == 4 {
@@ -1387,12 +1392,12 @@ func rexexpExample(){
 }
 
 /**
-	fmt.Println("*******-args desc***********")
-	fmt.Println("args : args == 2 , arg 1: full file path, arg 2: search regexp content")
-	fmt.Println("args : args == 4 , arg 1: full file path, arg 2: search regexp content \n "+
-	                                          " args 3: replace content, args 4 :  new file name")
-	fmt.Println("***********************")
- */
+fmt.Println("*******-args desc***********")
+fmt.Println("args : args == 2 , arg 1: full file path, arg 2: search regexp content")
+fmt.Println("args : args == 4 , arg 1: full file path, arg 2: search regexp content \n "+
+                                          " args 3: replace content, args 4 :  new file name")
+fmt.Println("***********************")
+*/
 //func main() {
 //	//doSimple()
 //	//doConcurrent()
@@ -1403,10 +1408,3 @@ func rexexpExample(){
 //	//playPigGame()
 //	rexexpExample()
 //}
-
-
-
-
-
-
-

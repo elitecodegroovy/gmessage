@@ -1,13 +1,13 @@
 package main
 
 import (
-	"github.com/go-redis/redis"
 	"fmt"
+	"github.com/go-redis/redis"
 )
 
-func NewRClient() *redis.Client{
+func NewRClient() *redis.Client {
 	client := redis.NewClient(&redis.Options{
-		Addr:    "10.50.115.17:7003",
+		Addr:     "10.50.115.17:7003",
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
@@ -18,11 +18,11 @@ func NewRClient() *redis.Client{
 	return client
 }
 
-func NewRClusterClient() *redis.ClusterClient{
+func NewRClusterClient() *redis.ClusterClient {
 	client := redis.NewClusterClient(&redis.ClusterOptions{
 		Addrs: []string{"10.50.115.17:7006", "10.50.115.17:7001", "10.50.115.17:7002", "10.50.115.17:7003", "10.50.115.17:7004", "10.50.115.17:7005"},
 	})
-	pong, err := client.Ping().Result();
+	pong, err := client.Ping().Result()
 	if err != nil {
 		panic(err)
 	}
@@ -56,7 +56,7 @@ func SimpleRedisClient() {
 	// key2 does not exists
 }
 
-func ClusterRedisClient(){
+func ClusterRedisClient() {
 	client := NewRClusterClient()
 
 	err := client.Set("123456", "value", 0).Err()
@@ -71,7 +71,7 @@ func ClusterRedisClient(){
 }
 
 //go get -u github.com/go-redis/redis
-func main(){
+func main() {
 	//SimpleRedisClient()				//single node
-	ClusterRedisClient()				//cluster nodes
+	ClusterRedisClient() //cluster nodes
 }

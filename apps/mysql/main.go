@@ -1,14 +1,13 @@
 package main
 
-import (_ "mysql"
+import (
 	"database/sql"
-	"fmt"
 	"encoding/json"
+	"fmt"
+	_ "mysql"
 )
 
-
-
-func QueryUserMySql(reqSql string ){
+func QueryUserMySql(reqSql string) {
 	db, err := sql.Open("mysql", "swisse:swisse@tcp(10.50.115.114:16052)/swisse?charset=utf8&&readTimeout=5s&timeout=3s&loc=Local&autocommit=true")
 
 	if err != nil {
@@ -75,7 +74,8 @@ type Response1 struct {
 	Page   int
 	Fruits []string
 }
-func testQueryAll(){
+
+func testQueryAll() {
 	sql := "SELECT * FROM bw_askQuestion"
 	QueryUserMySql(sql)
 
@@ -86,7 +86,7 @@ func testQueryAll(){
 	fmt.Println(string(res1B))
 }
 
-func main(){
+func main() {
 	testQueryAll()
 
 }

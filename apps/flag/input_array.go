@@ -1,23 +1,23 @@
 package main
 
 import (
-	"internal/app"
 	"flag"
-	"os"
-	"log"
 	"fmt"
+	"internal/app"
+	"log"
+	"os"
 )
 
 var (
 	flagSet = flag.NewFlagSet("input_array", flag.ExitOnError)
-	xArray = app.StringArray{}
+	xArray  = app.StringArray{}
 )
 
-func init(){
+func init() {
 	flagSet.Var(&xArray, "x-array", "input string array with comma separator(may be given multiple times)")
 }
 
-func main(){
+func main() {
 	flagSet.Parse(os.Args[1:])
 	if len(xArray) == 0 {
 		log.Fatal("x-array CL input parameter must be provided. \n e.g. --x-array=1 --x-array=2")

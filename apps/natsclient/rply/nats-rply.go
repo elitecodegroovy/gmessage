@@ -28,19 +28,18 @@ func main() {
 
 	args := flag.Args()
 
-
 	nc, err := nats.Connect(*urls)
 	if err != nil {
 		log.Fatalf("Can't connect: %v\n", err)
 	}
 
-	subj, reply, i :=  "", "", 0
+	subj, reply, i := "", "", 0
 	if len(args) == 0 {
 		subj = "NATS"
 		reply = " NATS response "
-	}else if len(args) < 2 {
+	} else if len(args) < 2 {
 		usage()
-	}else {
+	} else {
 		subj, reply, i = args[0], args[1], 0
 	}
 
@@ -51,7 +50,7 @@ func main() {
 		printMsg(msg, i)
 		currentTime := time.Now().Local()
 		newFormatTime := currentTime.Format("2006-01-02 15:04:05.000")
-		nc.Publish(msg.Reply, []byte(reply+ newFormatTime))
+		nc.Publish(msg.Reply, []byte(reply+newFormatTime))
 	})
 	nc.Flush()
 

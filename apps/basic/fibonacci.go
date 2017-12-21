@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 	"log"
+	"strconv"
 	"time"
 )
 
@@ -21,47 +21,46 @@ func fibonacci(c, quit chan int) {
 	fmt.Println("fibonacci x :", x)
 }
 
-func ExeFibonacci(){
+func ExeFibonacci() {
 	c := make(chan int)
 	quit := make(chan int)
 	s := strconv.Quote(`"Fran & Freddie's Diner	☺"`)
 	fmt.Println(s)
 
 	//produce data
-	go func(){
-		for i:= 0; i < 10; i++ {
-			log.Println("channel data item ", <- c)
+	go func() {
+		for i := 0; i < 10; i++ {
+			log.Println("channel data item ", <-c)
 		}
 		quit <- 0
 	}()
 	fibonacci(c, quit)
 }
 
-
-func receiveMsg(){
+func receiveMsg() {
 	c1 := make(chan string)
 	c2 := make(chan string)
 	t1 := time.Now() // get current time
-	go func(){
+	go func() {
 		//received three message
-		for i:=0; i < 3; i++ {
+		for i := 0; i < 3; i++ {
 			time.Sleep(time.Millisecond * 150)
 			c1 <- "msg 1 with index " + strconv.Itoa(i)
 		}
 	}()
-	go func(){
-		for j:=0; j < 3; j++ {
+	go func() {
+		for j := 0; j < 3; j++ {
 			time.Sleep(time.Millisecond * 200)
-			c2 <- "msg 2 with index "+ strconv.Itoa(j)
+			c2 <- "msg 2 with index " + strconv.Itoa(j)
 		}
 	}()
 
 	//print two message
-	for i:= 0; i < 3; i++ {
+	for i := 0; i < 3; i++ {
 		select {
-		case msg1 := <- c1:
+		case msg1 := <-c1:
 			log.Println("received msg :", msg1)
-		case msg2 := <- c2:
+		case msg2 := <-c2:
 			log.Println("received msg :", msg2)
 		}
 	}

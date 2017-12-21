@@ -1,4 +1,3 @@
-
 package message
 
 import (
@@ -309,6 +308,7 @@ func (s *Server) sendLocalSubsToRoute(route *client) {
 
 	route.Debugf("Route sent local subscriptions")
 }
+
 // route cluster setup
 func (s *Server) createRoute(conn net.Conn, rURL *url.URL) *client {
 	// Snapshot server options.
@@ -658,7 +658,7 @@ func (s *Server) routeAcceptLoop(ch chan struct{}) {
 
 	// Setup state that can enable shutdown
 	s.mu.Lock()
-	s.routeListener = l																									//route Listener object
+	s.routeListener = l //route Listener object
 	s.mu.Unlock()
 
 	// Let them know we are up

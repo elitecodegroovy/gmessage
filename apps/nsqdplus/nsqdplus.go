@@ -13,12 +13,12 @@ import (
 	"syscall"
 	"time"
 
-	"toml"
-	"go-svc/svc"
 	"go-options"
+	"go-svc/svc"
 	"internal/app"
 	"internal/version"
 	"nsqd"
+	"toml"
 )
 
 type tlsRequiredOption int

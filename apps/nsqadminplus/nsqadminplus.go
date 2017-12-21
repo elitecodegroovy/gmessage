@@ -9,15 +9,15 @@ import (
 	"syscall"
 	"time"
 
-	"toml"
 	"go-options"
 	"internal/app"
 	"internal/version"
 	"nsqadmin"
+	"toml"
 )
 
 var (
-	flagSet = flag.NewFlagSet("nsqadmin", flag.ExitOnError)
+	flagSet     = flag.NewFlagSet("nsqadmin", flag.ExitOnError)
 	config      = flagSet.String("config", "", "path to config file")
 	showVersion = flagSet.Bool("version", false, "print version string")
 

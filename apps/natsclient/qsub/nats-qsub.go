@@ -35,12 +35,11 @@ func main() {
 	if len(args) == 0 {
 		subj = "NATS"
 		queue = " NATS.queue"
-	}else if len(args) < 2 {
+	} else if len(args) < 2 {
 		usage()
-	}else {
+	} else {
 		subj, queue, i = args[0], args[1], 0
 	}
-
 
 	nc.QueueSubscribe(subj, queue, func(msg *nats.Msg) {
 		i++

@@ -1,14 +1,14 @@
 package main
 
 import (
-	"github.com/go-xorm/xorm"
 	"github.com/go-xorm/core"
+	"github.com/go-xorm/xorm"
 	"os"
 )
 
 var engine *xorm.Engine
 
-func NewEngine(){
+func NewEngine() {
 
 	var err error
 	engine, err = xorm.NewEngine("mysql", "swisse:swisse@10.50.115.114:16052/swisse?charset=utf8")
@@ -25,6 +25,6 @@ func NewEngine(){
 	}
 	engine.SetLogger(xorm.NewSimpleLogger(f))
 }
-func main(){
+func main() {
 
 }

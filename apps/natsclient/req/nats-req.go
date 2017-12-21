@@ -27,9 +27,9 @@ func main() {
 	if len(args) == 0 {
 		subj = "NATS"
 		payload = []byte(" NATS.msg-" + newFormatTime)
-	}else if len(args) < 2 {
+	} else if len(args) < 2 {
 		usage()
-	}else {
+	} else {
 		subj, payload = args[0], []byte(args[1])
 	}
 
@@ -38,7 +38,6 @@ func main() {
 		log.Fatalf("Can't connect: %v\n", err)
 	}
 	defer nc.Close()
-
 
 	msg, err := nc.Request(subj, []byte(payload), 100*time.Millisecond)
 	if err != nil {

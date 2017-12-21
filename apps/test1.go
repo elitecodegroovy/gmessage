@@ -1,30 +1,30 @@
 package main
 
 import (
+	"flag"
 	"fmt"
-	"runtime"
-	"sync/atomic"
-	"time"
-	"strconv"
 	"log"
+	"net"
+	"os"
+	"runtime"
+	"strconv"
 	"strings"
 	"sync"
-	"flag"
-	"os"
+	"sync/atomic"
+	"time"
 	"unsafe"
-	"net"
 )
 
 var a uint64 = 0
 
-func getName(params ...interface{})string {
+func getName(params ...interface{}) string {
 	var paramSlice []string
 	for _, param := range params {
-		switch v := param.(type){
-		case string :
+		switch v := param.(type) {
+		case string:
 			paramSlice = append(paramSlice, v)
-		case int :
-			paramSlice = append(paramSlice , strconv.Itoa(v))
+		case int:
+			paramSlice = append(paramSlice, strconv.Itoa(v))
 		default:
 			log.Fatalln(" params has error type", v)
 		}
@@ -32,7 +32,7 @@ func getName(params ...interface{})string {
 	return strings.Join(paramSlice, " ")
 }
 
-func test1(){
+func test1() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	fmt.Println(runtime.NumCPU(), runtime.GOMAXPROCS(0))
 
@@ -63,21 +63,21 @@ func GetInstance() *singleton {
 	return instance
 }
 
-func fibonacci(n int , c chan int){
-	x , y := 1, 1
-	for i :=0; i < n; i++ {
+func fibonacci(n int, c chan int) {
+	x, y := 1, 1
+	for i := 0; i < n; i++ {
 		c <- x
-		x, y = y, x + y
+		x, y = y, x+y
 	}
 	close(c)
-	isClosed, ok := <- c
+	isClosed, ok := <-c
 	if ok {
 		fmt.Println("closed", isClosed)
 	}
 }
 
-func testFibonacci(){
-	c := make(chan int , 10)
+func testFibonacci() {
+	c := make(chan int, 10)
 
 	go fibonacci(cap(c), c)
 	for j := range c {
@@ -86,36 +86,34 @@ func testFibonacci(){
 	testSelectWaitNSleep()
 }
 
-func testSelectWaitNSleep(){
+func testSelectWaitNSleep() {
 	c := make(chan int)
 	o := make(chan bool)
 	go func() {
 		for {
 			select {
-			case v := <- c:
+			case v := <-c:
 				println(v)
-			case <- time.After(3 * time.Second):
+			case <-time.After(3 * time.Second):
 				println("timeout")
 				o <- true
 				break
 			}
 		}
 	}()
-	<- o
+	<-o
 }
 
-func testFlag(){
+func testFlag() {
 	propFlag := flag.NewFlagSet("properties", flag.ExitOnError)
 	word := propFlag.String("word", "default word", "as string word ")
 
 	isSet := propFlag.Bool("isSet", false, "whether it is set or not?")
 
-	times := propFlag.Int("times", 0 , "The app should run for many times")
+	times := propFlag.Int("times", 0, "The app should run for many times")
 
 	var svar string
 	propFlag.StringVar(&svar, "address", ":9990", " server listenning ip address.")
-
-
 
 	propFlag.Parse(os.Args[1:])
 	fmt.Println("word", *word)
@@ -128,26 +126,25 @@ func testFlag(){
 		fmt.Println(" `isSet` used the default value 'false' .")
 	}
 
-
 }
 
-func testOsEnv(){
+func testOsEnv() {
 	//os environment
 	os.Setenv("registry_ip", "192.168.2.2")
 	os.Setenv("default_ip", "127.0.0.1")
 	fmt.Println("os env , registry_ip :", os.Getenv("registry_ip"))
 	fmt.Println("os env , registry_ip :", os.Getenv("default_ip"))
 	//os.Getenv("hold_machine_ip")
-	fmt.Println("os env , hold_machine_ip :",len(os.Getenv("hold_machine_ip")) )
+	fmt.Println("os env , hold_machine_ip :", len(os.Getenv("hold_machine_ip")))
 	//for _, e := range os.Environ() {
 	//	fmt.Println("----env: ", e)
 	//}
 
-	cmd , _ := os.Getwd()
+	cmd, _ := os.Getwd()
 	fmt.Println("current workspace rooted directory", cmd)
 }
 
-func testUnsafe(){
+func testUnsafe() {
 	fmt.Println(unsafe.Sizeof(float64(0))) // "8"
 }
 
@@ -169,7 +166,7 @@ func getLocalIp() string {
 	return ""
 }
 
-func optSig(){
+func optSig() {
 	// Use bitwise OR | to get the bits that are in 1 OR 2
 	// 1     = 00000001
 	// 2     = 00000010
@@ -202,7 +199,7 @@ func optSig(){
 }
 
 //Limiting Concurrency in Go
-func LimitGoroutine(){
+func LimitGoroutine() {
 	concurrency := 5
 	sem := make(chan bool, concurrency)
 	urls := []string{"http://jmoiron.net/blog/limiting-concurrency-in-go/", "https://github.com/go-sql-driver/mysql/tree/alloc-pool"}
@@ -212,7 +209,7 @@ func LimitGoroutine(){
 			defer func() {
 				<-sem
 			}()
-			fmt.Println("imput url:", url )
+			fmt.Println("imput url:", url)
 			// get the url
 		}(url)
 	}
@@ -220,6 +217,7 @@ func LimitGoroutine(){
 		sem <- true
 	}
 }
+
 //
 func main() {
 	//fmt.Println("show you name : ", getName("我的年龄", 30, ",你的呢？"))

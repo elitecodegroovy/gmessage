@@ -10,7 +10,6 @@ import (
 	"strings"
 )
 
-
 func handleCommandLine() (algorithm int, minSize, maxSize int64,
 	suffixes, files []string) {
 	flag.IntVar(&algorithm, "algorithm", 1, "1 or 2")
@@ -95,11 +94,11 @@ func sink(in <-chan string) {
 	}
 }
 
-func doExe(){
+func doExe() {
 	runtime.GOMAXPROCS(runtime.NumCPU()) // Use all the machine's cores
 	log.SetFlags(0)
 	algorithm,
-	minSize, maxSize, suffixes, files := handleCommandLine()
+		minSize, maxSize, suffixes, files := handleCommandLine()
 
 	if algorithm == 1 {
 		sink(filterSize(minSize, maxSize, filterSuffixes(suffixes, source(files))))

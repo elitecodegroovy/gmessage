@@ -1,14 +1,14 @@
 package main
 
 import (
-	"os"
-	"log"
 	"bufio"
 	"fmt"
+	"log"
+	"os"
 	"regexp"
 )
 
-func loadData(){
+func loadData() {
 	file, err := os.Open("./data.txt")
 	if err != nil {
 		log.Fatal(err)
@@ -21,7 +21,7 @@ func loadData(){
 	for scanner.Scan() {
 		//get(scanner.Text())
 		i++
-		r, _ :=regexp.Compile(`\{[\S\s]+}`)
+		r, _ := regexp.Compile(`\{[\S\s]+}`)
 		matches := r.FindString(scanner.Text())
 
 		fmt.Println("", i, ":", matches)
@@ -33,9 +33,9 @@ func loadData(){
 	fmt.Println("total number: ", i)
 }
 
-func sync(){
+func sync() {
 	loadData()
 }
-func main(){
+func main() {
 	sync()
 }

@@ -9,11 +9,11 @@ import (
 	"syscall"
 	"time"
 
-	"toml"
-	"go-svc/svc"
 	"go-options"
+	"go-svc/svc"
 	"internal/version"
 	"nsqlookupd"
+	"toml"
 )
 
 var (

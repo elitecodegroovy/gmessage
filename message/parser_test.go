@@ -1,5 +1,3 @@
-
-
 package message
 
 import (
@@ -246,7 +244,7 @@ func TestParsePubBadSize(t *testing.T) {
 	// Setup localized max payload
 	c.mpay = 32768
 	if err := c.processPub([]byte("foo 2222222222222222\r")); err == nil {
-		t.Fatalf("Expected parse error for size too large"+ err.Error())
+		t.Fatalf("Expected parse error for size too large" + err.Error())
 	}
 }
 

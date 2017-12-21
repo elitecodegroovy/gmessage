@@ -1,5 +1,3 @@
-
-
 package message
 
 import (
@@ -257,7 +255,7 @@ func TestMaxConnections(t *testing.T) {
 	nc2, err := nats.Connect(addr)
 	if err == nil {
 		nc2.Close()
-		t.Fatal("Expected connection to fail"+err.Error())
+		t.Fatal("Expected connection to fail" + err.Error())
 	}
 }
 

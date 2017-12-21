@@ -1,12 +1,13 @@
 package main
 
-import ("fmt"
-	_ "mysql"
-	"time"
+import (
 	"database/sql"
-	"log"
-	"net/http"
 	"encoding/json"
+	"fmt"
+	"log"
+	_ "mysql"
+	"net/http"
+	"time"
 	//"github.com/google/jsonapi"
 	"strconv"
 )
@@ -15,59 +16,55 @@ var db *sql.DB
 
 var reqCount uint64
 
-
-
 type Category struct {
-	Id      	int64		`json:"id"`
-	Category 	string		`json:"category"`
-	Status   	int		`json:"status"`
-	Created_time    time.Time	`json:"created_time"`
+	Id           int64     `json:"id"`
+	Category     string    `json:"category"`
+	Status       int       `json:"status"`
+	Created_time time.Time `json:"created_time"`
 }
 
-type SuccessResp struct{
-	Code 		int		`json:"code"`
-	Message 	string		`json:"message"`
+type SuccessResp struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
 }
-
-
 
 type Profile struct {
 	Name    string
 	Hobbies []string
 }
 
-
-type Question struct{
-	Id 		uint64		`json:"id"`
-	Question	string		`json:"question"`
-	Right_ask	string		`json:"right_ask"`
-	Ask1		string		`json:"ask1"`
-	Ask2 		string		`json:"ask2"`
-	Ask3 		string		`json:"ask3"`
-	Category	string		`json:"category"`
-	Created_time	time.Time	`json:"created_time"`
-	Created_by	string		`json:"created_by"`
-	System		string		`json:"system"`
-	Updated_by	string		`json:"updated_by"`
-	Priority	int		`json:"priority"`
+type Question struct {
+	Id           uint64    `json:"id"`
+	Question     string    `json:"question"`
+	Right_ask    string    `json:"right_ask"`
+	Ask1         string    `json:"ask1"`
+	Ask2         string    `json:"ask2"`
+	Ask3         string    `json:"ask3"`
+	Category     string    `json:"category"`
+	Created_time time.Time `json:"created_time"`
+	Created_by   string    `json:"created_by"`
+	System       string    `json:"system"`
+	Updated_by   string    `json:"updated_by"`
+	Priority     int       `json:"priority"`
 }
+
 //define your personal json format output
-func (t *Question)MarshalJSON() ([]byte, error) {
+func (t *Question) MarshalJSON() ([]byte, error) {
 	type Alias Question
-	return json.Marshal( &struct{
+	return json.Marshal(&struct {
 		Created_time string `json:"created_time"`
 		*Alias
-	} {
+	}{
 		Created_time: t.Created_time.Format("2006-01-02 15:04:05"),
-		Alias: (*Alias)(t),
+		Alias:        (*Alias)(t),
 	})
 
 }
 
-func (t *Question) UnmarshalJSON(data []byte)error {
+func (t *Question) UnmarshalJSON(data []byte) error {
 	type Alias Question
 	aux := &struct {
-		Created_time	string `json:"created_time"`
+		Created_time string `json:"created_time"`
 		*Alias
 	}{
 		Alias: (*Alias)(t),
@@ -76,7 +73,7 @@ func (t *Question) UnmarshalJSON(data []byte)error {
 		return err
 	}
 	form := "2006-01-02 15:04:05"
-	time , err := time.Parse(form, aux.Created_time)
+	time, err := time.Parse(form, aux.Created_time)
 	if err != nil {
 		log.Fatal("Parsing time err ", err)
 		return err
@@ -98,8 +95,7 @@ func init() {
 	}
 }
 
-
-func QueryQuestionById(w http.ResponseWriter, r *http.Request)  {
+func QueryQuestionById(w http.ResponseWriter, r *http.Request) {
 
 	id := 23
 	// query
@@ -108,7 +104,6 @@ func QueryQuestionById(w http.ResponseWriter, r *http.Request)  {
 		fmt.Println(err)
 	}
 	defer rows.Close()
-
 
 	q := &Question{}
 	for rows.Next() {
@@ -121,7 +116,7 @@ func QueryQuestionById(w http.ResponseWriter, r *http.Request)  {
 		log.Fatal(err)
 	}
 
-	fmt.Println("get question by " ,q)
+	fmt.Println("get question by ", q)
 	if err != nil {
 		log.Fatal("js parsing error", err)
 	}
@@ -136,7 +131,6 @@ func QueryQuestionById(w http.ResponseWriter, r *http.Request)  {
 	//w.Header().Set("X-NSQ-Content-Type", "nsq; version=1.0")
 	w.WriteHeader(200)
 }
-
 
 func Index(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
@@ -171,7 +165,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	//for _, c := range categories {
 	//	fmt.Sprintf("%d, %s, %s, £%.2f\n", c .id, c.category, c.status, c.created_time)
 	//}
-	js , err := json.Marshal(categoryData)
+	js, err := json.Marshal(categoryData)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -206,7 +200,7 @@ func GoJson(w http.ResponseWriter, r *http.Request) {
 	w.Write(js)
 }
 
-func InsertCategory(w http.ResponseWriter, r *http.Request){
+func InsertCategory(w http.ResponseWriter, r *http.Request) {
 	c := Category{}
 	json.NewDecoder(r.Body).Decode(&c)
 
@@ -215,7 +209,7 @@ func InsertCategory(w http.ResponseWriter, r *http.Request){
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	res, err := stmt.Exec(c.Category, c.Status, c.Created_time )
+	res, err := stmt.Exec(c.Category, c.Status, c.Created_time)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -226,7 +220,7 @@ func InsertCategory(w http.ResponseWriter, r *http.Request){
 		return
 	}
 	fmt.Println(id)
-	js , err := json.Marshal(SuccessResp{Code : 200, Message: "success", })
+	js, err := json.Marshal(SuccessResp{Code: 200, Message: "success"})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -235,7 +229,7 @@ func InsertCategory(w http.ResponseWriter, r *http.Request){
 	w.Write(js)
 }
 
-func UpdateCategory(w http.ResponseWriter, r *http.Request){
+func UpdateCategory(w http.ResponseWriter, r *http.Request) {
 	c := Category{}
 	json.NewDecoder(r.Body).Decode(&c)
 
@@ -244,12 +238,12 @@ func UpdateCategory(w http.ResponseWriter, r *http.Request){
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	_, err = stmt.Exec(c.Category, c.Status, c.Created_time , c.Id)
+	_, err = stmt.Exec(c.Category, c.Status, c.Created_time, c.Id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	js , err := json.Marshal(SuccessResp{Code : 200, Message: "success", })
+	js, err := json.Marshal(SuccessResp{Code: 200, Message: "success"})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -258,13 +252,13 @@ func UpdateCategory(w http.ResponseWriter, r *http.Request){
 	w.Write(js)
 }
 
-func DeleteCategory(w http.ResponseWriter, r *http.Request){
+func DeleteCategory(w http.ResponseWriter, r *http.Request) {
 	sId := r.URL.Query().Get("id")
 	if len(sId) == 0 {
 		http.Error(w, "req Id is empty", http.StatusInternalServerError)
 		return
 	}
-	id , err := strconv.ParseInt(sId, 10, 64)
+	id, err := strconv.ParseInt(sId, 10, 64)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -286,7 +280,7 @@ func DeleteCategory(w http.ResponseWriter, r *http.Request){
 	}
 
 	fmt.Println(affected)
-	js , err := json.Marshal(SuccessResp{Code : 200, Message: "row(s) "+ fmt.Sprintf("%d", affected ) + " affected", })
+	js, err := json.Marshal(SuccessResp{Code: 200, Message: "row(s) " + fmt.Sprintf("%d", affected) + " affected"})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -295,7 +289,7 @@ func DeleteCategory(w http.ResponseWriter, r *http.Request){
 	w.Write(js)
 }
 
-func main(){
+func main() {
 	//Insert()
 	http.HandleFunc("/", Index)
 	http.HandleFunc("/json", GoJson)
