@@ -1,9 +1,9 @@
 package decode
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
-	"fmt"
 )
 
 func TestComposeDecodeHookFunc(t *testing.T) {
@@ -33,7 +33,7 @@ func TestComposeDecodeHookFunc(t *testing.T) {
 	}
 }
 
-func TestDecode(t *testing.T){
+func TestDecode(t *testing.T) {
 	type Person struct {
 		Name   string
 		Age    int
@@ -62,8 +62,7 @@ func TestDecode(t *testing.T){
 	fmt.Printf("%#v", result)
 }
 
-
-func TestDecodeEmbededStruct(t *testing.T){
+func TestDecodeEmbededStruct(t *testing.T) {
 	// Squashing multiple embedded structs is allowed using the squash tag.
 	// This is demonstrated by creating a composite struct of multiple types
 	// and decoding into it. In this case, a person can carry with it both
@@ -95,7 +94,7 @@ func TestDecodeEmbededStruct(t *testing.T){
 	fmt.Printf("%s %s, %s, %#v", result.FirstName, result.LastName, result.City, result)
 }
 
-func TestDecodeThrowErrow(t *testing.T){
+func TestDecodeThrowErrow(t *testing.T) {
 	type Person struct {
 		Name   string
 		Age    int
@@ -121,7 +120,7 @@ func TestDecodeThrowErrow(t *testing.T){
 	fmt.Println(err.Error())
 }
 
-func TestMetadataDecode(t *testing.T){
+func TestMetadataDecode(t *testing.T) {
 	type Person struct {
 		Name string
 		Age  int
@@ -158,7 +157,7 @@ func TestMetadataDecode(t *testing.T){
 	fmt.Printf("Unused keys: %#v", md.Unused)
 }
 
-func TestDeocodeWithTag(t *testing.T){
+func TestDeocodeWithTag(t *testing.T) {
 
 	// Note that the mapstructure tags defined in the struct type
 	// can indicate which fields the values are mapped to.
@@ -181,7 +180,7 @@ func TestDeocodeWithTag(t *testing.T){
 	fmt.Printf("%#v", result)
 }
 
-func TestDecodeWithWeaklyTypeInput(t *testing.T){
+func TestDecodeWithWeaklyTypeInput(t *testing.T) {
 	type Person struct {
 		Name   string
 		Age    int

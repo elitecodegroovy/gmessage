@@ -5,7 +5,7 @@ import (
 	"unsafe"
 )
 
-func doArithmetic(){
+func doArithmetic() {
 	intArray := [...]int{10, 20}
 
 	fmt.Printf("\nintArray: %v\n", intArray)
@@ -20,14 +20,14 @@ func doArithmetic(){
 	fmt.Printf("\nintPtr=%p, *intPtr=%d.\n\n", intPtr, *intPtr)
 }
 
-func doConvert(){
+func doConvert() {
 	type MyStr string
 
 	a := []MyStr{"10", "100", "1000"}
 	// b := ([]MyStr)(a) // error: cannot convert a (type []MyStr) to type []MyStr
 	b := *(*[]MyStr)(unsafe.Pointer(&a))
 
-	b[0]= "0"
+	b[0] = "0"
 
 	fmt.Println("a =", a) // a = [0 100 1000]
 	fmt.Println("b =", b) // b = [0 100 1000]
@@ -38,8 +38,7 @@ func doConvert(){
 	fmt.Println("b =", b) // b = [0 100 CONVERT]
 }
 
-
-func main(){
+func main() {
 	doArithmetic()
 	doConvert()
 }

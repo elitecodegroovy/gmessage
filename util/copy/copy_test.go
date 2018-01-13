@@ -1,11 +1,11 @@
 package copy
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
-func TestCopyMap(t *testing.T){
+func TestCopyMap(t *testing.T) {
 	input := map[string]interface{}{
 		"bob": map[string]interface{}{
 			"emails": []string{"a", "b"},

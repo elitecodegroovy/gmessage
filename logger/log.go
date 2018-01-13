@@ -1,4 +1,3 @@
-
 //Package logger provides logging facilities for the gMessage server
 package logger
 

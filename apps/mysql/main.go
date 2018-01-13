@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	_ "mysql"
+	_ "github.com/go-sql-driver"
 )
 
 func QueryUserMySql(reqSql string) {

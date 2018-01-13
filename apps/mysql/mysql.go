@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	_ "mysql"
+	_ "github.com/go-sql-driver"
 	"net/http"
 	"time"
 	//"github.com/google/jsonapi"

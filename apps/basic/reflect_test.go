@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"reflect"
 	"testing"
@@ -68,4 +69,20 @@ func TestCallTypeFunc(t *testing.T) {
 
 	fmt.Printf(" CallTypeFunc(func(x int) int { return x*x }, []int{1, 10, 100}).([]int) return :%+v",
 		CallTypeFunc(func(x int) int { return x * x }, []int{1, 10, 100}))
+}
+
+func TestBytesToString(t *testing.T) {
+	/***************************************/
+	byteArray1 := []byte{'J', 'O', 'H', 'N'}
+	str1 := BytesToString(byteArray1)
+	fmt.Println("String:", str1)
+
+	/****************************************/
+
+	str2 := string(byteArray1[:])
+	fmt.Println("String:", str2)
+
+	/****************************************/
+	str3 := bytes.NewBuffer(byteArray1).String()
+	fmt.Println("String:", str3)
 }
