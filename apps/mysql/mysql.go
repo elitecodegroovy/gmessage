@@ -89,6 +89,7 @@ func init() {
 		log.Fatal(err)
 	}
 	db.SetMaxIdleConns(10)
+	db.SetMaxOpenConns(300)
 
 	if err = db.Ping(); err != nil {
 		log.Fatal(err)
