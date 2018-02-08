@@ -9,7 +9,7 @@ import (
 
 func callTask() {
 	task := func()(r interface{}, err error){
-		url := "https://pv.mama100.com/pointstats"
+		url := "http://ip.taobao.com/service/getIpInfo.php?ip=221.4.38.21"
 
 		resp, err := http.Get(url)
 		defer resp.Body.Close()
