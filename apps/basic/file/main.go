@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 	"encoding/csv"
-	"github.com/elitecodegroovy/gmessage/osext"
+	"github.com/elitecodegroovy/gmessage/apps/osext"
 	"bufio"
 	"io"
 	"fmt"
