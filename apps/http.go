@@ -3,9 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
-	"mux"
+	"github.com/gorilla/mux"
 	"net/http"
-	//"html/template"
 	"encoding/json"
 	"encoding/xml"
 	"html/template"
