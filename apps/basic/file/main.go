@@ -3,13 +3,20 @@ package main
 import (
 	"os"
 	"encoding/csv"
-	"github.com/elitecodegroovy/gmessage/apps/osext"
+	"github.com/kardianos/osext"
 	"bufio"
 	"io"
 	"fmt"
 	"log"
 	"flag"
+	"path/filepath"
 )
+
+var (
+	// Initialization of the working directory. Needed to load asset files.
+	binaryFilePath = initWorkingDirectory()
+)
+
 func initWorkingDirectory() string {
 	var customPath string
 	// Check if a custom path has been provided by the user.
@@ -28,7 +35,9 @@ func initWorkingDirectory() string {
 }
 
 func readAndOutput(){
-	csvFile, _ := os.Open( "file.csv")
+	filename := filepath.Join(binaryFilePath, "file.csv")
+	fmt.Println("[]:"+filename)
+	csvFile, _ := os.Open( filename)
 	defer csvFile.Close()
 	reader := csv.NewReader(bufio.NewReader(csvFile))
 	fmt.Println("[")
@@ -37,17 +46,18 @@ func readAndOutput(){
 		line, err := reader.Read()
 		i++
 		if err == io.EOF {
+			fmt.Println("]")
 			break
 		} else if err != nil {
 			log.Fatal("read error " + err.Error())
 		}
 		if i == 1 {
-			fmt.Printf("[%s, %s,8,1]", line[0], line[1])
+			fmt.Printf("[%s,%s,8,1]", line[0], line[1])
 		}else {
-			fmt.Printf(",\n[%s, %s,8,1]", line[0], line[1])
+			fmt.Printf(",\n[%s,%s,8,1]", line[0], line[1])
 		}
 	}
-	fmt.Println("[")
+
 }
 
 func main(){

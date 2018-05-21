@@ -22,3 +22,9 @@ func TestPostWithJsonBody(t *testing.T) {
 	result, _ := PostWithJsonBody(url, data)
 	fmt.Println("url resposne: \n ", string(result))
 }
+
+
+func TestDownloadImg(t *testing.T) {
+	url := "http://112.74.17.193:8582/picFile/menj-face/photo/20180520/180520213652872.jpg"
+	DownloadImg(url, "180520213652872.jpg")
+}
