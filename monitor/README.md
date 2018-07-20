@@ -27,7 +27,7 @@ gmessage -m 6220
 gmessage-monitor
 
 # Custom port
-gnatsd -m 6220
-gmessage-monitor --nats-mon-url http://192.168.1.225:6220
+gmessage -m 6220
+gmessage-monitor --gmonitor-url http://192.168.1.225:6220
 ```
 
