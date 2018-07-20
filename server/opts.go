@@ -588,8 +588,8 @@ func checkSubjectArray(sa []string) ([]string, error) {
 	return sa, nil
 }
 
-// PrintTLSHelpAndDie prints TLS usage and exits.
-func PrintTLSHelpAndDie() {
+// PrintTLSHelpAndExit prints TLS usage and exits.
+func PrintTLSHelpAndExit() {
 	fmt.Printf("%s", tlsUsage)
 	for k := range cipherMap {
 		fmt.Printf("    %s\n", k)
