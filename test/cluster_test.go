@@ -1,3 +1,16 @@
+// Copyright 2013-2018 The NATS Authors
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package test
 
 import (
@@ -7,39 +20,38 @@ import (
 	"testing"
 	"time"
 
-	"nats-io/gnatsd/server"
+	"github.com/nats-io/gnatsd/server"
 )
 
 // Helper function to check that a cluster is formed
 func checkClusterFormed(t *testing.T, servers ...*server.Server) {
-	// Wait for the cluster to form
-	var err string
+	t.Helper()
 	expectedNumRoutes := len(servers) - 1
-	maxTime := time.Now().Add(5 * time.Second)
-	for time.Now().Before(maxTime) {
-		err = ""
+	checkFor(t, 10*time.Second, 100*time.Millisecond, func() error {
 		for _, s := range servers {
 			if numRoutes := s.NumRoutes(); numRoutes != expectedNumRoutes {
-				err = fmt.Sprintf("Expected %d routes for server %q, got %d", expectedNumRoutes, s.ID(), numRoutes)
-				break
+				return fmt.Errorf("Expected %d routes for server %q, got %d", expectedNumRoutes, s.ID(), numRoutes)
 			}
 		}
-		if err != "" {
-			time.Sleep(100 * time.Millisecond)
-		} else {
-			break
+		return nil
+	})
+}
+
+func checkNumRoutes(t *testing.T, s *server.Server, expected int) {
+	t.Helper()
+	checkFor(t, 5*time.Second, 15*time.Millisecond, func() error {
+		if nr := s.NumRoutes(); nr != expected {
+			return fmt.Errorf("Expected %v routes, got %v", expected, nr)
 		}
-	}
-	if err != "" {
-		t.Fatalf("%s", err)
-	}
+		return nil
+	})
 }
 
 // Helper function to check that a server (or list of servers) have the
-// expected number of subscriptions
+// expected number of subscriptions.
 func checkExpectedSubs(expected int, servers ...*server.Server) error {
 	var err string
-	maxTime := time.Now().Add(5 * time.Second)
+	maxTime := time.Now().Add(10 * time.Second)
 	for time.Now().Before(maxTime) {
 		err = ""
 		for _, s := range servers {
@@ -49,7 +61,7 @@ func checkExpectedSubs(expected int, servers ...*server.Server) error {
 			}
 		}
 		if err != "" {
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(10 * time.Millisecond)
 		} else {
 			break
 		}
@@ -435,8 +447,45 @@ func TestAutoUnsubscribePropagation(t *testing.T) {
 	sendA("PING\r\n")
 	expectA(pongRe)
 
+	time.Sleep(50 * time.Millisecond)
+
 	// Make sure number of subscriptions on B is correct
 	if subs := srvB.NumSubscriptions(); subs != 0 {
 		t.Fatalf("Expected no subscriptions on remote server, got %d\n", subs)
+	}
+}
+
+func TestAutoUnsubscribePropagationOnClientDisconnect(t *testing.T) {
+	srvA, srvB, optsA, _ := runServers(t)
+	defer srvA.Shutdown()
+	defer srvB.Shutdown()
+
+	cluster := []*server.Server{srvA, srvB}
+
+	clientA := createClientConn(t, optsA.Host, optsA.Port)
+	defer clientA.Close()
+
+	sendA, expectA := setupConn(t, clientA)
+
+	// No subscriptions. Ready to test.
+	if err := checkExpectedSubs(0, cluster...); err != nil {
+		t.Fatalf("%v", err)
+	}
+
+	sendA("SUB foo 1\r\n")
+	sendA("UNSUB 1 1\r\n")
+	sendA("PING\r\n")
+	expectA(pongRe)
+
+	// Waiting cluster subs propagation
+	if err := checkExpectedSubs(1, cluster...); err != nil {
+		t.Fatalf("%v", err)
+	}
+
+	clientA.Close()
+
+	// No subs should be on the cluster when all clients is disconnected
+	if err := checkExpectedSubs(0, cluster...); err != nil {
+		t.Fatalf("%v", err)
 	}
 }

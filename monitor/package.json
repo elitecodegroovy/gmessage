@@ -1,0 +1,52 @@
+{
+  "name": "gmonitor",
+  "version": "1.0.0",
+  "description": "Dashboard for gmessage ",
+  "main": "index.js",
+  "bin": {
+    "gmonitor": "bin/gmonitor"
+  },
+  "pkg": {
+    "scripts": "index.js",
+    "assets": "public/*/*"
+  },
+  "scripts": {
+    "lint": "jshint --reporter node_modules/jshint-stylish lib/* test/*",
+    "lint:build": "jshint --reporter checkstyle lib/* test/* > reports/jshint-checkstyle.xml",
+    "depcheck": "dependency-check . lib/*",
+    "depcheck:unused": "dependency-check ./package.json --unused --no-dev lib/*",
+    "test:unit": "mkdir -p reports/ && NODE_ENV=test multi='spec=- xunit=reports/mocha-xunit.xml' istanbul cover _mocha -- -R mocha-multi && istanbul check-coverage",
+    "test:coveralls": "cat reports/coverage/lcov.info | node_modules/coveralls/bin/coveralls.js",
+    "test": "npm run lint && npm run test:unit",
+    "start": "bin/gmonitor"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/elitecodegroovy/gmessage.git"
+  },
+  "keywords": [
+    "natsboard",
+    "gmessage",
+    "dashboard",
+    "monitoring"
+  ],
+  "author": "devfacet",
+  "license": "MIT",
+  "homepage": "",
+  "dependencies": {
+    "express": "4.15.x",
+    "request": "2.80.x",
+    "utilex": "3.x.x",
+    "ws": "3.x.x"
+  },
+  "devDependencies": {
+    "chai": "3.5.x",
+    "jshint": "2.9.x",
+    "jshint-stylish": "2.2.x",
+    "mocha": "3.2.x",
+    "mocha-multi": "0.10.x",
+    "dependency-check": "2.8.x",
+    "istanbul": "0.4.x",
+    "nats": "0.7.x"
+  }
+}

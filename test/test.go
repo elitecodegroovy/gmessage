@@ -1,3 +1,16 @@
+// Copyright 2012-2018 The NATS Authors
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package test
 
 import (
@@ -7,21 +20,13 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"os/exec"
 	"regexp"
 	"runtime"
 	"strings"
 	"time"
 
-	"nats-io/gnatsd/server"
+	"github.com/nats-io/gnatsd/server"
 )
-
-const natsServerExe = "../gnatsd"
-
-type natsServer struct {
-	args []string
-	cmd  *exec.Cmd
-}
 
 // So we can pass tests and benchmarks..
 type tLogger interface {
@@ -31,7 +36,7 @@ type tLogger interface {
 
 // DefaultTestOptions are default options for the unit tests.
 var DefaultTestOptions = server.Options{
-	Host:           "localhost",
+	Host:           "127.0.0.1",
 	Port:           4222,
 	NoLog:          true,
 	NoSigs:         true,
@@ -168,7 +173,7 @@ func checkInfoMsg(t tLogger, c net.Conn) server.Info {
 
 func doConnect(t tLogger, c net.Conn, verbose, pedantic, ssl bool) {
 	checkInfoMsg(t, c)
-	cs := fmt.Sprintf("CONNECT {\"verbose\":%v,\"pedantic\":%v,\"ssl_required\":%v}\r\n", verbose, pedantic, ssl)
+	cs := fmt.Sprintf("CONNECT {\"verbose\":%v,\"pedantic\":%v,\"tls_required\":%v}\r\n", verbose, pedantic, ssl)
 	sendProto(t, c, cs)
 }
 
@@ -205,7 +210,7 @@ func setupConn(t tLogger, c net.Conn) (sendFun, expectFun) {
 
 func setupConnWithProto(t tLogger, c net.Conn, proto int) (sendFun, expectFun) {
 	checkInfoMsg(t, c)
-	cs := fmt.Sprintf("CONNECT {\"verbose\":%v,\"pedantic\":%v,\"ssl_required\":%v,\"protocol\":%d}\r\n", false, false, false, proto)
+	cs := fmt.Sprintf("CONNECT {\"verbose\":%v,\"pedantic\":%v,\"tls_required\":%v,\"protocol\":%d}\r\n", false, false, false, proto)
 	sendProto(t, c, cs)
 	return sendCommand(t, c), expectCommand(t, c)
 }
@@ -239,17 +244,15 @@ func sendProto(t tLogger, c net.Conn, op string) {
 }
 
 var (
-	infoRe       = regexp.MustCompile(`INFO\s+([^\r\n]+)\r\n`)
-	pingRe       = regexp.MustCompile(`PING\r\n`)
-	pongRe       = regexp.MustCompile(`PONG\r\n`)
-	msgRe        = regexp.MustCompile(`(?:(?:MSG\s+([^\s]+)\s+([^\s]+)\s+(([^\s]+)[^\S\r\n]+)?(\d+)\s*\r\n([^\\r\\n]*?)\r\n)+?)`)
-	okRe         = regexp.MustCompile(`\A\+OK\r\n`)
-	errRe        = regexp.MustCompile(`\A\-ERR\s+([^\r\n]+)\r\n`)
-	subRe        = regexp.MustCompile(`SUB\s+([^\s]+)((\s+)([^\s]+))?\s+([^\s]+)\r\n`)
-	unsubRe      = regexp.MustCompile(`UNSUB\s+([^\s]+)(\s+(\d+))?\r\n`)
-	unsubmaxRe   = regexp.MustCompile(`UNSUB\s+([^\s]+)(\s+(\d+))\r\n`)
-	unsubnomaxRe = regexp.MustCompile(`UNSUB\s+([^\s]+)\r\n`)
-	connectRe    = regexp.MustCompile(`CONNECT\s+([^\r\n]+)\r\n`)
+	infoRe    = regexp.MustCompile(`INFO\s+([^\r\n]+)\r\n`)
+	pingRe    = regexp.MustCompile(`PING\r\n`)
+	pongRe    = regexp.MustCompile(`PONG\r\n`)
+	msgRe     = regexp.MustCompile(`(?:(?:MSG\s+([^\s]+)\s+([^\s]+)\s+(([^\s]+)[^\S\r\n]+)?(\d+)\s*\r\n([^\\r\\n]*?)\r\n)+?)`)
+	okRe      = regexp.MustCompile(`\A\+OK\r\n`)
+	errRe     = regexp.MustCompile(`\A\-ERR\s+([^\r\n]+)\r\n`)
+	subRe     = regexp.MustCompile(`SUB\s+([^\s]+)((\s+)([^\s]+))?\s+([^\s]+)\r\n`)
+	unsubRe   = regexp.MustCompile(`UNSUB\s+([^\s]+)(\s+(\d+))?\r\n`)
+	connectRe = regexp.MustCompile(`CONNECT\s+([^\r\n]+)\r\n`)
 )
 
 const (
@@ -264,7 +267,7 @@ const (
 func expectResult(t tLogger, c net.Conn, re *regexp.Regexp) []byte {
 	expBuf := make([]byte, 32768)
 	// Wait for commands to be processed and results queued for read
-	c.SetReadDeadline(time.Now().Add(2 * time.Second))
+	c.SetReadDeadline(time.Now().Add(5 * time.Second))
 	n, err := c.Read(expBuf)
 	c.SetReadDeadline(time.Time{})
 
@@ -367,9 +370,9 @@ func checkForPubSids(t tLogger, matches [][][]byte, sids []string) {
 
 // Helper function to generate next opts to make sure no port conflicts etc.
 func nextServerOpts(opts *server.Options) *server.Options {
-	nopts := *opts
+	nopts := opts.Clone()
 	nopts.Port++
 	nopts.Cluster.Port++
 	nopts.HTTPPort++
-	return &nopts
+	return nopts
 }

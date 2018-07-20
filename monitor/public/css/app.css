@@ -1,0 +1,11 @@
+body {
+  padding-top: 90px;
+}
+
+.chart-value {
+  color: #00bd9c;
+}
+
+.table-value {
+  font-weight: bold;
+}

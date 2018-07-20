@@ -3,11 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"go-options"
+	"github.com/elitecodegroovy/nsqplus/go-options"
 	"internal/app"
 	"internal/version"
 	"log"
-	"nsqplus"
+	"github.com/elitecodegroovy/nsqplus/nsqplus"
 	"os"
 	"os/signal"
 	"syscall"

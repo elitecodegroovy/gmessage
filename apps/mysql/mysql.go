@@ -97,7 +97,6 @@ func init() {
 }
 
 func QueryQuestionById(w http.ResponseWriter, r *http.Request) {
-
 	id := 23
 	// query
 	rows, err := db.Query("SELECT * FROM bw_askQuestion WHERE id = ?", id)

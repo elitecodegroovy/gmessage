@@ -1,3 +1,16 @@
+// Copyright 2015-2018 The NATS Authors
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package test
 
 import (
@@ -13,7 +26,7 @@ import (
 	"testing"
 	"time"
 
-	"nats-io/gnatsd/server"
+	"github.com/nats-io/gnatsd/server"
 )
 
 func runSeedServer(t *testing.T) (*server.Server, *server.Options) {
@@ -284,39 +297,16 @@ func TestStressSeedSolicitWorks(t *testing.T) {
 
 			serversInfo := []serverInfo{{s1, opts}, {s2, s2Opts}, {s3, s3Opts}, {s4, s4Opts}}
 
-			var err error
-			maxTime := time.Now().Add(5 * time.Second)
-			for time.Now().Before(maxTime) {
-				resetPreviousHTTPConnections()
-
+			checkFor(t, 5*time.Second, 100*time.Millisecond, func() error {
 				for j := 0; j < len(serversInfo); j++ {
-					err = checkConnected(t, serversInfo, j, true)
-					// If error, start this for loop from beginning
-					if err != nil {
-						// Sleep a bit before the next attempt
-						time.Sleep(100 * time.Millisecond)
-						break
+					if err := checkConnected(t, serversInfo, j, true); err != nil {
+						return err
 					}
 				}
-				// All servers checked ok, we are done, otherwise, try again
-				// until time is up
-				if err == nil {
-					break
-				}
-			}
-			// Report error
-			if err != nil {
-				t.Fatalf("Error: %v", err)
-			}
+				return nil
+			})
 		}()
-		maxTime := time.Now().Add(2 * time.Second)
-		for time.Now().Before(maxTime) {
-			if s1.NumRoutes() > 0 {
-				time.Sleep(10 * time.Millisecond)
-			} else {
-				break
-			}
-		}
+		checkNumRoutes(t, s1, 0)
 	}
 }
 
@@ -425,39 +415,16 @@ func TestStressChainedSolicitWorks(t *testing.T) {
 
 			serversInfo := []serverInfo{{s1, opts}, {s2, s2Opts}, {s3, s3Opts}, {s4, s4Opts}}
 
-			var err error
-			maxTime := time.Now().Add(5 * time.Second)
-			for time.Now().Before(maxTime) {
-				resetPreviousHTTPConnections()
-
+			checkFor(t, 5*time.Second, 100*time.Millisecond, func() error {
 				for j := 0; j < len(serversInfo); j++ {
-					err = checkConnected(t, serversInfo, j, false)
-					// If error, start this for loop from beginning
-					if err != nil {
-						// Sleep a bit before the next attempt
-						time.Sleep(100 * time.Millisecond)
-						break
+					if err := checkConnected(t, serversInfo, j, false); err != nil {
+						return err
 					}
 				}
-				// All servers checked ok, we are done, otherwise, try again
-				// until time is up
-				if err == nil {
-					break
-				}
-			}
-			// Report error
-			if err != nil {
-				t.Fatalf("Error: %v", err)
-			}
+				return nil
+			})
 		}()
-		maxTime := time.Now().Add(2 * time.Second)
-		for time.Now().Before(maxTime) {
-			if s1.NumRoutes() > 0 {
-				time.Sleep(10 * time.Millisecond)
-			} else {
-				break
-			}
-		}
+		checkNumRoutes(t, s1, 0)
 	}
 }
 
@@ -552,25 +519,22 @@ func expectRidsNoFatal(t *testing.T, direct bool, rz *server.Routez, rids []stri
 
 // Helper to easily grab routez info.
 func readHTTPRoutez(t *testing.T, url string) *server.Routez {
+	resetPreviousHTTPConnections()
 	resp, err := http.Get(url + "routez")
 	if err != nil {
-		t.Fatalf("Expected no error: Got %v\n", err)
-	}
-	if resp.StatusCode != 200 {
-		// Do one retry - FIXME(dlc) - Why does this fail when running the solicit tests b2b?
-		resp, _ = http.Get(url + "routez")
-		if resp.StatusCode != 200 {
-			t.Fatalf("Expected a 200 response, got %d\n", resp.StatusCode)
-		}
+		stackFatalf(t, "Expected no error: Got %v\n", err)
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		stackFatalf(t, "Expected a 200 response, got %d\n", resp.StatusCode)
+	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		t.Fatalf("Got an error reading the body: %v\n", err)
+		stackFatalf(t, "Got an error reading the body: %v\n", err)
 	}
 	r := server.Routez{}
 	if err := json.Unmarshal(body, &r); err != nil {
-		t.Fatalf("Got an error unmarshalling the body: %v\n", err)
+		stackFatalf(t, "Got an error unmarshalling the body: %v\n", err)
 	}
 	return &r
 }
@@ -584,7 +548,7 @@ func TestSeedReturnIPInInfo(t *testing.T) {
 
 	rc1ID := "2222"
 	rc1Port := 22
-	rc1Host := "localhost"
+	rc1Host := "127.0.0.1"
 
 	routeSend1, route1Expect := setupRouteEx(t, rc1, opts, rc1ID)
 	route1Expect(infoRe)
@@ -602,7 +566,7 @@ func TestSeedReturnIPInInfo(t *testing.T) {
 
 	rc2ID := "2224"
 	rc2Port := 24
-	rc2Host := "localhost"
+	rc2Host := "127.0.0.1"
 
 	routeSend2, _ := setupRouteEx(t, rc2, opts, rc2ID)
 
