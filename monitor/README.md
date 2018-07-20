@@ -4,13 +4,13 @@
 
 Dashboard for monitoring gmessage. It provides real-time information from gmessage server. 
 
-![Overview](public/img/ss-natsboard-v3-1.png)
+![Overview](public/img/overview.jpg)
 
-![Connections](public/img/ss-natsboard-v3-2.png)
+![Connections](public/img/clients.jpg)
 
-![Routes](public/img/ss-natsboard-v3-4.png)
+![Routes](public/img/routines.jpg)
 
-![Dashboard](public/img/ss-natsboard-v3-3.png)
+![Dashboard](public/img/dashboard.jpg)
 
 ## Installation
 

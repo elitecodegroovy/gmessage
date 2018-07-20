@@ -1,16 +1,3 @@
-// Copyright 2012-2018 The NATS Authors
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package main
 
 import (
@@ -21,8 +8,11 @@ import (
 	"github.com/nats-io/gnatsd/server"
 )
 
+const (
+	GmVersion = "1.0.0"
+)
 var usageStr = `
-Usage: gnatsd [options]
+Usage: gmessage [options]
 
 Server Options:
     -a, --addr <host>                Bind to host address (default: 0.0.0.0)
@@ -69,22 +59,28 @@ Common Options:
         --help_tls                   TLS help
 `
 
+
 // usage will print out the flag options for the server.
 func usage() {
 	fmt.Printf("%s\n", usageStr)
 	os.Exit(0)
 }
 
+// PrintServerAndExit will print our version and exit.
+func PrintGMServerAndExit() {
+	fmt.Printf("gmessage-server version %s\n", GmVersion)
+	os.Exit(0)
+}
+
 func main() {
 	// Create a FlagSet and sets the usage
-	fs := flag.NewFlagSet("nats-server", flag.ExitOnError)
-	fs.Usage = usage
+	fs := flag.NewFlagSet("gmesssage-server", flag.ExitOnError)
 
 	// Configure the options from the flags/config file
 	opts, err := server.ConfigureOptions(fs, os.Args[1:],
-		server.PrintServerAndExit,
-		fs.Usage,
-		server.PrintTLSHelpAndDie)
+		PrintGMServerAndExit,
+		usage,
+		server.PrintTLSHelpAndExit)
 	if err != nil {
 		server.PrintAndDie(err.Error() + "\n" + usageStr)
 	}
