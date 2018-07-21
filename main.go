@@ -21,7 +21,7 @@ Server Options:
     -m, --http_port <port>           Use port for http monitoring
     -ms,--https_port <port>          Use port for https monitoring
     -c, --config <file>              Configuration file
-    -sl,--signal <signal>[=<pid>]    Send signal to gnatsd process (stop, quit, reopen, reload)
+    -sl,--signal <signal>[=<pid>]    Send signal to gmessage process (stop, quit, reopen, reload)
         --client_advertise <string>  Client URL to advertise to other servers
 
 Logging Options:
@@ -78,9 +78,9 @@ func main() {
 
 	// Configure the options from the flags/config file
 	opts, err := server.ConfigureOptions(fs, os.Args[1:],
-		PrintGMServerAndExit,
-		usage,
-		server.PrintTLSHelpAndExit)
+										PrintGMServerAndExit,
+										usage,
+										server.PrintTLSHelpAndExit)
 	if err != nil {
 		server.PrintAndDie(err.Error() + "\n" + usageStr)
 	}
