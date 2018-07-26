@@ -520,6 +520,7 @@ func (s *Server) sendLocalSubsToRoute(route *client) {
 	route.Debugf("Sent local subscriptions to route")
 }
 
+// Routine handler: create new routine
 func (s *Server) createRoute(conn net.Conn, rURL *url.URL) *client {
 	// Snapshot server options.
 	opts := s.getOpts()
@@ -867,6 +868,7 @@ func (s *Server) broadcastUnSubscribe(sub *subscription) {
 	s.broadcastInterestToRoutes(sub, proto)
 }
 
+//Route Accept Loop
 func (s *Server) routeAcceptLoop(ch chan struct{}) {
 	defer func() {
 		if ch != nil {
@@ -910,7 +912,7 @@ func (s *Server) routeAcceptLoop(ch chan struct{}) {
 	}
 	// If we have selected a random port...
 	if port == 0 {
-		// Write resolved port back to options.
+		// Write resolved port back to options. Real routine's port
 		opts.Cluster.Port = l.Addr().(*net.TCPAddr).Port
 	}
 	// Keep track of actual listen port. This will be needed in case of

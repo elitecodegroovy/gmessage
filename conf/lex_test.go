@@ -20,6 +20,7 @@ func expect(t *testing.T, lx *lexer, items []item) {
 	}
 }
 
+//Test plain value
 func TestPlainValue(t *testing.T) {
 	expectedItems := []item{
 		{itemKey, "foo", 1},

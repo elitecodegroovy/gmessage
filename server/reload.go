@@ -430,7 +430,7 @@ type clientAdvertiseOption struct {
 // Apply the setting by updating the server info and regenerate the infoJSON byte array.
 func (c *clientAdvertiseOption) Apply(server *Server) {
 	server.mu.Lock()
-	server.setInfoHostPortAndGenerateJSON()
+	server.setInfoHostPort()
 	server.mu.Unlock()
 	server.Noticef("Reload: client_advertise = %s", c.newValue)
 }

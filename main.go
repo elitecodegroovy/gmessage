@@ -72,6 +72,12 @@ func PrintGMServerAndExit() {
 	os.Exit(0)
 }
 
+// PrintAndDie is exported for access in other packages.
+func PrintAndExit(msg string) {
+	fmt.Fprintf(os.Stderr, "%s\n", msg)
+	os.Exit(1)
+}
+
 func main() {
 	// Create a FlagSet and sets the usage
 	fs := flag.NewFlagSet("gmesssage-server", flag.ExitOnError)
@@ -82,7 +88,7 @@ func main() {
 										usage,
 										server.PrintTLSHelpAndExit)
 	if err != nil {
-		server.PrintAndDie(err.Error() + "\n" + usageStr)
+		PrintAndExit(err.Error() + "\n" + usageStr)
 	}
 
 	// Create the server with appropriate options.
@@ -93,6 +99,6 @@ func main() {
 
 	// Start things up. Block here until done.
 	if err := server.Run(s); err != nil {
-		server.PrintAndDie(err.Error())
+		PrintAndExit(err.Error())
 	}
 }

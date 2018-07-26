@@ -163,7 +163,7 @@ func New(opts *Options) *Server {
 	// listener has been created (possibly with random port),
 	// but since some tests may expect the INFO to be properly
 	// set after New(), let's do it now.
-	s.setInfoHostPortAndGenerateJSON()
+	s.setInfoHostPort()
 
 	// Used internally for quick look-ups.
 	s.clientConnectURLsMap = make(map[string]struct{})
@@ -214,17 +214,6 @@ func (s *Server) generateRouteInfoJSON() {
 	s.routeInfoJSON = bytes.Join(pcs, []byte(" "))
 }
 
-// PrintAndDie is exported for access in other packages.
-func PrintAndDie(msg string) {
-	fmt.Fprintf(os.Stderr, "%s\n", msg)
-	os.Exit(1)
-}
-
-// PrintServerAndExit will print our version and exit.
-func PrintServerAndExit() {
-	fmt.Printf("nats-server version %s\n", VERSION)
-	os.Exit(0)
-}
 
 // ProcessCommandLineArgs takes the command line arguments
 // validating and setting flags for handling in case any
@@ -283,7 +272,8 @@ func (s *Server) Start() {
 	// Log the pid to a file
 	if opts.PidFile != _EMPTY_ {
 		if err := s.logPid(); err != nil {
-			PrintAndDie(fmt.Sprintf("Could not write pidfile: %v\n", err))
+			fmt.Fprintf(os.Stderr, "%s\n", fmt.Sprintf("Could not write pidfile: %v\n", err))
+			os.Exit(2)
 		}
 	}
 
@@ -315,7 +305,7 @@ func (s *Server) Start() {
 		s.logPorts()
 	}
 
-	// Wait for clients.
+	//core 3: Wait for clients.
 	s.AcceptLoop(clientListenReady)
 }
 
@@ -426,6 +416,7 @@ func (s *Server) AcceptLoop(clr chan struct{}) {
 	opts := s.getOpts()
 
 	hp := net.JoinHostPort(opts.Host, strconv.Itoa(opts.Port))
+	//start TCP listen
 	l, e := net.Listen("tcp", hp)
 	if e != nil {
 		s.Fatalf("Error listening on port: %s, %q", hp, e)
@@ -459,7 +450,7 @@ func (s *Server) AcceptLoop(clr chan struct{}) {
 	// Now that port has been set (if it was set to RANDOM), set the
 	// server's info Host/Port with either values from Options or
 	// ClientAdvertise. Also generate the JSON byte array.
-	if err := s.setInfoHostPortAndGenerateJSON(); err != nil {
+	if err := s.setInfoHostPort(); err != nil {
 		s.Fatalf("Error setting server INFO with ClientAdvertise value of %s, err=%v", s.opts.ClientAdvertise, err)
 		s.mu.Unlock()
 		return
@@ -469,6 +460,7 @@ func (s *Server) AcceptLoop(clr chan struct{}) {
 	s.mu.Unlock()
 
 	// Let the caller know that we are ready
+	//TODO ....close(clr)
 	close(clr)
 	clr = nil
 
@@ -492,6 +484,7 @@ func (s *Server) AcceptLoop(clr chan struct{}) {
 		}
 		tmpDelay = ACCEPT_MIN_SLEEP
 		s.startGoRoutine(func() {
+			//Create one client with go routine.
 			s.createClient(conn)
 			s.grWG.Done()
 		})
@@ -505,7 +498,7 @@ func (s *Server) AcceptLoop(clr chan struct{}) {
 // Host/Port may be reset to original Options if the ClientAdvertise option
 // is not set (since it may have previously been).
 // The function then generates the server infoJSON.
-func (s *Server) setInfoHostPortAndGenerateJSON() error {
+func (s *Server) setInfoHostPort() error {
 	// When this function is called, opts.Port is set to the actual listen
 	// port (if option was originally set to RANDOM), even during a config
 	// reload. So use of s.opts.Port is safe.
@@ -1205,6 +1198,7 @@ func (s *Server) getClientConnectURLs() []string {
 				s.Errorf("Address %q can not be resolved properly", opts.Host)
 			} else {
 				urls = append(urls, net.JoinHostPort(opts.Host, sPort))
+				s.Noticef("init getClientConnectURLs [%V]", urls)
 			}
 		}
 	}

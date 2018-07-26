@@ -338,7 +338,7 @@ func (c *client) writeLoop() {
 	waitOk := true
 
 	// Main loop. Will wait to be signaled and then will use
-	// buffered outbound structure for efficient writev to the underlying socket.
+	// buffered outbound structure for efficient writing to the underlying socket.
 	for {
 		c.mu.Lock()
 		if waitOk && (c.out.pb == 0 || c.out.fsp > 0) && len(c.out.nb) == 0 && !c.flags.isSet(clearConnection) {
@@ -356,6 +356,7 @@ func (c *client) writeLoop() {
 	}
 }
 
+//client read operations
 // readLoop is the main socket read functionality.
 // Runs in its own Go routine.
 func (c *client) readLoop() {
@@ -373,7 +374,6 @@ func (c *client) readLoop() {
 	}
 
 	// Start read buffer.
-
 	b := make([]byte, c.in.rsz)
 
 	for {
