@@ -20,7 +20,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nats-io/gnatsd/server"
+	"github.com/elitecodegroovy/gmessage/server"
 )
 
 func doAuthConnect(t tLogger, c net.Conn, token, user, pass string) {

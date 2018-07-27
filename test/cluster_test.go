@@ -20,7 +20,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nats-io/gnatsd/server"
+	"github.com/elitecodegroovy/gmessage/server"
 )
 
 // Helper function to check that a cluster is formed

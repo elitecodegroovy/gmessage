@@ -25,8 +25,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nats-io/gnatsd/server"
-	"github.com/nats-io/go-nats"
+	"github.com/elitecodegroovy/gmessage/server"
+	"github.com/elitecodegroovy/gmessage/gio"
 )
 
 const clientProtoInfo = 1

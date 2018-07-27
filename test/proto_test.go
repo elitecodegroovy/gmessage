@@ -18,7 +18,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nats-io/gnatsd/server"
+	"github.com/elitecodegroovy/gmessage/server"
 )
 
 const PROTO_TEST_PORT = 9922

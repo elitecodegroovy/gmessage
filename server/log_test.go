@@ -10,7 +10,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/nats-io/gnatsd/logger"
+	"github.com/elitecodegroovy/gmessage/logger"
 )
 
 func TestSetLogger(t *testing.T) {
