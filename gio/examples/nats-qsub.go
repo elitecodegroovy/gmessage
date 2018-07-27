@@ -9,7 +9,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/elitecodegroovy/gmessage/g-io"
+	"github.com/elitecodegroovy/gmessage/gio"
 )
 
 // NOTE: Use tls scheme for TLS, e.g. nats-qsub -s tls://demo.nats.io:4443 foo

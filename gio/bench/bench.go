@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/elitecodegroovy/gmessage/g-io"
+	"github.com/elitecodegroovy/gmessage/gio"
 	"github.com/nats-io/nuid"
 )
 

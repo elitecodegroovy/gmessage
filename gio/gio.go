@@ -21,7 +21,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/elitecodegroovy/gmessage/g-io/util"
+	"github.com/elitecodegroovy/gmessage/gio/util"
 	"github.com/nats-io/nuid"
 )
 

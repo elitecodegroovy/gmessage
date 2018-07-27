@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elitecodegroovy/gmessage/g-io"
+	"github.com/elitecodegroovy/gmessage/gio"
 )
 
 func BenchmarkPublishSpeed(b *testing.B) {

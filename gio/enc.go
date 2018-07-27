@@ -10,7 +10,7 @@ import (
 	"time"
 
 	// Default Encoders
-	. "github.com/elitecodegroovy/gmessage/g-io/encoders/builtin"
+	. "github.com/elitecodegroovy/gmessage/gio/encoders/builtin"
 )
 
 // Encoder interface is for all register encoders

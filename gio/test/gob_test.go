@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/elitecodegroovy/gmessage/g-io"
+	"github.com/elitecodegroovy/gmessage/gio"
 )
 
 func NewGobEncodedConn(tl TestLogger) *nats.EncodedConn {

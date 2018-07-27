@@ -14,7 +14,7 @@ import (
 
 	"github.com/elitecodegroovy/gmessage/server"
 	"github.com/elitecodegroovy/gmessage/test"
-	"github.com/elitecodegroovy/gmessage/g-io"
+	"github.com/elitecodegroovy/gmessage/gio"
 )
 
 var testServers = []string{

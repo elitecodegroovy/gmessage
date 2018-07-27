@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/elitecodegroovy/gmessage/g-io"
+	"github.com/elitecodegroovy/gmessage/gio"
 )
 
 // Additional index for registered Encoders.

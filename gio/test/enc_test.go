@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elitecodegroovy/gmessage/g-io"
-	"github.com/elitecodegroovy/gmessage/g-io/encoders/builtin"
+	"github.com/elitecodegroovy/gmessage/gio"
+	"github.com/elitecodegroovy/gmessage/gio/encoders/builtin"
 )
 
 const TEST_PORT = 8168

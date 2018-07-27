@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elitecodegroovy/gmessage/g-io"
-	"github.com/elitecodegroovy/gmessage/g-io/bench"
+	"github.com/elitecodegroovy/gmessage/gio"
+	"github.com/elitecodegroovy/gmessage/gio/bench"
 )
 
 // Some sane defaults

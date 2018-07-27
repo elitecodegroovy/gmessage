@@ -19,7 +19,7 @@ import (
 	"time"
 
 	"github.com/elitecodegroovy/gmessage/server"
-	gnatsd "github.com/elitecodegroovy/gmessage/g-io/test"
+	gnatsd "github.com/elitecodegroovy/gmessage/gio/test"
 )
 
 // Dumb wait program to sync on callbacks, etc... Will timeout
