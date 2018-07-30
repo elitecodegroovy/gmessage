@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nats-io/go-nats"
+	"github.com/elitecodegroovy/gmessage/gio"
 )
 
 func checkFor(t *testing.T, totalWait, sleepDur time.Duration, f func() error) {
@@ -587,7 +587,7 @@ func TestRandomPorts(t *testing.T) {
 
 }
 
-// Test nil monitorAddress
+// Test nil monitorAddress: PASS
 func TestNilMonitoringPort(t *testing.T) {
 	opts := DefaultOptions()
 	opts.HTTPPort = 0
@@ -607,7 +607,7 @@ func (d *DummyAuth) Check(c ClientAuthentication) bool {
 	return c.GetOpts().Username == "valid"
 }
 
-//Test Custom Client Authentication
+//Test Custom Client Authentication: PASS
 func TestCustomClientAuthentication(t *testing.T) {
 	var clientAuth DummyAuth
 
@@ -630,7 +630,7 @@ func TestCustomClientAuthentication(t *testing.T) {
 	}
 }
 
-//Test
+//Test customer router authentication: PASS
 func TestCustomRouterAuthentication(t *testing.T) {
 	opts := DefaultOptions()
 	opts.CustomRouterAuthentication = &DummyAuth{}
@@ -641,7 +641,7 @@ func TestCustomRouterAuthentication(t *testing.T) {
 
 	opts2 := DefaultOptions()
 	opts2.Cluster.Host = "127.0.0.1"
-	opts2.Routes = RoutesFromStr(fmt.Sprintf("nats://invalid@127.0.0.1:%d", clusterPort))
+	opts2.Routes = RoutesFromStr(fmt.Sprintf("nats://valid1@127.0.0.1:%d", clusterPort))
 	s2 := RunServer(opts2)
 	defer s2.Shutdown()
 
@@ -659,6 +659,7 @@ func TestCustomRouterAuthentication(t *testing.T) {
 	checkNumRoutes(t, s3, 1)
 }
 
+// Test monitor timeout : PASS
 func TestMonitoringNoTimeout(t *testing.T) {
 	s := runMonitorServer()
 	defer s.Shutdown()

@@ -81,6 +81,7 @@ func newQSub(subject, queue string) *subscription {
 	return newSub(subject)
 }
 
+//Test sublist init func
 func TestSublistInit(t *testing.T) {
 	s := NewSublist()
 	verifyCount(s, 0, t)

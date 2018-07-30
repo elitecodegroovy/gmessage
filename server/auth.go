@@ -128,6 +128,7 @@ func (s *Server) hasUsers() bool {
 
 // isClientAuthorized will check the client against the proper authorization method and data.
 // This could be token or username/password based.
+//VIP authorization
 func (s *Server) isClientAuthorized(c *client) bool {
 	// Snapshot server options.
 	opts := s.getOpts()

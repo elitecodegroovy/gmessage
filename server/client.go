@@ -359,9 +359,10 @@ func (c *client) writeLoop() {
 //client read operations
 // readLoop is the main socket read functionality.
 // Runs in its own Go routine.
+// TODO >> VIP read operations
 func (c *client) readLoop() {
 	// Grab the connection off the client, it will be cleared on a close.
-	// We check for that after the loop, but want to avoid a nil dereference
+ 	// We check for that after the loop, but want to avoid a nil dereference
 	c.mu.Lock()
 	nc := c.nc
 	s := c.srv
@@ -658,6 +659,7 @@ func (c *client) processErr(errStr string) {
 	c.closeConnection(ParseError)
 }
 
+//TODO ... VIP processing Connnection
 func (c *client) processConnect(arg []byte) error {
 	c.traceInOp("CONNECT", arg)
 
@@ -1411,6 +1413,7 @@ func (c *client) prepMsgHeader() []byte {
 }
 
 // processMsg is called to process an inbound msg from a client.
+// TODO ... VIP logic
 func (c *client) processMsg(msg []byte) {
 	// Snapshot server.
 	srv := c.srv
@@ -1776,7 +1779,7 @@ func (c *client) setRouteNoReconnectOnClose() {
 	c.mu.Unlock()
 }
 
-// Logging functionality scoped to a client or route.
+//---------------- Logging functionality scoped to a client or route.-------------------
 
 func (c *client) Errorf(format string, v ...interface{}) {
 	format = fmt.Sprintf("%s - %s", c, format)

@@ -80,6 +80,8 @@ const (
 	INFO_ARG
 )
 
+//VIP operation: Proto parsing
+//TODO >> proto rules was define here.
 func (c *client) parse(buf []byte) error {
 	var i int
 	var b byte
