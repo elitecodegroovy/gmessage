@@ -1,5 +1,3 @@
-
-
 package nats
 
 import (

@@ -1,4 +1,3 @@
-
 package server
 
 import (
@@ -213,7 +212,6 @@ func (s *Server) generateRouteInfoJSON() {
 	pcs := [][]byte{[]byte("INFO"), b, []byte(CR_LF)}
 	s.routeInfoJSON = bytes.Join(pcs, []byte(" "))
 }
-
 
 // ProcessCommandLineArgs takes the command line arguments
 // validating and setting flags for handling in case any

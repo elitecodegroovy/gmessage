@@ -1,11 +1,10 @@
-
 package protobuf
 
 import (
 	"errors"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/elitecodegroovy/gmessage/gio"
+	"github.com/golang/protobuf/proto"
 )
 
 // Additional index for registered Encoders.

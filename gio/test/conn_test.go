@@ -1,4 +1,3 @@
-
 package test
 
 import (
@@ -17,9 +16,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elitecodegroovy/gmessage/gio"
 	"github.com/elitecodegroovy/gmessage/server"
 	"github.com/elitecodegroovy/gmessage/test"
-	"github.com/elitecodegroovy/gmessage/gio"
 )
 
 func TestDefaultConnection(t *testing.T) {

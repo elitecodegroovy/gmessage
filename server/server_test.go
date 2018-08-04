@@ -1,4 +1,3 @@
-
 package server
 
 import (
@@ -414,7 +413,6 @@ func TestMaxSubscriptions(t *testing.T) {
 	}
 }
 
-
 func TestProcessCommandLineArgs(t *testing.T) {
 	var host string
 	var port int
@@ -580,7 +578,7 @@ func TestRandomPorts(t *testing.T) {
 		t.Fatal("Should not have dynamically assigned default port: 4222.")
 	}
 
-	t.Logf("monitor port : %d", s.MonitorAddr().Port )
+	t.Logf("monitor port : %d", s.MonitorAddr().Port)
 	if s.MonitorAddr() == nil || s.MonitorAddr().Port <= 0 {
 		t.Fatal("Should have dynamically assigned monitoring port.")
 	}

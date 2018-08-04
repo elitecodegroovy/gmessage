@@ -27,8 +27,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elitecodegroovy/gmessage/server"
 	"github.com/elitecodegroovy/gmessage/gio"
+	"github.com/elitecodegroovy/gmessage/server"
 )
 
 const CLIENT_PORT = 11422

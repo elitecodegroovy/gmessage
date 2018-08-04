@@ -2,14 +2,14 @@ package httpclient
 
 import (
 	"fmt"
-	"net/http"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"time"
 )
 
 var myTransport http.RoundTripper = &http.Transport{
-	Proxy:                 http.ProxyFromEnvironment,
+	Proxy: http.ProxyFromEnvironment,
 	ResponseHeaderTimeout: time.Second * 2,
 }
 
@@ -47,5 +47,3 @@ func DownloadImg(uri string, dst string) {
 		}
 	}
 }
-
-

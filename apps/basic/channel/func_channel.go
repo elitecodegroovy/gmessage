@@ -1,18 +1,18 @@
 package channel
 
 import (
-	"strconv"
 	"fmt"
+	"strconv"
 	"time"
 )
 
-func addFunc(fxChan chan func() string){
+func addFunc(fxChan chan func() string) {
 	i := 0
 	max := 10
 	for {
 		i++
 		fxChan <- func() string {
-			return "msg "+ strconv.Itoa(i)
+			return "msg " + strconv.Itoa(i)
 		}
 		time.Sleep(1 * time.Second)
 		if i > max {
@@ -25,11 +25,11 @@ func addFunc(fxChan chan func() string){
 }
 
 //It is always doing.
-func doTask(fxChan chan func() string){
+func doTask(fxChan chan func() string) {
 	i := 10
-	for{
+	for {
 		select {
-		case rfx := <- fxChan:
+		case rfx := <-fxChan:
 			msg := rfx()
 			fmt.Println(msg, "Received!")
 		default:
@@ -40,12 +40,11 @@ func doTask(fxChan chan func() string){
 			return
 		}
 
-
 	}
 }
 
-func DoFuncChan(){
-	fxChan := make (chan func() string)
+func DoFuncChan() {
+	fxChan := make(chan func() string)
 	go addFunc(fxChan)
 	doTask(fxChan)
 }

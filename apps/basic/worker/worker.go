@@ -13,7 +13,7 @@ type Worker interface {
 // tasks that are submitted.
 type Pool struct {
 	worker chan Worker
-	wg   sync.WaitGroup
+	wg     sync.WaitGroup
 }
 
 // New creates a new worker pool.

@@ -1,4 +1,3 @@
-
 // Customized heavily from
 // https://github.com/BurntSushi/toml/blob/master/lex.go, which is based on
 // Rob Pike's talk: http://cuddle.googlecode.com/hg/talk/lex.html

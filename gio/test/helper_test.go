@@ -1,4 +1,3 @@
-
 package test
 
 import (
@@ -8,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elitecodegroovy/gmessage/server"
 	"github.com/elitecodegroovy/gmessage/gio"
+	"github.com/elitecodegroovy/gmessage/server"
 
 	gnatsd "github.com/elitecodegroovy/gmessage/test"
 )

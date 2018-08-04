@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"time"
-	"math/rand"
 	"log"
+	"math/rand"
+	"time"
 )
 
 func asChan(vs ...int) <-chan int {
@@ -45,7 +45,6 @@ func merge1(a, b <-chan int) <-chan int {
 	}()
 	return c
 }
-
 
 func merge(a, b <-chan int) <-chan int {
 	c := make(chan int)

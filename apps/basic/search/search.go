@@ -84,7 +84,7 @@ func Submit(query string, options ...func(*searchSession)) []Result {
 			continue
 		}
 
-		// Wait to recieve results.
+		// Wait to receive results.
 		log.Println("search : Submit : Info : Waiting For Results...")
 		result := <-session.resultChan
 

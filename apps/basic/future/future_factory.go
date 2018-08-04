@@ -11,7 +11,7 @@ type anyPromiseResult struct {
 
 //Start start a goroutines to execute task function
 //and return a Future that presents the result.
-//If option paramter is true, the act function will be sync called.
+//If option parameter is true, the act function will be sync called.
 //Type of act can be any of below four types:
 //  func() (r interface{}, err error):
 //     if err returned by act != nil or panic error, then Future will be rejected with error,

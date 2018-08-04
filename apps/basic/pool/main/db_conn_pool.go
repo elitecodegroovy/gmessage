@@ -16,7 +16,7 @@ import (
 //Change the value if you want to test with big value.
 const (
 	maxGoroutines   = 100 // the number of routines to use.
-	pooledResources = 10 // number of resources in the pool
+	pooledResources = 10  // number of resources in the pool
 )
 
 // dbConnection simulates a resource to share.

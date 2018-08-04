@@ -1,4 +1,3 @@
-
 package nats_test
 
 import (

@@ -1,4 +1,3 @@
-
 package server
 
 // We wrap to hold onto optional items for /connz.

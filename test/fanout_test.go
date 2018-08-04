@@ -20,8 +20,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/elitecodegroovy/gmessage/server"
 	"github.com/elitecodegroovy/gmessage/gio"
+	"github.com/elitecodegroovy/gmessage/server"
 )
 
 // IMPORTANT: Tests in this file are not executed when running with the -race flag.

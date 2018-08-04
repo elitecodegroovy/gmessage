@@ -1,14 +1,14 @@
 package main
 
 import (
-	"net/http"
-	"io/ioutil"
-	"github.com/elitecodegroovy/gmessage/apps/basic/future"
 	"fmt"
+	"github.com/elitecodegroovy/gmessage/apps/basic/future"
+	"io/ioutil"
+	"net/http"
 )
 
 func callTask() {
-	task := func()(r interface{}, err error){
+	task := func() (r interface{}, err error) {
 		url := "http://ip.taobao.com/service/getIpInfo.php?ip=221.4.38.21"
 
 		resp, err := http.Get(url)
@@ -36,11 +36,10 @@ func callTask() {
 	})
 	if r, err := f.Get(); err == nil {
 		fmt.Println("response : ", string(r.([]byte)))
-	}else {
+	} else {
 		fmt.Errorf("error %s", err.Error())
 	}
 }
-
 
 func main() {
 	//Test()
