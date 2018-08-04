@@ -8,9 +8,8 @@ import (
 	"github.com/elitecodegroovy/gmessage/gio"
 )
 
-// NOTE: Use tls scheme for TLS, e.g. gio-req -s tls://demo.nats.io:4443 foo hello
 func usage() {
-	log.Fatalf("Usage: gio-req [-s server (%s)] <subject> <msg> \n", nats.DefaultURL)
+	log.Fatalf("Usage: gio-req [-s server (%s)] <subject> <msg> \n", gio.DefaultURL)
 }
 
 func main() {
@@ -25,7 +24,7 @@ func main() {
 		usage()
 	}
 
-	nc, err := nats.Connect(*urls)
+	nc, err := gio.Connect(*urls)
 	if err != nil {
 		log.Fatalf("Can't connect: %v\n", err)
 	}

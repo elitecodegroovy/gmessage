@@ -1,15 +1,15 @@
 [Unit]
-Description=NATS messaging server
+Description=GMessage messaging server
 After=network.target
 
 [Service]
 PrivateTmp=true
 Type=simple
-ExecStart=/usr/sbin/gnatsd -c /etc/gnatsd.conf
+ExecStart=/usr/sbin/gmessaged -c /etc/gnatsd.conf
 ExecReload=/bin/kill -s HUP $MAINPID
 ExecStop=/bin/kill -s SIGINT $MAINPID
-User=gnatsd
-Group=gnatsd
+User=ggiod
+Group=ggiod
 
 [Install]
 WantedBy=multi-user.target

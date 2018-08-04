@@ -14,7 +14,7 @@ const (
 
 func init() {
 	// Register protobuf encoder
-	nats.RegisterEncoder(PROTOBUF_ENCODER, &ProtobufEncoder{})
+	gio.RegisterEncoder(PROTOBUF_ENCODER, &ProtobufEncoder{})
 }
 
 // ProtobufEncoder is a protobuf implementation for EncodedConn

@@ -11,8 +11,8 @@ import (
 
 const TEST_PORT = 8168
 
-func NewDefaultEConn(t *testing.T) *nats.EncodedConn {
-	ec, err := nats.NewEncodedConn(NewConnection(t, TEST_PORT), nats.DEFAULT_ENCODER)
+func NewDefaultEConn(t *testing.T) *gio.EncodedConn {
+	ec, err := gio.NewEncodedConn(NewConnection(t, TEST_PORT), gio.DEFAULT_ENCODER)
 	if err != nil {
 		t.Fatalf("Failed to create an encoded connection: %v\n", err)
 	}
@@ -24,16 +24,16 @@ func TestEncBuiltinConstructorErrs(t *testing.T) {
 	defer s.Shutdown()
 
 	c := NewConnection(t, TEST_PORT)
-	_, err := nats.NewEncodedConn(nil, "default")
+	_, err := gio.NewEncodedConn(nil, "default")
 	if err == nil {
 		t.Fatal("Expected err for nil connection")
 	}
-	_, err = nats.NewEncodedConn(c, "foo22")
+	_, err = gio.NewEncodedConn(c, "foo22")
 	if err == nil {
 		t.Fatal("Expected err for bad encoder")
 	}
 	c.Close()
-	_, err = nats.NewEncodedConn(c, "default")
+	_, err = gio.NewEncodedConn(c, "default")
 	if err == nil {
 		t.Fatal("Expected err for closed connection")
 	}
@@ -328,7 +328,7 @@ func TestEncBuiltinRawMsgSubscribeCB(t *testing.T) {
 	oSubj := "cb_args"
 	oReply := "foobar"
 
-	ec.Subscribe(oSubj, func(m *nats.Msg) {
+	ec.Subscribe(oSubj, func(m *gio.Msg) {
 		s := string(m.Data)
 		if s != testString {
 			t.Fatalf("Received test string of '%s', wanted '%s'\n", s, testString)
@@ -387,7 +387,7 @@ func TestEncBuiltinRequestReceivesMsg(t *testing.T) {
 		ec.Publish(reply, expectedResp)
 	})
 
-	var resp nats.Msg
+	var resp gio.Msg
 
 	err := ec.Request("help", "help me", &resp, 1*time.Second)
 	if err != nil {
@@ -414,7 +414,7 @@ func TestEncBuiltinAsyncMarshalErr(t *testing.T) {
 		// This will never get called.
 	})
 
-	ec.Conn.Opts.AsyncErrorCB = func(c *nats.Conn, s *nats.Subscription, err error) {
+	ec.Conn.Opts.AsyncErrorCB = func(c *gio.Conn, s *gio.Subscription, err error) {
 		ch <- true
 	}
 

@@ -27,7 +27,7 @@ func TestServerAutoUnsub(t *testing.T) {
 
 	base := runtime.NumGoroutine()
 
-	sub, err := nc.Subscribe("foo", func(_ *nats.Msg) {
+	sub, err := nc.Subscribe("foo", func(_ *gio.Msg) {
 		atomic.AddInt32(&received, 1)
 	})
 	if err != nil {
@@ -74,8 +74,8 @@ func TestClientSyncAutoUnsub(t *testing.T) {
 	for {
 		_, err := sub.NextMsg(10 * time.Millisecond)
 		if err != nil {
-			if err != nats.ErrMaxMessages {
-				t.Fatalf("Expected '%v', but got: '%v'\n", nats.ErrBadSubscription, err.Error())
+			if err != gio.ErrMaxMessages {
+				t.Fatalf("Expected '%v', but got: '%v'\n", gio.ErrBadSubscription, err.Error())
 			}
 			break
 		}
@@ -100,7 +100,7 @@ func TestClientASyncAutoUnsub(t *testing.T) {
 	defer nc.Close()
 	received := int32(0)
 	max := int32(10)
-	sub, err := nc.Subscribe("foo", func(_ *nats.Msg) {
+	sub, err := nc.Subscribe("foo", func(_ *gio.Msg) {
 		atomic.AddInt32(&received, 1)
 	})
 	if err != nil {
@@ -128,9 +128,9 @@ func TestAutoUnsubAndReconnect(t *testing.T) {
 
 	rch := make(chan bool)
 
-	nc, err := nats.Connect(nats.DefaultURL,
-		nats.ReconnectWait(50*time.Millisecond),
-		nats.ReconnectHandler(func(_ *nats.Conn) { rch <- true }))
+	nc, err := gio.Connect(gio.DefaultURL,
+		gio.ReconnectWait(50*time.Millisecond),
+		gio.ReconnectHandler(func(_ *gio.Conn) { rch <- true }))
 	if err != nil {
 		t.Fatalf("Unable to connect: %v", err)
 	}
@@ -138,7 +138,7 @@ func TestAutoUnsubAndReconnect(t *testing.T) {
 
 	received := int32(0)
 	max := int32(10)
-	sub, err := nc.Subscribe("foo", func(_ *nats.Msg) {
+	sub, err := nc.Subscribe("foo", func(_ *gio.Msg) {
 		atomic.AddInt32(&received, 1)
 	})
 	if err != nil {
@@ -185,9 +185,9 @@ func TestAutoUnsubWithParallelNextMsgCalls(t *testing.T) {
 
 	rch := make(chan bool, 1)
 
-	nc, err := nats.Connect(nats.DefaultURL,
-		nats.ReconnectWait(50*time.Millisecond),
-		nats.ReconnectHandler(func(_ *nats.Conn) { rch <- true }))
+	nc, err := gio.Connect(gio.DefaultURL,
+		gio.ReconnectWait(50*time.Millisecond),
+		gio.ReconnectHandler(func(_ *gio.Conn) { rch <- true }))
 	if err != nil {
 		t.Fatalf("Unable to connect: %v", err)
 	}
@@ -210,7 +210,7 @@ func TestAutoUnsubWithParallelNextMsgCalls(t *testing.T) {
 	wg.Add(numRoutines)
 
 	for i := 0; i < numRoutines; i++ {
-		go func(s *nats.Subscription, idx int) {
+		go func(s *gio.Subscription, idx int) {
 			for {
 				// The first to reach the max delivered will cause the
 				// subscription to be removed, which will kick out all
@@ -256,7 +256,7 @@ func TestAutoUnsubscribeFromCallback(t *testing.T) {
 	s := RunDefaultServer()
 	defer s.Shutdown()
 
-	nc, err := nats.Connect(nats.DefaultURL)
+	nc, err := gio.Connect(gio.DefaultURL)
 	if err != nil {
 		t.Fatalf("Unable to connect: %v", err)
 	}
@@ -272,7 +272,7 @@ func TestAutoUnsubscribeFromCallback(t *testing.T) {
 	// Auto-unsubscribe within the callback with a value lower
 	// than what was already received.
 
-	sub, err := nc.Subscribe("foo", func(m *nats.Msg) {
+	sub, err := nc.Subscribe("foo", func(m *gio.Msg) {
 		r := atomic.AddInt64(&received, 1)
 		if r == resetUnsubMark {
 			m.Sub.AutoUnsubscribe(int(r - 1))
@@ -306,7 +306,7 @@ func TestAutoUnsubscribeFromCallback(t *testing.T) {
 	received = int64(0)
 	newMax := int64(2 * max)
 
-	sub, err = nc.Subscribe("foo", func(m *nats.Msg) {
+	sub, err = nc.Subscribe("foo", func(m *gio.Msg) {
 		r := atomic.AddInt64(&received, 1)
 		if r == resetUnsubMark {
 			m.Sub.AutoUnsubscribe(int(newMax))
@@ -426,7 +426,7 @@ func TestSlowChanSubscriber(t *testing.T) {
 	nc := NewDefaultConnection(t)
 	defer nc.Close()
 
-	ch := make(chan *nats.Msg, 64)
+	ch := make(chan *gio.Msg, 64)
 	sub, _ := nc.ChanSubscribe("foo", ch)
 	sub.SetPendingLimits(100, 1024)
 
@@ -451,17 +451,17 @@ func TestSlowAsyncSubscriber(t *testing.T) {
 
 	bch := make(chan bool)
 
-	sub, _ := nc.Subscribe("foo", func(_ *nats.Msg) {
+	sub, _ := nc.Subscribe("foo", func(_ *gio.Msg) {
 		// block to back us up..
 		<-bch
 	})
 	// Make sure these are the defaults
 	pm, pb, _ := sub.PendingLimits()
-	if pm != nats.DefaultSubPendingMsgsLimit {
-		t.Fatalf("Pending limit for number of msgs incorrect, expected %d, got %d\n", nats.DefaultSubPendingMsgsLimit, pm)
+	if pm != gio.DefaultSubPendingMsgsLimit {
+		t.Fatalf("Pending limit for number of msgs incorrect, expected %d, got %d\n", gio.DefaultSubPendingMsgsLimit, pm)
 	}
-	if pb != nats.DefaultSubPendingBytesLimit {
-		t.Fatalf("Pending limit for number of bytes incorrect, expected %d, got %d\n", nats.DefaultSubPendingBytesLimit, pb)
+	if pb != gio.DefaultSubPendingBytesLimit {
+		t.Fatalf("Pending limit for number of bytes incorrect, expected %d, got %d\n", gio.DefaultSubPendingBytesLimit, pb)
 	}
 
 	// Set new limits
@@ -494,7 +494,7 @@ func TestSlowAsyncSubscriber(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Expected no error from Flush()\n")
 	}
-	if nc.LastError() != nats.ErrSlowConsumer {
+	if nc.LastError() != gio.ErrSlowConsumer {
 		t.Fatal("Expected LastError to indicate slow consumer")
 	}
 	// release the sub
@@ -505,7 +505,7 @@ func TestAsyncErrHandler(t *testing.T) {
 	s := RunDefaultServer()
 	defer s.Shutdown()
 
-	opts := nats.GetDefaultOptions()
+	opts := gio.GetDefaultOptions()
 
 	nc, err := opts.Connect()
 	if err != nil {
@@ -516,7 +516,7 @@ func TestAsyncErrHandler(t *testing.T) {
 	subj := "async_test"
 	bch := make(chan bool)
 
-	sub, err := nc.Subscribe(subj, func(_ *nats.Msg) {
+	sub, err := nc.Subscribe(subj, func(_ *gio.Msg) {
 		// block to back us up..
 		<-bch
 	})
@@ -534,14 +534,14 @@ func TestAsyncErrHandler(t *testing.T) {
 
 	aeCalled := int64(0)
 
-	nc.SetErrorHandler(func(c *nats.Conn, s *nats.Subscription, e error) {
+	nc.SetErrorHandler(func(c *gio.Conn, s *gio.Subscription, e error) {
 		atomic.AddInt64(&aeCalled, 1)
 
 		if s != sub {
 			t.Fatal("Did not receive proper subscription")
 		}
-		if e != nats.ErrSlowConsumer {
-			t.Fatalf("Did not receive proper error: %v vs %v\n", e, nats.ErrSlowConsumer)
+		if e != gio.ErrSlowConsumer {
+			t.Fatalf("Did not receive proper error: %v vs %v\n", e, gio.ErrSlowConsumer)
 		}
 		// Suppress additional calls
 		if atomic.LoadInt64(&aeCalled) == 1 {
@@ -584,7 +584,7 @@ func TestAsyncErrHandlerChanSubscription(t *testing.T) {
 	s := RunDefaultServer()
 	defer s.Shutdown()
 
-	opts := nats.GetDefaultOptions()
+	opts := gio.GetDefaultOptions()
 
 	nc, err := opts.Connect()
 	if err != nil {
@@ -598,7 +598,7 @@ func TestAsyncErrHandlerChanSubscription(t *testing.T) {
 	toSend := 100
 
 	// Create our own channel.
-	mch := make(chan *nats.Msg, limit)
+	mch := make(chan *gio.Msg, limit)
 	sub, err := nc.ChanSubscribe(subj, mch)
 	if err != nil {
 		t.Fatalf("Could not subscribe: %v\n", err)
@@ -606,11 +606,11 @@ func TestAsyncErrHandlerChanSubscription(t *testing.T) {
 	ch := make(chan bool)
 	aeCalled := int64(0)
 
-	nc.SetErrorHandler(func(c *nats.Conn, s *nats.Subscription, e error) {
+	nc.SetErrorHandler(func(c *gio.Conn, s *gio.Subscription, e error) {
 		atomic.AddInt64(&aeCalled, 1)
-		if e != nats.ErrSlowConsumer {
+		if e != gio.ErrSlowConsumer {
 			t.Fatalf("Did not receive proper error: %v vs %v\n",
-				e, nats.ErrSlowConsumer)
+				e, gio.ErrSlowConsumer)
 		}
 		// Suppress additional calls
 		if atomic.LoadInt64(&aeCalled) == 1 {
@@ -652,17 +652,17 @@ func TestAsyncSubscriberStarvation(t *testing.T) {
 	defer nc.Close()
 
 	// Helper
-	nc.Subscribe("helper", func(m *nats.Msg) {
+	nc.Subscribe("helper", func(m *gio.Msg) {
 		nc.Publish(m.Reply, []byte("Hello"))
 	})
 
 	ch := make(chan bool)
 
 	// Kickoff
-	nc.Subscribe("start", func(m *nats.Msg) {
+	nc.Subscribe("start", func(m *gio.Msg) {
 		// Helper Response
-		response := nats.NewInbox()
-		nc.Subscribe(response, func(_ *nats.Msg) {
+		response := gio.NewInbox()
+		nc.Subscribe(response, func(_ *gio.Msg) {
 			ch <- true
 		})
 		nc.PublishRequest("helper", response, []byte("Help Me!"))
@@ -687,7 +687,7 @@ func TestAsyncSubscribersOnClose(t *testing.T) {
 	callbacks := int32(0)
 	ch := make(chan bool, toSend)
 
-	nc.Subscribe("foo", func(_ *nats.Msg) {
+	nc.Subscribe("foo", func(_ *gio.Msg) {
 		atomic.AddInt32(&callbacks, 1)
 		<-ch
 	})
@@ -718,7 +718,7 @@ func TestNextMsgCallOnAsyncSub(t *testing.T) {
 
 	nc := NewDefaultConnection(t)
 	defer nc.Close()
-	sub, err := nc.Subscribe("foo", func(_ *nats.Msg) {
+	sub, err := nc.Subscribe("foo", func(_ *gio.Msg) {
 	})
 	if err != nil {
 		t.Fatal("Failed to subscribe: ", err)
@@ -747,8 +747,8 @@ func TestNextMsgCallOnClosedSub(t *testing.T) {
 	_, err = sub.NextMsg(time.Second)
 	if err == nil {
 		t.Fatal("Expected an error calling NextMsg() on closed subscription")
-	} else if err != nats.ErrBadSubscription {
-		t.Fatalf("Expected '%v', but got: '%v'\n", nats.ErrBadSubscription, err.Error())
+	} else if err != gio.ErrBadSubscription {
+		t.Fatalf("Expected '%v', but got: '%v'\n", gio.ErrBadSubscription, err.Error())
 	}
 }
 
@@ -760,7 +760,7 @@ func TestChanSubscriber(t *testing.T) {
 	defer nc.Close()
 
 	// Create our own channel.
-	ch := make(chan *nats.Msg, 128)
+	ch := make(chan *gio.Msg, 128)
 
 	// Channel is mandatory
 	if _, err := nc.ChanSubscribe("foo", nil); err == nil {
@@ -807,8 +807,8 @@ func TestChanQueueSubscriber(t *testing.T) {
 	defer nc.Close()
 
 	// Create our own channel.
-	ch1 := make(chan *nats.Msg, 64)
-	ch2 := make(chan *nats.Msg, 64)
+	ch1 := make(chan *gio.Msg, 64)
+	ch2 := make(chan *gio.Msg, 64)
 
 	nc.ChanQueueSubscribe("foo", "bar", ch1)
 	nc.ChanQueueSubscribe("foo", "bar", ch2)
@@ -859,16 +859,16 @@ func TestChanSubscriberPendingLimits(t *testing.T) {
 	// There was a defect that prevented to receive more than
 	// the default pending message limit. Trying to send more
 	// than this limit.
-	total := nats.DefaultSubPendingMsgsLimit + 100
+	total := gio.DefaultSubPendingMsgsLimit + 100
 
 	for typeSubs := 0; typeSubs < 3; typeSubs++ {
 
 		func() {
 			// Create our own channel.
-			ch := make(chan *nats.Msg, total)
+			ch := make(chan *gio.Msg, total)
 
 			var err error
-			var sub *nats.Subscription
+			var sub *gio.Subscription
 			switch typeSubs {
 			case 0:
 				sub, err = nc.ChanSubscribe("foo", ch)
@@ -928,8 +928,8 @@ func TestQueueChanQueueSubscriber(t *testing.T) {
 	defer nc.Close()
 
 	// Create our own channel.
-	ch1 := make(chan *nats.Msg, 64)
-	ch2 := make(chan *nats.Msg, 64)
+	ch1 := make(chan *gio.Msg, 64)
+	ch2 := make(chan *gio.Msg, 64)
 
 	nc.QueueSubscribeSyncWithChan("foo", "bar", ch1)
 	nc.QueueSubscribeSyncWithChan("foo", "bar", ch2)
@@ -987,7 +987,7 @@ func TestUnsubscribeChanOnSubscriber(t *testing.T) {
 	defer nc.Close()
 
 	// Create our own channel.
-	ch := make(chan *nats.Msg, 8)
+	ch := make(chan *gio.Msg, 8)
 	sub, _ := nc.ChanSubscribe("foo", ch)
 
 	// Send some messages to ourselves.
@@ -1002,7 +1002,7 @@ func TestUnsubscribeChanOnSubscriber(t *testing.T) {
 	}
 	// Make sure we can send to the channel still.
 	// Test that we do not close it.
-	ch <- &nats.Msg{}
+	ch <- &gio.Msg{}
 }
 
 func TestCloseChanOnSubscriber(t *testing.T) {
@@ -1013,7 +1013,7 @@ func TestCloseChanOnSubscriber(t *testing.T) {
 	defer nc.Close()
 
 	// Create our own channel.
-	ch := make(chan *nats.Msg, 8)
+	ch := make(chan *gio.Msg, 8)
 	nc.ChanSubscribe("foo", ch)
 
 	// Send some messages to ourselves.
@@ -1028,7 +1028,7 @@ func TestCloseChanOnSubscriber(t *testing.T) {
 	}
 	// Make sure we can send to the channel still.
 	// Test that we do not close it.
-	ch <- &nats.Msg{}
+	ch <- &gio.Msg{}
 }
 
 func TestAsyncSubscriptionPending(t *testing.T) {
@@ -1045,7 +1045,7 @@ func TestAsyncSubscriptionPending(t *testing.T) {
 	inCb := make(chan bool)
 	block := make(chan bool)
 
-	sub, _ := nc.Subscribe("foo", func(_ *nats.Msg) {
+	sub, _ := nc.Subscribe("foo", func(_ *gio.Msg) {
 		inCb <- true
 		<-block
 	})
@@ -1127,7 +1127,7 @@ func TestAsyncSubscriptionPendingDrain(t *testing.T) {
 	total := 100
 	msg := []byte("0123456789")
 
-	sub, _ := nc.Subscribe("foo", func(_ *nats.Msg) {})
+	sub, _ := nc.Subscribe("foo", func(_ *gio.Msg) {})
 	defer sub.Unsubscribe()
 
 	for i := 0; i < total; i++ {
@@ -1251,7 +1251,7 @@ func TestSetPendingLimits(t *testing.T) {
 	payloadLen := len(payload)
 	toSend := 100
 
-	var sub *nats.Subscription
+	var sub *gio.Subscription
 
 	// Check for invalid values
 	invalid := func() error {
@@ -1299,7 +1299,7 @@ func TestSetPendingLimits(t *testing.T) {
 
 	recv := make(chan bool)
 	block := make(chan bool)
-	cb := func(m *nats.Msg) {
+	cb := func(m *gio.Msg) {
 		recv <- true
 		<-block
 		m.Sub.Unsubscribe()
@@ -1414,9 +1414,9 @@ func TestSubscriptionTypes(t *testing.T) {
 	nc := NewDefaultConnection(t)
 	defer nc.Close()
 
-	sub, _ := nc.Subscribe("foo", func(_ *nats.Msg) {})
+	sub, _ := nc.Subscribe("foo", func(_ *gio.Msg) {})
 	defer sub.Unsubscribe()
-	if st := sub.Type(); st != nats.AsyncSubscription {
+	if st := sub.Type(); st != gio.AsyncSubscription {
 		t.Fatalf("Expected AsyncSubscription, got %v\n", st)
 	}
 	// Check Pending
@@ -1436,7 +1436,7 @@ func TestSubscriptionTypes(t *testing.T) {
 
 	sub, _ = nc.SubscribeSync("foo")
 	defer sub.Unsubscribe()
-	if st := sub.Type(); st != nats.SyncSubscription {
+	if st := sub.Type(); st != gio.SyncSubscription {
 		t.Fatalf("Expected SyncSubscription, got %v\n", st)
 	}
 	// Check Pending
@@ -1454,9 +1454,9 @@ func TestSubscriptionTypes(t *testing.T) {
 		t.Fatal("Calling PendingLimits() on closed subscription should fail")
 	}
 
-	sub, _ = nc.ChanSubscribe("foo", make(chan *nats.Msg))
+	sub, _ = nc.ChanSubscribe("foo", make(chan *gio.Msg))
 	defer sub.Unsubscribe()
-	if st := sub.Type(); st != nats.ChanSubscription {
+	if st := sub.Type(); st != gio.ChanSubscription {
 		t.Fatalf("Expected ChanSubscription, got %v\n", st)
 	}
 	// Check Pending

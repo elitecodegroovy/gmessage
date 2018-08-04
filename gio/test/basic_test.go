@@ -47,7 +47,7 @@ func TestLeakingGoRoutinesOnFailedConnect(t *testing.T) {
 
 	base := runtime.NumGoroutine()
 
-	nc, err := nats.Connect(nats.DefaultURL)
+	nc, err := gio.Connect(gio.DefaultURL)
 	if err == nil {
 		nc.Close()
 		t.Fatalf("Expected failure to connect")
@@ -71,7 +71,7 @@ func TestConnectedServer(t *testing.T) {
 	defer nc.Close()
 
 	u := nc.ConnectedUrl()
-	if u == "" || u != nats.DefaultURL {
+	if u == "" || u != gio.DefaultURL {
 		t.Fatalf("Unexpected connected URL of %s\n", u)
 	}
 	srv := nc.ConnectedServerId()
@@ -109,7 +109,7 @@ func TestBadOptionTimeoutConnect(t *testing.T) {
 	s := RunDefaultServer()
 	defer s.Shutdown()
 
-	opts := nats.GetDefaultOptions()
+	opts := gio.GetDefaultOptions()
 	opts.Timeout = -1
 	opts.Url = "nats://localhost:4222"
 
@@ -117,7 +117,7 @@ func TestBadOptionTimeoutConnect(t *testing.T) {
 	if err == nil {
 		t.Fatal("Expected an error")
 	}
-	if err != nats.ErrNoServers {
+	if err != gio.ErrNoServers {
 		t.Fatalf("Expected a ErrNoServers error: Got %v\n", err)
 	}
 }
@@ -189,7 +189,7 @@ func TestAsyncSubscribe(t *testing.T) {
 		t.Fatal("Creating subscription without callback should have failed")
 	}
 
-	_, err := nc.Subscribe("foo", func(m *nats.Msg) {
+	_, err := nc.Subscribe("foo", func(m *gio.Msg) {
 		if !bytes.Equal(m.Data, omsg) {
 			t.Fatal("Message received does not match")
 		}
@@ -224,7 +224,7 @@ func TestAsyncSubscribeRoutineLeakOnUnsubscribe(t *testing.T) {
 	// the subscriber is created.
 	base := runtime.NumGoroutine()
 
-	sub, err := nc.Subscribe("foo", func(m *nats.Msg) { ch <- true })
+	sub, err := nc.Subscribe("foo", func(m *gio.Msg) { ch <- true })
 	if err != nil {
 		t.Fatal("Failed to subscribe: ", err)
 	}
@@ -270,7 +270,7 @@ func TestAsyncSubscribeRoutineLeakOnClose(t *testing.T) {
 	nc := NewDefaultConnection(t)
 	defer nc.Close()
 
-	_, err := nc.Subscribe("foo", func(m *nats.Msg) { ch <- true })
+	_, err := nc.Subscribe("foo", func(m *gio.Msg) { ch <- true })
 	if err != nil {
 		t.Fatal("Failed to subscribe: ", err)
 	}
@@ -328,7 +328,7 @@ func TestPubSubWithReply(t *testing.T) {
 		t.Fatal("Failed to subscribe: ", err)
 	}
 	omsg := []byte("Hello World")
-	nc.PublishMsg(&nats.Msg{Subject: "foo", Reply: "bar", Data: omsg})
+	nc.PublishMsg(&gio.Msg{Subject: "foo", Reply: "bar", Data: omsg})
 	msg, err := sub.NextMsg(10 * time.Second)
 	if err != nil || !bytes.Equal(msg.Data, omsg) {
 		t.Fatal("Message received does not match")
@@ -409,14 +409,14 @@ func TestReplyArg(t *testing.T) {
 	ch := make(chan bool)
 	replyExpected := "bar"
 
-	nc.Subscribe("foo", func(m *nats.Msg) {
+	nc.Subscribe("foo", func(m *gio.Msg) {
 		if m.Reply != replyExpected {
 			t.Fatalf("Did not receive correct reply arg in callback: "+
 				"('%s' vs '%s')", m.Reply, replyExpected)
 		}
 		ch <- true
 	})
-	nc.PublishMsg(&nats.Msg{Subject: "foo", Reply: replyExpected, Data: []byte("Hello")})
+	nc.PublishMsg(&gio.Msg{Subject: "foo", Reply: replyExpected, Data: []byte("Hello")})
 	if e := Wait(ch); e != nil {
 		t.Fatal("Did not receive callback")
 	}
@@ -430,7 +430,7 @@ func TestSyncReplyArg(t *testing.T) {
 
 	replyExpected := "bar"
 	sub, _ := nc.SubscribeSync("foo")
-	nc.PublishMsg(&nats.Msg{Subject: "foo", Reply: replyExpected, Data: []byte("Hello")})
+	nc.PublishMsg(&gio.Msg{Subject: "foo", Reply: replyExpected, Data: []byte("Hello")})
 	msg, err := sub.NextMsg(1 * time.Second)
 	if err != nil {
 		t.Fatal("Received an err on NextMsg()")
@@ -450,7 +450,7 @@ func TestUnsubscribe(t *testing.T) {
 	received := int32(0)
 	max := int32(10)
 	ch := make(chan bool)
-	nc.Subscribe("foo", func(m *nats.Msg) {
+	nc.Subscribe("foo", func(m *gio.Msg) {
 		atomic.AddInt32(&received, 1)
 		if received == max {
 			err := m.Sub.Unsubscribe()
@@ -507,14 +507,14 @@ func TestOldRequest(t *testing.T) {
 	s := RunDefaultServer()
 	defer s.Shutdown()
 
-	nc, err := nats.Connect(nats.DefaultURL, nats.UseOldRequestStyle())
+	nc, err := gio.Connect(gio.DefaultURL, gio.UseOldRequestStyle())
 	if err != nil {
 		t.Fatalf("Failed to connect: %v", err)
 	}
 	defer nc.Close()
 
 	response := []byte("I will help you")
-	nc.Subscribe("foo", func(m *nats.Msg) {
+	nc.Subscribe("foo", func(m *gio.Msg) {
 		nc.Publish(m.Reply, response)
 	})
 	msg, err := nc.Request("foo", []byte("help"), 500*time.Millisecond)
@@ -533,7 +533,7 @@ func TestRequest(t *testing.T) {
 	defer nc.Close()
 
 	response := []byte("I will help you")
-	nc.Subscribe("foo", func(m *nats.Msg) {
+	nc.Subscribe("foo", func(m *gio.Msg) {
 		nc.Publish(m.Reply, response)
 	})
 	msg, err := nc.Request("foo", []byte("help"), 500*time.Millisecond)
@@ -552,7 +552,7 @@ func TestRequestNoBody(t *testing.T) {
 	defer nc.Close()
 
 	response := []byte("I will help you")
-	nc.Subscribe("foo", func(m *nats.Msg) {
+	nc.Subscribe("foo", func(m *gio.Msg) {
 		nc.Publish(m.Reply, response)
 	})
 	msg, err := nc.Request("foo", nil, 500*time.Millisecond)
@@ -571,7 +571,7 @@ func TestSimultaneousRequests(t *testing.T) {
 	defer nc.Close()
 
 	response := []byte("I will help you")
-	nc.Subscribe("foo", func(m *nats.Msg) {
+	nc.Subscribe("foo", func(m *gio.Msg) {
 		nc.Publish(m.Reply, response)
 	})
 
@@ -603,7 +603,7 @@ func TestRequestClose(t *testing.T) {
 		time.Sleep(100 * time.Millisecond)
 		nc.Close()
 	}()
-	if _, err := nc.Request("foo", []byte("help"), 2*time.Second); err != nats.ErrInvalidConnection && err != nats.ErrConnectionClosed {
+	if _, err := nc.Request("foo", []byte("help"), 2*time.Second); err != gio.ErrInvalidConnection && err != gio.ErrConnectionClosed {
 		t.Fatalf("Expected connection error: got %v", err)
 	}
 	wg.Wait()
@@ -620,7 +620,7 @@ func TestRequestCloseTimeout(t *testing.T) {
 	defer nc.Close()
 
 	response := []byte("I will help you")
-	nc.Subscribe("foo", func(m *nats.Msg) {
+	nc.Subscribe("foo", func(m *gio.Msg) {
 		nc.Publish(m.Reply, response)
 		nc.Close()
 	})
@@ -637,7 +637,7 @@ func TestFlushInCB(t *testing.T) {
 
 	ch := make(chan bool)
 
-	nc.Subscribe("foo", func(_ *nats.Msg) {
+	nc.Subscribe("foo", func(_ *gio.Msg) {
 		nc.Flush()
 		ch <- true
 	})
@@ -660,7 +660,7 @@ func TestReleaseFlush(t *testing.T) {
 }
 
 func TestInbox(t *testing.T) {
-	inbox := nats.NewInbox()
+	inbox := gio.NewInbox()
 	if matched, _ := regexp.Match(`_INBOX.\S`, []byte(inbox)); !matched {
 		t.Fatal("Bad INBOX format")
 	}
@@ -691,7 +691,7 @@ func TestStats(t *testing.T) {
 	nc.OutMsgs, nc.OutBytes = 0, 0
 
 	// Test both sync and async versions of subscribe.
-	nc.Subscribe("foo", func(_ *nats.Msg) {})
+	nc.Subscribe("foo", func(_ *gio.Msg) {})
 	nc.SubscribeSync("foo")
 
 	for i := 0; i < iter; i++ {
@@ -735,7 +735,7 @@ func TestBadSubject(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected an error on bad subject to publish")
 	}
-	if err != nats.ErrBadSubject {
+	if err != gio.ErrBadSubject {
 		t.Fatalf("Expected a ErrBadSubject error: Got %v\n", err)
 	}
 }
@@ -744,11 +744,11 @@ func TestOptions(t *testing.T) {
 	s := RunDefaultServer()
 	defer s.Shutdown()
 
-	nc, err := nats.Connect(nats.DefaultURL,
-		nats.Name("myName"),
-		nats.MaxReconnects(2),
-		nats.ReconnectWait(50*time.Millisecond),
-		nats.PingInterval(20*time.Millisecond))
+	nc, err := gio.Connect(gio.DefaultURL,
+		gio.Name("myName"),
+		gio.MaxReconnects(2),
+		gio.ReconnectWait(50*time.Millisecond),
+		gio.PingInterval(20*time.Millisecond))
 	if err != nil {
 		t.Fatalf("Failed to connect: %v", err)
 	}
@@ -757,8 +757,8 @@ func TestOptions(t *testing.T) {
 	rch := make(chan bool)
 	cch := make(chan bool)
 
-	nc.SetReconnectHandler(func(_ *nats.Conn) { rch <- true })
-	nc.SetClosedHandler(func(_ *nats.Conn) { cch <- true })
+	nc.SetReconnectHandler(func(_ *gio.Conn) { rch <- true })
+	nc.SetClosedHandler(func(_ *gio.Conn) { cch <- true })
 
 	s.Shutdown()
 
@@ -775,14 +775,14 @@ func TestOptions(t *testing.T) {
 		t.Fatal("Failed getting closed cb")
 	}
 
-	nc, err = nats.Connect(nats.DefaultURL, nats.NoReconnect())
+	nc, err = gio.Connect(gio.DefaultURL, gio.NoReconnect())
 	if err != nil {
 		t.Fatalf("Failed to connect: %v", err)
 	}
 	defer nc.Close()
 
-	nc.SetReconnectHandler(func(_ *nats.Conn) { rch <- true })
-	nc.SetClosedHandler(func(_ *nats.Conn) { cch <- true })
+	nc.SetReconnectHandler(func(_ *gio.Conn) { rch <- true })
+	nc.SetClosedHandler(func(_ *gio.Conn) { cch <- true })
 
 	s.Shutdown()
 
@@ -799,91 +799,91 @@ func TestOptions(t *testing.T) {
 }
 
 func TestNilConnection(t *testing.T) {
-	var nc *nats.Conn
+	var nc *gio.Conn
 	data := []byte("ok")
 
 	// Publish
-	if err := nc.Publish("foo", data); err == nil || err != nats.ErrInvalidConnection {
+	if err := nc.Publish("foo", data); err == nil || err != gio.ErrInvalidConnection {
 		t.Fatalf("Expected ErrInvalidConnection error, got %v\n", err)
 	}
-	if err := nc.PublishMsg(nil); err == nil || err != nats.ErrInvalidMsg {
+	if err := nc.PublishMsg(nil); err == nil || err != gio.ErrInvalidMsg {
 		t.Fatalf("Expected ErrInvalidMsg error, got %v\n", err)
 	}
-	if err := nc.PublishMsg(&nats.Msg{}); err == nil || err != nats.ErrInvalidConnection {
+	if err := nc.PublishMsg(&gio.Msg{}); err == nil || err != gio.ErrInvalidConnection {
 		t.Fatalf("Expected ErrInvalidConnection error, got %v\n", err)
 	}
-	if err := nc.PublishRequest("foo", "reply", data); err == nil || err != nats.ErrInvalidConnection {
+	if err := nc.PublishRequest("foo", "reply", data); err == nil || err != gio.ErrInvalidConnection {
 		t.Fatalf("Expected ErrInvalidConnection error, got %v\n", err)
 	}
 
 	// Subscribe
-	if _, err := nc.Subscribe("foo", nil); err == nil || err != nats.ErrInvalidConnection {
+	if _, err := nc.Subscribe("foo", nil); err == nil || err != gio.ErrInvalidConnection {
 		t.Fatalf("Expected ErrInvalidConnection error, got %v\n", err)
 	}
-	if _, err := nc.SubscribeSync("foo"); err == nil || err != nats.ErrInvalidConnection {
+	if _, err := nc.SubscribeSync("foo"); err == nil || err != gio.ErrInvalidConnection {
 		t.Fatalf("Expected ErrInvalidConnection error, got %v\n", err)
 	}
-	if _, err := nc.QueueSubscribe("foo", "bar", nil); err == nil || err != nats.ErrInvalidConnection {
+	if _, err := nc.QueueSubscribe("foo", "bar", nil); err == nil || err != gio.ErrInvalidConnection {
 		t.Fatalf("Expected ErrInvalidConnection error, got %v\n", err)
 	}
-	ch := make(chan *nats.Msg)
-	if _, err := nc.ChanSubscribe("foo", ch); err == nil || err != nats.ErrInvalidConnection {
+	ch := make(chan *gio.Msg)
+	if _, err := nc.ChanSubscribe("foo", ch); err == nil || err != gio.ErrInvalidConnection {
 		t.Fatalf("Expected ErrInvalidConnection error, got %v\n", err)
 	}
-	if _, err := nc.ChanQueueSubscribe("foo", "bar", ch); err == nil || err != nats.ErrInvalidConnection {
+	if _, err := nc.ChanQueueSubscribe("foo", "bar", ch); err == nil || err != gio.ErrInvalidConnection {
 		t.Fatalf("Expected ErrInvalidConnection error, got %v\n", err)
 	}
-	if _, err := nc.QueueSubscribeSyncWithChan("foo", "bar", ch); err == nil || err != nats.ErrInvalidConnection {
+	if _, err := nc.QueueSubscribeSyncWithChan("foo", "bar", ch); err == nil || err != gio.ErrInvalidConnection {
 		t.Fatalf("Expected ErrInvalidConnection error, got %v\n", err)
 	}
 
 	// Flush
-	if err := nc.Flush(); err == nil || err != nats.ErrInvalidConnection {
+	if err := nc.Flush(); err == nil || err != gio.ErrInvalidConnection {
 		t.Fatalf("Expected ErrInvalidConnection error, got %v\n", err)
 	}
-	if err := nc.FlushTimeout(time.Millisecond); err == nil || err != nats.ErrInvalidConnection {
+	if err := nc.FlushTimeout(time.Millisecond); err == nil || err != gio.ErrInvalidConnection {
 		t.Fatalf("Expected ErrInvalidConnection error, got %v\n", err)
 	}
 
 	// Nil Subscribers
-	var sub *nats.Subscription
-	if sub.Type() != nats.NilSubscription {
+	var sub *gio.Subscription
+	if sub.Type() != gio.NilSubscription {
 		t.Fatalf("Got wrong type for nil subscription, %v\n", sub.Type())
 	}
 	if sub.IsValid() {
 		t.Fatalf("Expected IsValid() to return false")
 	}
-	if err := sub.Unsubscribe(); err == nil || err != nats.ErrBadSubscription {
+	if err := sub.Unsubscribe(); err == nil || err != gio.ErrBadSubscription {
 		t.Fatalf("Expected Unsubscribe to return proper error, got %v\n", err)
 	}
-	if err := sub.AutoUnsubscribe(1); err == nil || err != nats.ErrBadSubscription {
+	if err := sub.AutoUnsubscribe(1); err == nil || err != gio.ErrBadSubscription {
 		t.Fatalf("Expected ErrBadSubscription error, got %v\n", err)
 	}
-	if _, err := sub.NextMsg(time.Millisecond); err == nil || err != nats.ErrBadSubscription {
+	if _, err := sub.NextMsg(time.Millisecond); err == nil || err != gio.ErrBadSubscription {
 		t.Fatalf("Expected ErrBadSubscription error, got %v\n", err)
 	}
-	if _, err := sub.QueuedMsgs(); err == nil || err != nats.ErrBadSubscription {
+	if _, err := sub.QueuedMsgs(); err == nil || err != gio.ErrBadSubscription {
 		t.Fatalf("Expected ErrBadSubscription error, got %v\n", err)
 	}
-	if _, _, err := sub.Pending(); err == nil || err != nats.ErrBadSubscription {
+	if _, _, err := sub.Pending(); err == nil || err != gio.ErrBadSubscription {
 		t.Fatalf("Expected ErrBadSubscription error, got %v\n", err)
 	}
-	if _, _, err := sub.MaxPending(); err == nil || err != nats.ErrBadSubscription {
+	if _, _, err := sub.MaxPending(); err == nil || err != gio.ErrBadSubscription {
 		t.Fatalf("Expected ErrBadSubscription error, got %v\n", err)
 	}
-	if err := sub.ClearMaxPending(); err == nil || err != nats.ErrBadSubscription {
+	if err := sub.ClearMaxPending(); err == nil || err != gio.ErrBadSubscription {
 		t.Fatalf("Expected ErrBadSubscription error, got %v\n", err)
 	}
-	if _, _, err := sub.PendingLimits(); err == nil || err != nats.ErrBadSubscription {
+	if _, _, err := sub.PendingLimits(); err == nil || err != gio.ErrBadSubscription {
 		t.Fatalf("Expected ErrBadSubscription error, got %v\n", err)
 	}
-	if err := sub.SetPendingLimits(1, 1); err == nil || err != nats.ErrBadSubscription {
+	if err := sub.SetPendingLimits(1, 1); err == nil || err != gio.ErrBadSubscription {
 		t.Fatalf("Expected ErrBadSubscription error, got %v\n", err)
 	}
-	if _, err := sub.Delivered(); err == nil || err != nats.ErrBadSubscription {
+	if _, err := sub.Delivered(); err == nil || err != gio.ErrBadSubscription {
 		t.Fatalf("Expected ErrBadSubscription error, got %v\n", err)
 	}
-	if _, err := sub.Dropped(); err == nil || err != nats.ErrBadSubscription {
+	if _, err := sub.Dropped(); err == nil || err != gio.ErrBadSubscription {
 		t.Fatalf("Expected ErrBadSubscription error, got %v\n", err)
 	}
 }

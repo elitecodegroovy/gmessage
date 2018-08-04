@@ -7,11 +7,9 @@ import (
 	"github.com/elitecodegroovy/gmessage/gio"
 )
 
-// NOTE: Use tls scheme for TLS, e.g. nats-pub -s tls://demo.nats.io:4443 foo hello
 func usage() {
-	log.Fatalf("Usage: publish [-s server (%s) -t topic_name -c topic's_content]  \n", nats.DefaultURL)
+	log.Fatalf("Usage: publish [-s server (%s) -t topic_name -c topic's_content]  \n", gio.DefaultURL)
 }
-
 
 func publishMsg() {
 	var urls = flag.String("s", "nats://192.168.1.225:6222", "The gmessage server URLs (separated by comma)")
@@ -24,7 +22,7 @@ func publishMsg() {
 		usage()
 	}
 
-	nc, err := nats.Connect(*urls)
+	nc, err := gio.Connect(*urls)
 	if err != nil {
 		log.Fatalf("Can't connect: %v\n", err)
 	}
@@ -33,7 +31,6 @@ func publishMsg() {
 
 	nc.Publish(subj, []byte(reply))
 	nc.Flush()
-
 
 	if err := nc.LastError(); err != nil {
 		log.Fatal(err)

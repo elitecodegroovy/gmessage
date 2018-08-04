@@ -37,13 +37,13 @@ func BenchmarkPubSubSpeed(b *testing.B) {
 
 	ch := make(chan bool)
 
-	nc.SetErrorHandler(func(nc *nats.Conn, s *nats.Subscription, err error) {
+	nc.SetErrorHandler(func(nc *gio.Conn, s *gio.Subscription, err error) {
 		b.Fatalf("Error : %v\n", err)
 	})
 
 	received := int32(0)
 
-	nc.Subscribe("foo", func(m *nats.Msg) {
+	nc.Subscribe("foo", func(m *gio.Msg) {
 		if nr := atomic.AddInt32(&received, 1); nr >= int32(b.N) {
 			ch <- true
 		}
@@ -83,7 +83,7 @@ func BenchmarkAsyncSubscriptionCreationSpeed(b *testing.B) {
 	b.ReportAllocs()
 
 	for i := 0; i < b.N; i++ {
-		nc.Subscribe("foo", func(m *nats.Msg) {})
+		nc.Subscribe("foo", func(m *gio.Msg) {})
 	}
 }
 
@@ -103,7 +103,7 @@ func BenchmarkSyncSubscriptionCreationSpeed(b *testing.B) {
 
 func BenchmarkInboxCreation(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		nats.NewInbox()
+		gio.NewInbox()
 	}
 }
 
@@ -114,7 +114,7 @@ func BenchmarkRequest(b *testing.B) {
 	nc := NewDefaultConnection(b)
 	defer nc.Close()
 	ok := []byte("ok")
-	nc.Subscribe("req", func(m *nats.Msg) {
+	nc.Subscribe("req", func(m *gio.Msg) {
 		nc.Publish(m.Reply, ok)
 	})
 	b.StartTimer()
@@ -132,13 +132,13 @@ func BenchmarkOldRequest(b *testing.B) {
 	b.StopTimer()
 	s := RunDefaultServer()
 	defer s.Shutdown()
-	nc, err := nats.Connect(nats.DefaultURL, nats.UseOldRequestStyle())
+	nc, err := gio.Connect(gio.DefaultURL, gio.UseOldRequestStyle())
 	if err != nil {
 		b.Fatalf("Failed to connect: %v", err)
 	}
 	defer nc.Close()
 	ok := []byte("ok")
-	nc.Subscribe("req", func(m *nats.Msg) {
+	nc.Subscribe("req", func(m *gio.Msg) {
 		nc.Publish(m.Reply, ok)
 	})
 	b.StartTimer()

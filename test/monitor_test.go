@@ -1,4 +1,4 @@
-// Copyright 2012-2018 The NATS Authors
+// Copyright 2012-2018 The gio Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -52,7 +52,7 @@ func runMonitorServerClusteredPair(t *testing.T) (*server.Server, *server.Server
 	opts.HTTPPort = MONITOR_PORT
 	opts.HTTPHost = "127.0.0.1"
 	opts.Cluster = server.ClusterOpts{Host: "127.0.0.1", Port: 10223}
-	opts.Routes = server.RoutesFromStr("nats-route://127.0.0.1:10222")
+	opts.Routes = server.RoutesFromStr("gio-route://127.0.0.1:10222")
 
 	s1 := RunServer(&opts)
 
@@ -61,7 +61,7 @@ func runMonitorServerClusteredPair(t *testing.T) (*server.Server, *server.Server
 	opts2.HTTPPort = MONITOR_PORT + 1
 	opts2.HTTPHost = "127.0.0.1"
 	opts2.Cluster = server.ClusterOpts{Host: "127.0.0.1", Port: 10222}
-	opts2.Routes = server.RoutesFromStr("nats-route://127.0.0.1:10223")
+	opts2.Routes = server.RoutesFromStr("gio-route://127.0.0.1:10223")
 
 	s2 := RunServer(&opts2)
 
@@ -103,7 +103,7 @@ func TestNoMonitorPort(t *testing.T) {
 // testEndpointDataRace tests a monitoring endpoint for data races by polling
 // while client code acts to ensure statistics are updated. It is designed to
 // run under the -race flag to catch violations. The caller must start the
-// NATS server.
+// gio server.
 func testEndpointDataRace(endpoint string, t *testing.T) {
 	var doneWg sync.WaitGroup
 
@@ -353,13 +353,13 @@ func TestTLSConnz(t *testing.T) {
 	// Test with secure connection
 	endpoint := fmt.Sprintf("%s:%d", opts.Host, opts.Port)
 	nurl := fmt.Sprintf("tls://%s:%s@%s/", opts.Username, opts.Password, endpoint)
-	nc, err := nats.Connect(nurl, nats.RootCAs(rootCAFile))
+	nc, err := gio.Connect(nurl, gio.RootCAs(rootCAFile))
 	if err != nil {
 		t.Fatalf("Got an error on Connect with Secure Options: %+v\n", err)
 	}
 	defer nc.Close()
 	ch := make(chan struct{})
-	nc.Subscribe("foo", func(m *nats.Msg) { ch <- struct{}{} })
+	nc.Subscribe("foo", func(m *gio.Msg) { ch <- struct{}{} })
 	nc.Publish("foo", []byte("Hello"))
 
 	// Wait for message
@@ -496,15 +496,15 @@ func TestConnzWithAuth(t *testing.T) {
 	defer srv.Shutdown()
 
 	endpoint := fmt.Sprintf("%s:%d", opts.Host, opts.Port)
-	curl := fmt.Sprintf("nats://%s:%s@%s/", opts.Users[0].Username, opts.Users[0].Password, endpoint)
-	nc, err := nats.Connect(curl)
+	curl := fmt.Sprintf("gio://%s:%s@%s/", opts.Users[0].Username, opts.Users[0].Password, endpoint)
+	nc, err := gio.Connect(curl)
 	if err != nil {
 		t.Fatalf("Got an error on Connect: %+v\n", err)
 	}
 	defer nc.Close()
 
 	ch := make(chan struct{})
-	nc.Subscribe("foo", func(m *nats.Msg) { ch <- struct{}{} })
+	nc.Subscribe("foo", func(m *gio.Msg) { ch <- struct{}{} })
 	nc.Publish("foo", []byte("Hello"))
 
 	// Wait for message

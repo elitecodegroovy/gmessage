@@ -20,7 +20,7 @@ func millionMessagesSecondSample(seconds int) *Sample {
 	messages := Million * seconds
 	start := baseTime
 	end := start.Add(time.Second * time.Duration(seconds))
-	nc := new(nats.Conn)
+	nc := new(gio.Conn)
 
 	s := NewSample(messages, MsgSize, start, end, nc)
 	s.MsgCnt = uint64(messages)

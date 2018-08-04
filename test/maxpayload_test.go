@@ -1,4 +1,4 @@
-// Copyright 2015-2018 The NATS Authors
+// Copyright 2015-2018 The gio Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nats-io/go-nats"
+	"github.com/elitecodegroovy/gmessage/gio"
 )
 
 func TestMaxPayload(t *testing.T) {
@@ -29,7 +29,7 @@ func TestMaxPayload(t *testing.T) {
 	defer srv.Shutdown()
 
 	endpoint := fmt.Sprintf("%s:%d", opts.Host, opts.Port)
-	nc, err := nats.Connect(fmt.Sprintf("nats://%s/", endpoint))
+	nc, err := gio.Connect(fmt.Sprintf("gio://%s/", endpoint))
 	if err != nil {
 		t.Fatalf("Could not connect to server: %v", err)
 	}
@@ -39,7 +39,7 @@ func TestMaxPayload(t *testing.T) {
 	big := sizedBytes(size)
 	err = nc.Publish("foo", big)
 
-	if err != nats.ErrMaxPayload {
+	if err != gio.ErrMaxPayload {
 		t.Fatalf("Expected a Max Payload error")
 	}
 

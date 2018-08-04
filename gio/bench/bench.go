@@ -23,7 +23,7 @@ type Sample struct {
 	End       time.Time
 }
 
-// SampleGroup for a number of samples, the group is a Sample itself agregating the values the Samples
+// SampleGroup for a number of samples, the group is a Sample itself aggregating the values the Samples
 type SampleGroup struct {
 	Sample
 	Samples []*Sample
@@ -129,8 +129,8 @@ func (bm *Benchmark) CSV() string {
 	return buffer.String()
 }
 
-// NewSample creates a new Sample initialized to the provided values. The nats.Conn information captured
-func NewSample(jobCount int, msgSize int, start, end time.Time, nc *nats.Conn) *Sample {
+// NewSample creates a new Sample initialized to the provided values. The gmessage.Conn information captured
+func NewSample(jobCount int, msgSize int, start, end time.Time, nc *gio.Conn) *Sample {
 	s := Sample{JobMsgCnt: jobCount, Start: start, End: end}
 	s.MsgBytes = uint64(msgSize * jobCount)
 	s.MsgCnt = nc.OutMsgs + nc.InMsgs

@@ -36,14 +36,14 @@ func TestConnectionStatus(t *testing.T) {
 	nc := NewDefaultConnection(t)
 	defer nc.Close()
 
-	if nc.Status() != nats.CONNECTED {
+	if nc.Status() != gio.CONNECTED {
 		t.Fatal("Should have status set to CONNECTED")
 	}
 	if !nc.IsConnected() {
 		t.Fatal("Should have status set to CONNECTED")
 	}
 	nc.Close()
-	if nc.Status() != nats.CLOSED {
+	if nc.Status() != gio.CLOSED {
 		t.Fatal("Should have status set to CLOSED")
 	}
 	if !nc.IsClosed() {
@@ -56,9 +56,9 @@ func TestConnClosedCB(t *testing.T) {
 	defer s.Shutdown()
 
 	ch := make(chan bool)
-	o := nats.GetDefaultOptions()
-	o.Url = nats.DefaultURL
-	o.ClosedCB = func(_ *nats.Conn) {
+	o := gio.GetDefaultOptions()
+	o.Url = gio.DefaultURL
+	o.ClosedCB = func(_ *gio.Conn) {
 		ch <- true
 	}
 	nc, err := o.Connect()
@@ -76,10 +76,10 @@ func TestCloseDisconnectedCB(t *testing.T) {
 	defer s.Shutdown()
 
 	ch := make(chan bool)
-	o := nats.GetDefaultOptions()
-	o.Url = nats.DefaultURL
+	o := gio.GetDefaultOptions()
+	o.Url = gio.DefaultURL
 	o.AllowReconnect = false
-	o.DisconnectedCB = func(_ *nats.Conn) {
+	o.DisconnectedCB = func(_ *gio.Conn) {
 		ch <- true
 	}
 	nc, err := o.Connect()
@@ -97,10 +97,10 @@ func TestServerStopDisconnectedCB(t *testing.T) {
 	defer s.Shutdown()
 
 	ch := make(chan bool)
-	o := nats.GetDefaultOptions()
-	o.Url = nats.DefaultURL
+	o := gio.GetDefaultOptions()
+	o.Url = gio.DefaultURL
 	o.AllowReconnect = false
-	o.DisconnectedCB = func(nc *nats.Conn) {
+	o.DisconnectedCB = func(nc *gio.Conn) {
 		ch <- true
 	}
 	nc, err := o.Connect()
@@ -120,10 +120,10 @@ func TestServerSecureConnections(t *testing.T) {
 	defer s.Shutdown()
 
 	endpoint := fmt.Sprintf("%s:%d", opts.Host, opts.Port)
-	secureURL := fmt.Sprintf("nats://%s:%s@%s/", opts.Username, opts.Password, endpoint)
+	secureURL := fmt.Sprintf("gio://%s:%s@%s/", opts.Username, opts.Password, endpoint)
 
 	// Make sure this succeeds
-	nc, err := nats.Connect(secureURL, nats.Secure())
+	nc, err := gio.Connect(secureURL, gio.Secure())
 	if err != nil {
 		t.Fatalf("Failed to create secure (TLS) connection: %v", err)
 	}
@@ -133,7 +133,7 @@ func TestServerSecureConnections(t *testing.T) {
 	checkRecv := make(chan bool)
 
 	received := 0
-	nc.Subscribe("foo", func(m *nats.Msg) {
+	nc.Subscribe("foo", func(m *gio.Msg) {
 		received++
 		if !bytes.Equal(m.Data, omsg) {
 			t.Fatal("Message received does not match")
@@ -153,8 +153,8 @@ func TestServerSecureConnections(t *testing.T) {
 	nc.Close()
 
 	// Server required, but not requested.
-	nc, err = nats.Connect(secureURL)
-	if err == nil || nc != nil || err != nats.ErrSecureConnRequired {
+	nc, err = gio.Connect(secureURL)
+	if err == nil || nc != nil || err != gio.ErrSecureConnRequired {
 		if nc != nil {
 			nc.Close()
 		}
@@ -166,8 +166,8 @@ func TestServerSecureConnections(t *testing.T) {
 	ds := RunDefaultServer()
 	defer ds.Shutdown()
 
-	nc, err = nats.Connect(nats.DefaultURL, nats.Secure())
-	if err == nil || nc != nil || err != nats.ErrSecureConnWanted {
+	nc, err = gio.Connect(gio.DefaultURL, gio.Secure())
+	if err == nil || nc != nil || err != gio.ErrSecureConnWanted {
 		if nc != nil {
 			nc.Close()
 		}
@@ -193,7 +193,7 @@ func TestServerSecureConnections(t *testing.T) {
 		MinVersion: tls.VersionTLS12,
 	}
 
-	nc, err = nats.Connect(secureURL, nats.Secure(tls1))
+	nc, err = gio.Connect(secureURL, gio.Secure(tls1))
 	if err != nil {
 		t.Fatalf("Got an error on Connect with Secure Options: %+v\n", err)
 	}
@@ -205,7 +205,7 @@ func TestServerSecureConnections(t *testing.T) {
 		MinVersion: tls.VersionTLS12,
 	}
 
-	nc2, err := nats.Connect(secureURL, nats.Secure(tls1, tls2))
+	nc2, err := gio.Connect(secureURL, gio.Secure(tls1, tls2))
 	if err == nil {
 		nc2.Close()
 		t.Fatal("Was expecting an error!")
@@ -218,41 +218,41 @@ func TestClientCertificate(t *testing.T) {
 	defer s.Shutdown()
 
 	endpoint := fmt.Sprintf("%s:%d", opts.Host, opts.Port)
-	secureURL := fmt.Sprintf("nats://%s", endpoint)
+	secureURL := fmt.Sprintf("gio://%s", endpoint)
 
 	// Make sure this fails
-	nc, err := nats.Connect(secureURL, nats.Secure())
+	nc, err := gio.Connect(secureURL, gio.Secure())
 	if err == nil {
 		nc.Close()
 		t.Fatal("Should have failed (TLS) connection without client certificate")
 	}
 
 	// Check parameters validity
-	nc, err = nats.Connect(secureURL, nats.ClientCert("", ""))
+	nc, err = gio.Connect(secureURL, gio.ClientCert("", ""))
 	if err == nil {
 		nc.Close()
 		t.Fatal("Should have failed due to invalid parameters")
 	}
 
 	// Should fail because wrong key
-	nc, err = nats.Connect(secureURL,
-		nats.ClientCert("./configs/certs/client-cert.pem", "./configs/certs/key.pem"))
+	nc, err = gio.Connect(secureURL,
+		gio.ClientCert("./configs/certs/client-cert.pem", "./configs/certs/key.pem"))
 	if err == nil {
 		nc.Close()
 		t.Fatal("Should have failed due to invalid key")
 	}
 
 	// Should fail because no CA
-	nc, err = nats.Connect(secureURL,
-		nats.ClientCert("./configs/certs/client-cert.pem", "./configs/certs/client-key.pem"))
+	nc, err = gio.Connect(secureURL,
+		gio.ClientCert("./configs/certs/client-cert.pem", "./configs/certs/client-key.pem"))
 	if err == nil {
 		nc.Close()
 		t.Fatal("Should have failed due to missing ca")
 	}
 
-	nc, err = nats.Connect(secureURL,
-		nats.RootCAs("./configs/certs/ca.pem"),
-		nats.ClientCert("./configs/certs/client-cert.pem", "./configs/certs/client-key.pem"))
+	nc, err = gio.Connect(secureURL,
+		gio.RootCAs("./configs/certs/ca.pem"),
+		gio.ClientCert("./configs/certs/client-cert.pem", "./configs/certs/client-key.pem"))
 	if err != nil {
 		t.Fatalf("Failed to create (TLS) connection: %v", err)
 	}
@@ -262,7 +262,7 @@ func TestClientCertificate(t *testing.T) {
 	checkRecv := make(chan bool)
 
 	received := 0
-	nc.Subscribe("foo", func(m *nats.Msg) {
+	nc.Subscribe("foo", func(m *gio.Msg) {
 		received++
 		if !bytes.Equal(m.Data, omsg) {
 			t.Fatal("Message received does not match")
@@ -287,13 +287,13 @@ func TestServerTLSHintConnections(t *testing.T) {
 	endpoint := fmt.Sprintf("%s:%d", opts.Host, opts.Port)
 	secureURL := fmt.Sprintf("tls://%s:%s@%s/", opts.Username, opts.Password, endpoint)
 
-	nc, err := nats.Connect(secureURL, nats.RootCAs("./configs/certs/badca.pem"))
+	nc, err := gio.Connect(secureURL, gio.RootCAs("./configs/certs/badca.pem"))
 	if err == nil {
 		nc.Close()
 		t.Fatal("Expected an error from bad RootCA file")
 	}
 
-	nc, err = nats.Connect(secureURL, nats.RootCAs("./configs/certs/ca.pem"))
+	nc, err = gio.Connect(secureURL, gio.RootCAs("./configs/certs/ca.pem"))
 	if err != nil {
 		t.Fatalf("Failed to create secure (TLS) connection: %v", err)
 	}
@@ -314,35 +314,35 @@ func TestClosedConnections(t *testing.T) {
 
 	// Test all API endpoints do the right thing with a closed connection.
 	nc.Close()
-	if err := nc.Publish("foo", nil); err != nats.ErrConnectionClosed {
+	if err := nc.Publish("foo", nil); err != gio.ErrConnectionClosed {
 		t.Fatalf("Publish on closed conn did not fail properly: %v\n", err)
 	}
-	if err := nc.PublishMsg(&nats.Msg{Subject: "foo"}); err != nats.ErrConnectionClosed {
+	if err := nc.PublishMsg(&gio.Msg{Subject: "foo"}); err != gio.ErrConnectionClosed {
 		t.Fatalf("PublishMsg on closed conn did not fail properly: %v\n", err)
 	}
-	if err := nc.Flush(); err != nats.ErrConnectionClosed {
+	if err := nc.Flush(); err != gio.ErrConnectionClosed {
 		t.Fatalf("Flush on closed conn did not fail properly: %v\n", err)
 	}
 	_, err := nc.Subscribe("foo", nil)
-	if err != nats.ErrConnectionClosed {
+	if err != gio.ErrConnectionClosed {
 		t.Fatalf("Subscribe on closed conn did not fail properly: %v\n", err)
 	}
 	_, err = nc.SubscribeSync("foo")
-	if err != nats.ErrConnectionClosed {
+	if err != gio.ErrConnectionClosed {
 		t.Fatalf("SubscribeSync on closed conn did not fail properly: %v\n", err)
 	}
 	_, err = nc.QueueSubscribe("foo", "bar", nil)
-	if err != nats.ErrConnectionClosed {
+	if err != gio.ErrConnectionClosed {
 		t.Fatalf("QueueSubscribe on closed conn did not fail properly: %v\n", err)
 	}
 	_, err = nc.Request("foo", []byte("help"), 10*time.Millisecond)
-	if err != nats.ErrConnectionClosed {
+	if err != gio.ErrConnectionClosed {
 		t.Fatalf("Request on closed conn did not fail properly: %v\n", err)
 	}
-	if _, err = sub.NextMsg(10); err != nats.ErrConnectionClosed {
+	if _, err = sub.NextMsg(10); err != gio.ErrConnectionClosed {
 		t.Fatalf("NextMessage on closed conn did not fail properly: %v\n", err)
 	}
-	if err = sub.Unsubscribe(); err != nats.ErrConnectionClosed {
+	if err = sub.Unsubscribe(); err != gio.ErrConnectionClosed {
 		t.Fatalf("Unsubscribe on closed conn did not fail properly: %v\n", err)
 	}
 }
@@ -374,8 +374,8 @@ func TestErrOnConnectAndDeadlock(t *testing.T) {
 	ch := make(chan bool)
 
 	go func() {
-		natsURL := fmt.Sprintf("nats://localhost:%d/", addr.Port)
-		nc, err := nats.Connect(natsURL)
+		gioURL := fmt.Sprintf("gio://localhost:%d/", addr.Port)
+		nc, err := gio.Connect(gioURL)
 		if err == nil {
 			nc.Close()
 			t.Fatal("Expected bad INFO err, got none")
@@ -470,14 +470,14 @@ func TestMoreErrOnConnect(t *testing.T) {
 		<-done
 	}()
 
-	natsURL := fmt.Sprintf("nats://localhost:%d", addr.Port)
+	gioURL := fmt.Sprintf("gio://localhost:%d", addr.Port)
 
-	if nc, err := nats.Connect(natsURL, nats.Timeout(20*time.Millisecond)); err == nil {
+	if nc, err := gio.Connect(gioURL, gio.Timeout(20*time.Millisecond)); err == nil {
 		nc.Close()
 		t.Fatal("Expected error, got none")
 	}
 
-	if nc, err := nats.Connect(natsURL, nats.Timeout(20*time.Millisecond)); err == nil {
+	if nc, err := gio.Connect(gioURL, gio.Timeout(20*time.Millisecond)); err == nil {
 		close(case1)
 		nc.Close()
 		t.Fatal("Expected error, got none")
@@ -485,8 +485,8 @@ func TestMoreErrOnConnect(t *testing.T) {
 
 	close(case1)
 
-	opts := nats.GetDefaultOptions()
-	opts.Servers = []string{natsURL}
+	opts := gio.GetDefaultOptions()
+	opts.Servers = []string{gioURL}
 	opts.Timeout = 20 * time.Millisecond
 	opts.Verbose = true
 
@@ -557,9 +557,9 @@ func TestErrOnMaxPayloadLimit(t *testing.T) {
 	// Wait for server mock to start
 	time.Sleep(100 * time.Millisecond)
 
-	natsURL := fmt.Sprintf("nats://%s:%d", addr.IP, addr.Port)
-	opts := nats.GetDefaultOptions()
-	opts.Servers = []string{natsURL}
+	gioURL := fmt.Sprintf("gio://%s:%d", addr.IP, addr.Port)
+	opts := gio.GetDefaultOptions()
+	opts.Servers = []string{gioURL}
 	nc, err := opts.Connect()
 	if err != nil {
 		t.Fatalf("Expected INFO message with custom max payload, got: %s", err)
@@ -571,7 +571,7 @@ func TestErrOnMaxPayloadLimit(t *testing.T) {
 		t.Fatalf("Expected MaxPayload to be %d, got: %d", expectedMaxPayload, got)
 	}
 	err = nc.Publish("hello", []byte("hello world"))
-	if err != nats.ErrMaxPayload {
+	if err != gio.ErrMaxPayload {
 		t.Fatalf("Expected to fail trying to send more than max payload, got: %s", err)
 	}
 	err = nc.Publish("hello", []byte("a"))
@@ -584,7 +584,7 @@ func TestConnectVerbose(t *testing.T) {
 	s := RunDefaultServer()
 	defer s.Shutdown()
 
-	o := nats.GetDefaultOptions()
+	o := gio.GetDefaultOptions()
 	o.Verbose = true
 
 	nc, err := o.Connect()
@@ -649,7 +649,7 @@ func TestCallbacksOrder(t *testing.T) {
 	recvCh1 := make(chan bool)
 	recvCh2 := make(chan bool)
 
-	dch := func(nc *nats.Conn) {
+	dch := func(nc *gio.Conn) {
 		if err := isRunningInAsyncCBDispatcher(); err != nil {
 			cbErrors <- err
 			return
@@ -663,7 +663,7 @@ func TestCallbacksOrder(t *testing.T) {
 		}
 	}
 
-	rch := func(nc *nats.Conn) {
+	rch := func(nc *gio.Conn) {
 		if err := isRunningInAsyncCBDispatcher(); err != nil {
 			cbErrors <- err
 			reconnected <- true
@@ -674,7 +674,7 @@ func TestCallbacksOrder(t *testing.T) {
 		reconnected <- true
 	}
 
-	ech := func(nc *nats.Conn, sub *nats.Subscription, err error) {
+	ech := func(nc *gio.Conn, sub *gio.Subscription, err error) {
 		if err := isRunningInAsyncCBDispatcher(); err != nil {
 			cbErrors <- err
 			asyncErr <- true
@@ -689,7 +689,7 @@ func TestCallbacksOrder(t *testing.T) {
 		asyncErr <- true
 	}
 
-	cch := func(nc *nats.Conn) {
+	cch := func(nc *gio.Conn) {
 		if err := isRunningInAsyncCBDispatcher(); err != nil {
 			cbErrors <- err
 			closed <- true
@@ -700,23 +700,23 @@ func TestCallbacksOrder(t *testing.T) {
 	}
 
 	url := net.JoinHostPort(authSOpts.Host, strconv.Itoa(authSOpts.Port))
-	url = "nats://" + url + "," + nats.DefaultURL
+	url = "gio://" + url + "," + gio.DefaultURL
 
-	nc, err := nats.Connect(url,
-		nats.DisconnectHandler(dch),
-		nats.ReconnectHandler(rch),
-		nats.ClosedHandler(cch),
-		nats.ErrorHandler(ech),
-		nats.ReconnectWait(50*time.Millisecond),
-		nats.DontRandomize())
+	nc, err := gio.Connect(url,
+		gio.DisconnectHandler(dch),
+		gio.ReconnectHandler(rch),
+		gio.ClosedHandler(cch),
+		gio.ErrorHandler(ech),
+		gio.ReconnectWait(50*time.Millisecond),
+		gio.DontRandomize())
 
 	if err != nil {
 		t.Fatalf("Unable to connect: %v\n", err)
 	}
 	defer nc.Close()
 
-	ncp, err := nats.Connect(nats.DefaultURL,
-		nats.ReconnectWait(50*time.Millisecond))
+	ncp, err := gio.Connect(gio.DefaultURL,
+		gio.ReconnectWait(50*time.Millisecond))
 	if err != nil {
 		t.Fatalf("Unable to connect: %v\n", err)
 	}
@@ -735,10 +735,10 @@ func TestCallbacksOrder(t *testing.T) {
 		t.Fatal("Did not get the reconnected callback")
 	}
 
-	var sub1 *nats.Subscription
-	var sub2 *nats.Subscription
+	var sub1 *gio.Subscription
+	var sub2 *gio.Subscription
 
-	recv := func(m *nats.Msg) {
+	recv := func(m *gio.Msg) {
 		// Signal that one message is received
 		recvCh <- true
 
@@ -867,10 +867,10 @@ func TestFlushReleaseOnClose(t *testing.T) {
 	// Wait for server mock to start
 	time.Sleep(100 * time.Millisecond)
 
-	natsURL := fmt.Sprintf("nats://%s:%d", addr.IP, addr.Port)
-	opts := nats.GetDefaultOptions()
+	gioURL := fmt.Sprintf("gio://%s:%d", addr.IP, addr.Port)
+	opts := gio.GetDefaultOptions()
 	opts.AllowReconnect = false
-	opts.Servers = []string{natsURL}
+	opts.Servers = []string{gioURL}
 	nc, err := opts.Connect()
 	if err != nil {
 		t.Fatalf("Expected INFO message with custom max payload, got: %s", err)
@@ -878,7 +878,7 @@ func TestFlushReleaseOnClose(t *testing.T) {
 	defer nc.Close()
 
 	// First try a FlushTimeout() and make sure we timeout
-	if err := nc.FlushTimeout(50 * time.Millisecond); err == nil || err != nats.ErrTimeout {
+	if err := nc.FlushTimeout(50 * time.Millisecond); err == nil || err != gio.ErrTimeout {
 		t.Fatalf("Expected a timeout error, got: %v", err)
 	}
 
@@ -934,13 +934,13 @@ func TestMaxPendingOut(t *testing.T) {
 	// Wait for server mock to start
 	time.Sleep(100 * time.Millisecond)
 
-	natsURL := fmt.Sprintf("nats://%s:%d", addr.IP, addr.Port)
-	opts := nats.GetDefaultOptions()
+	gioURL := fmt.Sprintf("gio://%s:%d", addr.IP, addr.Port)
+	opts := gio.GetDefaultOptions()
 	opts.PingInterval = 20 * time.Millisecond
 	opts.MaxPingsOut = 2
 	opts.AllowReconnect = false
-	opts.ClosedCB = func(_ *nats.Conn) { cch <- true }
-	opts.Servers = []string{natsURL}
+	opts.ClosedCB = func(_ *gio.Conn) { cch <- true }
+	opts.Servers = []string{gioURL}
 	nc, err := opts.Connect()
 	if err != nil {
 		t.Fatalf("Expected INFO message with custom max payload, got: %s", err)
@@ -953,8 +953,8 @@ func TestMaxPendingOut(t *testing.T) {
 	if err := Wait(cch); err != nil {
 		t.Fatal("Failed to get ClosedCB")
 	}
-	if nc.LastError() != nats.ErrStaleConnection {
-		t.Fatalf("Expected to get %v, got %v", nats.ErrStaleConnection, nc.LastError())
+	if nc.LastError() != gio.ErrStaleConnection {
+		t.Fatalf("Expected to get %v, got %v", gio.ErrStaleConnection, nc.LastError())
 	}
 
 	close(done)
@@ -1008,11 +1008,11 @@ func TestErrInReadLoop(t *testing.T) {
 	// Wait for server mock to start
 	time.Sleep(100 * time.Millisecond)
 
-	natsURL := fmt.Sprintf("nats://%s:%d", addr.IP, addr.Port)
-	opts := nats.GetDefaultOptions()
+	gioURL := fmt.Sprintf("gio://%s:%d", addr.IP, addr.Port)
+	opts := gio.GetDefaultOptions()
 	opts.AllowReconnect = false
-	opts.ClosedCB = func(_ *nats.Conn) { cch <- true }
-	opts.Servers = []string{natsURL}
+	opts.ClosedCB = func(_ *gio.Conn) { cch <- true }
+	opts.Servers = []string{gioURL}
 	nc, err := opts.Connect()
 	if err != nil {
 		t.Fatalf("Expected INFO message with custom max payload, got: %s", err)
@@ -1021,7 +1021,7 @@ func TestErrInReadLoop(t *testing.T) {
 
 	received := int64(0)
 
-	nc.Subscribe("foo", func(_ *nats.Msg) {
+	nc.Subscribe("foo", func(_ *gio.Msg) {
 		atomic.AddInt64(&received, 1)
 	})
 
@@ -1098,10 +1098,10 @@ func TestErrStaleConnection(t *testing.T) {
 	// Wait for server mock to start
 	time.Sleep(100 * time.Millisecond)
 
-	natsURL := fmt.Sprintf("nats://%s:%d", addr.IP, addr.Port)
-	opts := nats.GetDefaultOptions()
+	gioURL := fmt.Sprintf("gio://%s:%d", addr.IP, addr.Port)
+	opts := gio.GetDefaultOptions()
 	opts.AllowReconnect = true
-	opts.DisconnectedCB = func(_ *nats.Conn) {
+	opts.DisconnectedCB = func(_ *gio.Conn) {
 		// Interested only in the first disconnect cb
 		if firstDisconnect {
 			firstDisconnect = false
@@ -1109,11 +1109,11 @@ func TestErrStaleConnection(t *testing.T) {
 			dch <- true
 		}
 	}
-	opts.ReconnectedCB = func(_ *nats.Conn) { rch <- true }
-	opts.ClosedCB = func(_ *nats.Conn) { cch <- true }
+	opts.ReconnectedCB = func(_ *gio.Conn) { rch <- true }
+	opts.ClosedCB = func(_ *gio.Conn) { cch <- true }
 	opts.ReconnectWait = 20 * time.Millisecond
 	opts.MaxReconnect = 100
-	opts.Servers = []string{natsURL}
+	opts.Servers = []string{gioURL}
 	nc, err := opts.Connect()
 	if err != nil {
 		t.Fatalf("Expected INFO message with custom max payload, got: %s", err)
@@ -1189,15 +1189,15 @@ func TestServerErrorClosesConnection(t *testing.T) {
 	// Wait for server mock to start
 	time.Sleep(100 * time.Millisecond)
 
-	natsURL := fmt.Sprintf("nats://%s:%d", addr.IP, addr.Port)
-	opts := nats.GetDefaultOptions()
+	gioURL := fmt.Sprintf("gio://%s:%d", addr.IP, addr.Port)
+	opts := gio.GetDefaultOptions()
 	opts.AllowReconnect = true
-	opts.DisconnectedCB = func(_ *nats.Conn) { dch <- true }
-	opts.ReconnectedCB = func(_ *nats.Conn) { atomic.AddInt64(&reconnected, 1) }
-	opts.ClosedCB = func(_ *nats.Conn) { cch <- true }
+	opts.DisconnectedCB = func(_ *gio.Conn) { dch <- true }
+	opts.ReconnectedCB = func(_ *gio.Conn) { atomic.AddInt64(&reconnected, 1) }
+	opts.ClosedCB = func(_ *gio.Conn) { cch <- true }
 	opts.ReconnectWait = 20 * time.Millisecond
 	opts.MaxReconnect = 100
-	opts.Servers = []string{natsURL}
+	opts.Servers = []string{gioURL}
 	nc, err := opts.Connect()
 	if err != nil {
 		t.Fatalf("Expected INFO message with custom max payload, got: %s", err)
@@ -1222,9 +1222,9 @@ func TestServerErrorClosesConnection(t *testing.T) {
 		t.Fatal("ReconnectedCB should not have been invoked")
 	}
 
-	// Check LastError(), it should be "nats: <server error in lower case>"
+	// Check LastError(), it should be "gio: <server error in lower case>"
 	lastErr := nc.LastError().Error()
-	expectedErr := "nats: " + strings.ToLower(serverSentError)
+	expectedErr := "gio: " + strings.ToLower(serverSentError)
 	if lastErr != expectedErr {
 		t.Fatalf("Expected error: '%v', got '%v'", expectedErr, lastErr)
 	}
@@ -1236,16 +1236,16 @@ func TestUseDefaultTimeout(t *testing.T) {
 	s := RunDefaultServer()
 	defer s.Shutdown()
 
-	opts := &nats.Options{
-		Servers: []string{nats.DefaultURL},
+	opts := &gio.Options{
+		Servers: []string{gio.DefaultURL},
 	}
 	nc, err := opts.Connect()
 	if err != nil {
 		t.Fatalf("Unexpected error on connect: %v", err)
 	}
 	defer nc.Close()
-	if nc.Opts.Timeout != nats.DefaultTimeout {
-		t.Fatalf("Expected Timeout to be set to %v, got %v", nats.DefaultTimeout, nc.Opts.Timeout)
+	if nc.Opts.Timeout != gio.DefaultTimeout {
+		t.Fatalf("Expected Timeout to be set to %v, got %v", gio.DefaultTimeout, nc.Opts.Timeout)
 	}
 }
 
@@ -1257,19 +1257,19 @@ func TestNoRaceOnLastError(t *testing.T) {
 	// that there is no race. It is possible in some cases that
 	// nc.LastError() returns a non nil error. We don't care here about the
 	// returned value.
-	dch := func(c *nats.Conn) {
+	dch := func(c *gio.Conn) {
 		c.LastError()
 	}
 	closedCh := make(chan struct{})
-	cch := func(c *nats.Conn) {
+	cch := func(c *gio.Conn) {
 		c.LastError()
 		closedCh <- struct{}{}
 	}
-	nc, err := nats.Connect(nats.DefaultURL,
-		nats.DisconnectHandler(dch),
-		nats.ClosedHandler(cch),
-		nats.MaxReconnects(-1),
-		nats.ReconnectWait(5*time.Millisecond))
+	nc, err := gio.Connect(gio.DefaultURL,
+		gio.DisconnectHandler(dch),
+		gio.ClosedHandler(cch),
+		gio.MaxReconnects(-1),
+		gio.ReconnectWait(5*time.Millisecond))
 	if err != nil {
 		t.Fatalf("Unable to connect: %v\n", err)
 	}
@@ -1307,8 +1307,8 @@ func TestUseCustomDialer(t *testing.T) {
 		Timeout:   10 * time.Second,
 		DualStack: true,
 	}
-	opts := &nats.Options{
-		Servers: []string{nats.DefaultURL},
+	opts := &gio.Options{
+		Servers: []string{gio.DefaultURL},
 		Dialer:  dialer,
 	}
 	nc, err := opts.Connect()
@@ -1325,7 +1325,7 @@ func TestUseCustomDialer(t *testing.T) {
 		Timeout:   5 * time.Second,
 		DualStack: true,
 	}
-	nc2, err := nats.Connect(nats.DefaultURL, nats.Dialer(dialer2))
+	nc2, err := gio.Connect(gio.DefaultURL, gio.Dialer(dialer2))
 	if err != nil {
 		t.Fatalf("Unexpected error on connect: %v", err)
 	}
@@ -1335,13 +1335,13 @@ func TestUseCustomDialer(t *testing.T) {
 	}
 
 	// By default, dialer still uses the DefaultTimeout
-	nc3, err := nats.Connect(nats.DefaultURL)
+	nc3, err := gio.Connect(gio.DefaultURL)
 	if err != nil {
 		t.Fatalf("Unexpected error on connect: %v", err)
 	}
 	defer nc3.Close()
-	if nc3.Opts.Dialer.Timeout != nats.DefaultTimeout {
-		t.Fatalf("Expected DialTimeout to be set to %v, got %v", nats.DefaultTimeout, nc.Opts.Dialer.Timeout)
+	if nc3.Opts.Dialer.Timeout != gio.DefaultTimeout {
+		t.Fatalf("Expected DialTimeout to be set to %v, got %v", gio.DefaultTimeout, nc.Opts.Dialer.Timeout)
 	}
 
 	// Create custom dialer that return error on Dial().
@@ -1350,12 +1350,12 @@ func TestUseCustomDialer(t *testing.T) {
 	// When both Dialer and CustomDialer are set, CustomDialer
 	// should take precedence. That means that the connection
 	// should fail for these two set of options.
-	options := []*nats.Options{
-		&nats.Options{Dialer: dialer, CustomDialer: cdialer},
-		&nats.Options{CustomDialer: cdialer},
+	options := []*gio.Options{
+		&gio.Options{Dialer: dialer, CustomDialer: cdialer},
+		&gio.Options{CustomDialer: cdialer},
 	}
 	for _, o := range options {
-		o.Servers = []string{nats.DefaultURL}
+		o.Servers = []string{gio.DefaultURL}
 		nc, err := o.Connect()
 		// As of now, Connect() would not return the actual dialer error,
 		// instead it returns "no server available for connections".
@@ -1372,12 +1372,12 @@ func TestUseCustomDialer(t *testing.T) {
 		}
 	}
 	// Same with variadic
-	foptions := [][]nats.Option{
-		[]nats.Option{nats.Dialer(dialer), nats.SetCustomDialer(cdialer)},
-		[]nats.Option{nats.SetCustomDialer(cdialer)},
+	foptions := [][]gio.Option{
+		[]gio.Option{gio.Dialer(dialer), gio.SetCustomDialer(cdialer)},
+		[]gio.Option{gio.SetCustomDialer(cdialer)},
 	}
 	for _, fos := range foptions {
-		nc, err := nats.Connect(nats.DefaultURL, fos...)
+		nc, err := gio.Connect(gio.DefaultURL, fos...)
 		if err == nil {
 			if nc != nil {
 				nc.Close()
@@ -1394,8 +1394,8 @@ func TestDefaultOptionsDialer(t *testing.T) {
 	s := RunDefaultServer()
 	defer s.Shutdown()
 
-	opts1 := nats.DefaultOptions
-	opts2 := nats.DefaultOptions
+	opts1 := gio.DefaultOptions
+	opts2 := gio.DefaultOptions
 
 	nc1, err := opts1.Connect()
 	if err != nil {
@@ -1418,8 +1418,8 @@ func TestCustomFlusherTimeout(t *testing.T) {
 	s := RunDefaultServer()
 	defer s.Shutdown()
 
-	opts := &nats.Options{
-		Servers: []string{nats.DefaultURL},
+	opts := &gio.Options{
+		Servers: []string{gio.DefaultURL},
 
 		// Reasonably large flusher timeout will not induce errors
 		// when we can flush fast
@@ -1454,8 +1454,8 @@ func TestCustomFlusherTimeout(t *testing.T) {
 	}()
 	defer nc1.Close()
 
-	opts = &nats.Options{
-		Servers: []string{nats.DefaultURL},
+	opts = &gio.Options{
+		Servers: []string{gio.DefaultURL},
 
 		// Use short flusher timeout to trigger the error
 		FlusherTimeout: 1 * time.Microsecond,
@@ -1465,7 +1465,7 @@ func TestCustomFlusherTimeout(t *testing.T) {
 		PingInterval: 500 * time.Millisecond,
 	}
 
-	opts.DisconnectedCB = func(nc *nats.Conn) {
+	opts.DisconnectedCB = func(nc *gio.Conn) {
 		// Ping loops that test is done
 		doneCh <- struct{}{}
 	}
@@ -1477,7 +1477,7 @@ func TestCustomFlusherTimeout(t *testing.T) {
 	defer nc2.Close()
 
 	// Consume messages to make the reading loop work
-	_, err = nc2.Subscribe(">", func(_ *nats.Msg) {})
+	_, err = nc2.Subscribe(">", func(_ *gio.Msg) {})
 	if err != nil {
 		t.Fatalf("Expected to be able to create subscription, got: %s", err)
 	}
@@ -1488,7 +1488,7 @@ func TestCustomFlusherTimeout(t *testing.T) {
 			// Some of the publishes will succeed and others fail with i/o timeout error
 			// but eventually ping interval will fail and close the connection.
 			err = nc2.Publish("world", payloadBytes)
-			if err == nats.ErrConnectionClosed {
+			if err == gio.ErrConnectionClosed {
 				return
 			}
 		case <-time.After(5 * time.Second):
@@ -1513,30 +1513,30 @@ func TestNewServers(t *testing.T) {
 	s2Opts.Port = s1Opts.Port + 1
 	s2Opts.Cluster.Host = "localhost"
 	s2Opts.Cluster.Port = 6223
-	s2Opts.Routes = server.RoutesFromStr("nats://localhost:6222")
+	s2Opts.Routes = server.RoutesFromStr("gio://localhost:6222")
 	s2 := test.RunServer(&s2Opts)
 	defer s2.Shutdown()
 
 	ch := make(chan bool)
-	cb := func(_ *nats.Conn) {
+	cb := func(_ *gio.Conn) {
 		ch <- true
 	}
-	url := fmt.Sprintf("nats://%s:%d", s1Opts.Host, s1Opts.Port)
-	nc1, err := nats.Connect(url, nats.DiscoveredServersHandler(cb))
+	url := fmt.Sprintf("gio://%s:%d", s1Opts.Host, s1Opts.Port)
+	nc1, err := gio.Connect(url, gio.DiscoveredServersHandler(cb))
 	if err != nil {
 		t.Fatalf("Error on connect: %v", err)
 	}
 	defer nc1.Close()
 
-	nc2, err := nats.Connect(url)
+	nc2, err := gio.Connect(url)
 	if err != nil {
 		t.Fatalf("Error on connect: %v", err)
 	}
 	defer nc2.Close()
 	nc2.SetDiscoveredServersHandler(cb)
 
-	opts := nats.GetDefaultOptions()
-	opts.Url = nats.DefaultURL
+	opts := gio.GetDefaultOptions()
+	opts.Url = gio.DefaultURL
 	opts.DiscoveredServersCB = cb
 	nc3, err := opts.Connect()
 	if err != nil {
@@ -1558,7 +1558,7 @@ func TestNewServers(t *testing.T) {
 	s3Opts.Port = s2Opts.Port + 1
 	s3Opts.Cluster.Host = "localhost"
 	s3Opts.Cluster.Port = 6224
-	s3Opts.Routes = server.RoutesFromStr("nats://localhost:6222")
+	s3Opts.Routes = server.RoutesFromStr("gio://localhost:6222")
 	s3 := test.RunServer(&s3Opts)
 	defer s3.Shutdown()
 
@@ -1584,7 +1584,7 @@ func TestBarrier(t *testing.T) {
 	pubMsgs := int32(0)
 	ch := make(chan bool, 1)
 
-	sub1, err := nc.Subscribe("pub", func(_ *nats.Msg) {
+	sub1, err := nc.Subscribe("pub", func(_ *gio.Msg) {
 		atomic.AddInt32(&pubMsgs, 1)
 		time.Sleep(250 * time.Millisecond)
 	})
@@ -1592,7 +1592,7 @@ func TestBarrier(t *testing.T) {
 		t.Fatalf("Error on subscribe: %v", err)
 	}
 
-	sub2, err := nc.Subscribe("close", func(_ *nats.Msg) {
+	sub2, err := nc.Subscribe("close", func(_ *gio.Msg) {
 		// The "close" message was sent/received lat, but
 		// because we are dealing with different subscriptions,
 		// which are dispatched by different dispatchers, and
@@ -1640,7 +1640,7 @@ func TestBarrier(t *testing.T) {
 		t.Fatal("Barrier function was not invoked")
 	}
 
-	if _, err := nc.Subscribe("foo", func(m *nats.Msg) {
+	if _, err := nc.Subscribe("foo", func(m *gio.Msg) {
 		// To check that the Barrier() function works if the subscription
 		// is unsubscribed after the call was made, sleep a bit here.
 		time.Sleep(250 * time.Millisecond)
@@ -1662,7 +1662,7 @@ func TestBarrier(t *testing.T) {
 	}
 
 	// Test with AutoUnsubscribe now...
-	sub1, err = nc.Subscribe("foo", func(m *nats.Msg) {
+	sub1, err = nc.Subscribe("foo", func(m *gio.Msg) {
 		// Since we auto-unsubscribe with 1, there should not be another
 		// invocation of this callback, but the Barrier should still be
 		// invoked.
@@ -1688,7 +1688,7 @@ func TestBarrier(t *testing.T) {
 	}
 
 	// Check that Barrier only affects asynchronous subscriptions
-	sub1, err = nc.Subscribe("foo", func(m *nats.Msg) {
+	sub1, err = nc.Subscribe("foo", func(m *gio.Msg) {
 		nc.Barrier(func() { ch <- true })
 	})
 	if err != nil {
@@ -1698,7 +1698,7 @@ func TestBarrier(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error on subscribe: %v", err)
 	}
-	msgChan := make(chan *nats.Msg, 1)
+	msgChan := make(chan *gio.Msg, 1)
 	chanSub, err := nc.ChanSubscribe("foo", msgChan)
 	if err != nil {
 		t.Fatalf("Error on subscribe: %v", err)
@@ -1728,7 +1728,7 @@ func TestBarrier(t *testing.T) {
 
 	atomic.StoreInt32(&pubMsgs, 0)
 	// Check barrier does not prevent new messages to be delivered.
-	sub1, err = nc.Subscribe("foo", func(_ *nats.Msg) {
+	sub1, err = nc.Subscribe("foo", func(_ *gio.Msg) {
 		if pm := atomic.AddInt32(&pubMsgs, 1); pm == 1 {
 			nc.Barrier(func() {
 				nc.Publish("foo", []byte("second"))
@@ -1751,7 +1751,7 @@ func TestBarrier(t *testing.T) {
 
 	// Check that barrier works if called before connection
 	// is closed.
-	if _, err := nc.Subscribe("bar", func(_ *nats.Msg) {
+	if _, err := nc.Subscribe("bar", func(_ *gio.Msg) {
 		nc.Barrier(func() { ch <- true })
 		nc.Close()
 	}); err != nil {
@@ -1769,8 +1769,8 @@ func TestBarrier(t *testing.T) {
 
 	// Finally, check that if connection is closed, Barrier returns
 	// an error.
-	if err := nc.Barrier(func() { ch <- true }); err != nats.ErrConnectionClosed {
-		t.Fatalf("Expected error %v, got %v", nats.ErrConnectionClosed, err)
+	if err := nc.Barrier(func() { ch <- true }); err != gio.ErrConnectionClosed {
+		t.Fatalf("Expected error %v, got %v", gio.ErrConnectionClosed, err)
 	}
 
 	// Check that one can call connection methods from Barrier
@@ -1833,7 +1833,7 @@ func TestReceiveInfoRightAfterFirstPong(t *testing.T) {
 		}
 	}()
 
-	nc, err := nats.Connect(fmt.Sprintf("nats://127.0.0.1:%d", addr.Port))
+	nc, err := gio.Connect(fmt.Sprintf("gio://127.0.0.1:%d", addr.Port))
 	if err != nil {
 		t.Fatalf("Error on connect: %v", err)
 	}
@@ -1845,7 +1845,7 @@ func TestReceiveInfoRightAfterFirstPong(t *testing.T) {
 	)
 	for time.Now().Before(timeout) {
 		ds = nc.DiscoveredServers()
-		if len(ds) == 1 && ds[0] == "nats://me:1" {
+		if len(ds) == 1 && ds[0] == "gio://me:1" {
 			ok = true
 			break
 		}
@@ -1926,9 +1926,9 @@ func TestReceiveInfoWithEmptyConnectURLs(t *testing.T) {
 	}
 
 	rch := make(chan bool)
-	nc, err := nats.Connect("nats://127.0.0.1:4222",
-		nats.ReconnectWait(50*time.Millisecond),
-		nats.ReconnectHandler(func(_ *nats.Conn) {
+	nc, err := gio.Connect("gio://127.0.0.1:4222",
+		gio.ReconnectWait(50*time.Millisecond),
+		gio.ReconnectHandler(func(_ *gio.Conn) {
 			rch <- true
 		}))
 	if err != nil {
@@ -1943,8 +1943,8 @@ func TestReceiveInfoWithEmptyConnectURLs(t *testing.T) {
 	for time.Now().Before(timeout) {
 		ds = nc.DiscoveredServers()
 		if len(ds) == 2 {
-			if (ds[0] == "nats://127.0.0.1:4223" && ds[1] == "nats://127.0.0.1:4224") ||
-				(ds[0] == "nats://127.0.0.1:4224" && ds[1] == "nats://127.0.0.1:4223") {
+			if (ds[0] == "gio://127.0.0.1:4223" && ds[1] == "gio://127.0.0.1:4224") ||
+				(ds[0] == "gio://127.0.0.1:4224" && ds[1] == "gio://127.0.0.1:4223") {
 				ok = true
 				break
 			}
@@ -1960,11 +1960,11 @@ func TestReceiveInfoWithEmptyConnectURLs(t *testing.T) {
 	if err := Wait(rch); err != nil {
 		t.Fatal("Did not reconnect")
 	}
-	// Discovered servers should still contain nats://me:1
+	// Discovered servers should still contain gio://me:1
 	ds = nc.DiscoveredServers()
 	if len(ds) != 2 ||
-		!((ds[0] == "nats://127.0.0.1:4223" && ds[1] == "nats://127.0.0.1:4224") ||
-			(ds[0] == "nats://127.0.0.1:4224" && ds[1] == "nats://127.0.0.1:4223")) {
+		!((ds[0] == "gio://127.0.0.1:4223" && ds[1] == "gio://127.0.0.1:4224") ||
+			(ds[0] == "gio://127.0.0.1:4224" && ds[1] == "gio://127.0.0.1:4223")) {
 		t.Fatalf("Unexpected discovered servers list: %v", ds)
 	}
 	nc.Close()

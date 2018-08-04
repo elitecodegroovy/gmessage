@@ -40,16 +40,16 @@ func serverVersionAtLeast(major, minor, update int) error {
 }
 
 func TestServersOption(t *testing.T) {
-	opts := nats.GetDefaultOptions()
+	opts := gio.GetDefaultOptions()
 	opts.NoRandomize = true
 
 	_, err := opts.Connect()
-	if err != nats.ErrNoServers {
+	if err != gio.ErrNoServers {
 		t.Fatalf("Wrong error: '%v'\n", err)
 	}
 	opts.Servers = testServers
 	_, err = opts.Connect()
-	if err == nil || err != nats.ErrNoServers {
+	if err == nil || err != gio.ErrNoServers {
 		t.Fatalf("Did not receive proper error: %v\n", err)
 	}
 
@@ -62,7 +62,7 @@ func TestServersOption(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Could not connect: %v\n", err)
 	}
-	if nc.ConnectedUrl() != "nats://localhost:1222" {
+	if nc.ConnectedUrl() != "gio://localhost:1222" {
 		nc.Close()
 		t.Fatalf("Does not report correct connection: %s\n",
 			nc.ConnectedUrl())
@@ -80,21 +80,21 @@ func TestServersOption(t *testing.T) {
 		t.Fatalf("Could not connect: %v\n", err)
 	}
 	defer nc.Close()
-	if nc.ConnectedUrl() != "nats://localhost:1223" {
+	if nc.ConnectedUrl() != "gio://localhost:1223" {
 		t.Fatalf("Does not report correct connection: %s\n",
 			nc.ConnectedUrl())
 	}
 }
 
 func TestNewStyleServersOption(t *testing.T) {
-	_, err := nats.Connect(nats.DefaultURL, nats.DontRandomize())
-	if err != nats.ErrNoServers {
+	_, err := gio.Connect(gio.DefaultURL, gio.DontRandomize())
+	if err != gio.ErrNoServers {
 		t.Fatalf("Wrong error: '%v'\n", err)
 	}
 	servers := strings.Join(testServers, ",")
 
-	_, err = nats.Connect(servers, nats.DontRandomize())
-	if err == nil || err != nats.ErrNoServers {
+	_, err = gio.Connect(servers, gio.DontRandomize())
+	if err == nil || err != gio.ErrNoServers {
 		t.Fatalf("Did not receive proper error: %v\n", err)
 	}
 
@@ -103,11 +103,11 @@ func TestNewStyleServersOption(t *testing.T) {
 	// Do this in case some failure occurs before explicit shutdown
 	defer s1.Shutdown()
 
-	nc, err := nats.Connect(servers, nats.DontRandomize())
+	nc, err := gio.Connect(servers, gio.DontRandomize())
 	if err != nil {
 		t.Fatalf("Could not connect: %v\n", err)
 	}
-	if nc.ConnectedUrl() != "nats://localhost:1222" {
+	if nc.ConnectedUrl() != "gio://localhost:1222" {
 		nc.Close()
 		t.Fatalf("Does not report correct connection: %s\n",
 			nc.ConnectedUrl())
@@ -120,12 +120,12 @@ func TestNewStyleServersOption(t *testing.T) {
 	// Do this in case some failure occurs before explicit shutdown
 	defer s2.Shutdown()
 
-	nc, err = nats.Connect(servers, nats.DontRandomize())
+	nc, err = gio.Connect(servers, gio.DontRandomize())
 	if err != nil {
 		t.Fatalf("Could not connect: %v\n", err)
 	}
 	defer nc.Close()
-	if nc.ConnectedUrl() != "nats://localhost:1223" {
+	if nc.ConnectedUrl() != "gio://localhost:1223" {
 		t.Fatalf("Does not report correct connection: %s\n",
 			nc.ConnectedUrl())
 	}
@@ -133,8 +133,8 @@ func TestNewStyleServersOption(t *testing.T) {
 
 func TestAuthServers(t *testing.T) {
 	var plainServers = []string{
-		"nats://localhost:1222",
-		"nats://localhost:1224",
+		"gio://localhost:1222",
+		"gio://localhost:1224",
 	}
 
 	opts := test.DefaultTestOptions
@@ -149,7 +149,7 @@ func TestAuthServers(t *testing.T) {
 	defer as2.Shutdown()
 
 	pservers := strings.Join(plainServers, ",")
-	nc, err := nats.Connect(pservers, nats.DontRandomize(), nats.Timeout(5*time.Second))
+	nc, err := gio.Connect(pservers, gio.DontRandomize(), gio.Timeout(5*time.Second))
 	if err == nil {
 		nc.Close()
 		t.Fatalf("Expect Auth failure, got no error\n")
@@ -161,11 +161,11 @@ func TestAuthServers(t *testing.T) {
 
 	// Test that we can connect to a subsequent correct server.
 	var authServers = []string{
-		"nats://localhost:1222",
-		"nats://derek:foo@localhost:1224",
+		"gio://localhost:1222",
+		"gio://derek:foo@localhost:1224",
 	}
 	aservers := strings.Join(authServers, ",")
-	nc, err = nats.Connect(aservers, nats.DontRandomize(), nats.Timeout(5*time.Second))
+	nc, err = gio.Connect(aservers, gio.DontRandomize(), gio.Timeout(5*time.Second))
 	if err != nil {
 		t.Fatalf("Expected to connect properly: %v\n", err)
 	}
@@ -187,8 +187,8 @@ func TestBasicClusterReconnect(t *testing.T) {
 
 	dcbCalled := false
 
-	opts := []nats.Option{nats.DontRandomize(),
-		nats.DisconnectHandler(func(nc *nats.Conn) {
+	opts := []gio.Option{gio.DontRandomize(),
+		gio.DisconnectHandler(func(nc *gio.Conn) {
 			// Suppress any additional callbacks
 			if dcbCalled {
 				return
@@ -196,10 +196,10 @@ func TestBasicClusterReconnect(t *testing.T) {
 			dcbCalled = true
 			dch <- true
 		}),
-		nats.ReconnectHandler(func(_ *nats.Conn) { rch <- true }),
+		gio.ReconnectHandler(func(_ *gio.Conn) { rch <- true }),
 	}
 
-	nc, err := nats.Connect(servers, opts...)
+	nc, err := gio.Connect(servers, opts...)
 	if err != nil {
 		t.Fatalf("Expected to connect, got err: %v\n", err)
 	}
@@ -252,18 +252,18 @@ func TestHotSpotReconnect(t *testing.T) {
 	}
 
 	numClients := 32
-	clients := []*nats.Conn{}
+	clients := []*gio.Conn{}
 
 	wg := &sync.WaitGroup{}
 	wg.Add(numClients)
 
-	opts := []nats.Option{
-		nats.ReconnectWait(50 * time.Millisecond),
-		nats.ReconnectHandler(func(_ *nats.Conn) { wg.Done() }),
+	opts := []gio.Option{
+		gio.ReconnectWait(50 * time.Millisecond),
+		gio.ReconnectHandler(func(_ *gio.Conn) { wg.Done() }),
 	}
 
 	for i := 0; i < numClients; i++ {
-		nc, err := nats.Connect(srvrs, opts...)
+		nc, err := gio.Connect(srvrs, opts...)
 		if err != nil {
 			t.Fatalf("Expected to connect, got err: %v\n", err)
 		}
@@ -312,7 +312,7 @@ func TestProperReconnectDelay(t *testing.T) {
 	defer s1.Shutdown()
 
 	var srvs string
-	opts := nats.GetDefaultOptions()
+	opts := gio.GetDefaultOptions()
 	if runtime.GOOS == "windows" {
 		srvs = strings.Join(testServers[:2], ",")
 	} else {
@@ -324,7 +324,7 @@ func TestProperReconnectDelay(t *testing.T) {
 	closedCbCalled := false
 	dch := make(chan bool)
 
-	dcb := func(nc *nats.Conn) {
+	dcb := func(nc *gio.Conn) {
 		// Suppress any additional calls
 		if dcbCalled {
 			return
@@ -333,11 +333,11 @@ func TestProperReconnectDelay(t *testing.T) {
 		dch <- true
 	}
 
-	ccb := func(_ *nats.Conn) {
+	ccb := func(_ *gio.Conn) {
 		closedCbCalled = true
 	}
 
-	nc, err := nats.Connect(srvs, nats.DontRandomize(), nats.DisconnectHandler(dcb), nats.ClosedHandler(ccb))
+	nc, err := gio.Connect(srvs, gio.DontRandomize(), gio.DisconnectHandler(dcb), gio.ClosedHandler(ccb))
 	if err != nil {
 		t.Fatalf("Expected to connect, got err: %v\n", err)
 	}
@@ -357,7 +357,7 @@ func TestProperReconnectDelay(t *testing.T) {
 	if closedCbCalled {
 		t.Fatal("Closed CB was triggered, should not have been.")
 	}
-	if status := nc.Status(); status != nats.RECONNECTING {
+	if status := nc.Status(); status != gio.RECONNECTING {
 		t.Fatalf("Wrong status: %d\n", status)
 	}
 }
@@ -366,7 +366,7 @@ func TestProperFalloutAfterMaxAttempts(t *testing.T) {
 	s1 := RunServerOnPort(1222)
 	defer s1.Shutdown()
 
-	opts := nats.GetDefaultOptions()
+	opts := gio.GetDefaultOptions()
 	// Reduce the list of servers for Windows tests
 	if runtime.GOOS == "windows" {
 		opts.Servers = testServers[:2]
@@ -379,14 +379,14 @@ func TestProperFalloutAfterMaxAttempts(t *testing.T) {
 	opts.ReconnectWait = (25 * time.Millisecond)
 
 	dch := make(chan bool)
-	opts.DisconnectedCB = func(_ *nats.Conn) {
+	opts.DisconnectedCB = func(_ *gio.Conn) {
 		dch <- true
 	}
 
 	closedCbCalled := false
 	cch := make(chan bool)
 
-	opts.ClosedCB = func(_ *nats.Conn) {
+	opts.ClosedCB = func(_ *gio.Conn) {
 		closedCbCalled = true
 		cch <- true
 	}
@@ -426,8 +426,8 @@ func TestProperFalloutAfterMaxAttempts(t *testing.T) {
 
 func TestProperFalloutAfterMaxAttemptsWithAuthMismatch(t *testing.T) {
 	var myServers = []string{
-		"nats://localhost:1222",
-		"nats://localhost:4443",
+		"gio://localhost:1222",
+		"gio://localhost:4443",
 	}
 	s1 := RunServerOnPort(1222)
 	defer s1.Shutdown()
@@ -435,7 +435,7 @@ func TestProperFalloutAfterMaxAttemptsWithAuthMismatch(t *testing.T) {
 	s2, _ := RunServerWithConfig("./configs/tlsverify.conf")
 	defer s2.Shutdown()
 
-	opts := nats.GetDefaultOptions()
+	opts := gio.GetDefaultOptions()
 	opts.Servers = myServers
 	opts.NoRandomize = true
 	if runtime.GOOS == "windows" {
@@ -446,14 +446,14 @@ func TestProperFalloutAfterMaxAttemptsWithAuthMismatch(t *testing.T) {
 	opts.ReconnectWait = (25 * time.Millisecond)
 
 	dch := make(chan bool)
-	opts.DisconnectedCB = func(_ *nats.Conn) {
+	opts.DisconnectedCB = func(_ *gio.Conn) {
 		dch <- true
 	}
 
 	closedCbCalled := false
 	cch := make(chan bool)
 
-	opts.ClosedCB = func(_ *nats.Conn) {
+	opts.ClosedCB = func(_ *gio.Conn) {
 		closedCbCalled = true
 		cch <- true
 	}
@@ -502,7 +502,7 @@ func TestTimeoutOnNoServers(t *testing.T) {
 	s1 := RunServerOnPort(1222)
 	defer s1.Shutdown()
 
-	opts := nats.GetDefaultOptions()
+	opts := gio.GetDefaultOptions()
 	if runtime.GOOS == "windows" {
 		opts.Servers = testServers[:2]
 		opts.MaxReconnect = 2
@@ -516,14 +516,14 @@ func TestTimeoutOnNoServers(t *testing.T) {
 	opts.NoRandomize = true
 
 	dch := make(chan bool)
-	opts.DisconnectedCB = func(nc *nats.Conn) {
+	opts.DisconnectedCB = func(nc *gio.Conn) {
 		// Suppress any additional calls
 		nc.SetDisconnectHandler(nil)
 		dch <- true
 	}
 
 	cch := make(chan bool)
-	opts.ClosedCB = func(_ *nats.Conn) {
+	opts.ClosedCB = func(_ *gio.Conn) {
 		cch <- true
 	}
 
@@ -568,7 +568,7 @@ func TestPingReconnect(t *testing.T) {
 	s1 := RunServerOnPort(1222)
 	defer s1.Shutdown()
 
-	opts := nats.GetDefaultOptions()
+	opts := gio.GetDefaultOptions()
 	opts.Servers = testServers
 	opts.NoRandomize = true
 	opts.ReconnectWait = 200 * time.Millisecond
@@ -580,7 +580,7 @@ func TestPingReconnect(t *testing.T) {
 	rch := make(chan time.Time, RECONNECTS)
 	dch := make(chan time.Time, RECONNECTS)
 
-	opts.DisconnectedCB = func(_ *nats.Conn) {
+	opts.DisconnectedCB = func(_ *gio.Conn) {
 		d := dch
 		select {
 		case d <- time.Now():
@@ -589,7 +589,7 @@ func TestPingReconnect(t *testing.T) {
 		}
 	}
 
-	opts.ReconnectedCB = func(c *nats.Conn) {
+	opts.ReconnectedCB = func(c *gio.Conn) {
 		r := rch
 		select {
 		case r <- time.Now():
@@ -660,22 +660,22 @@ func TestServerPoolUpdatedWhenRouteGoesAway(t *testing.T) {
 	s1Opts.Port = 4222
 	s1Opts.Cluster.Host = "127.0.0.1"
 	s1Opts.Cluster.Port = 6222
-	s1Opts.Routes = server.RoutesFromStr("nats://127.0.0.1:6223,nats://127.0.0.1:6224")
+	s1Opts.Routes = server.RoutesFromStr("gio://127.0.0.1:6223,gio://127.0.0.1:6224")
 	s1 := test.RunServer(&s1Opts)
 	defer s1.Shutdown()
 
-	s1Url := "nats://127.0.0.1:4222"
-	s2Url := "nats://127.0.0.1:4223"
-	s3Url := "nats://127.0.0.1:4224"
+	s1Url := "gio://127.0.0.1:4222"
+	s2Url := "gio://127.0.0.1:4223"
+	s3Url := "gio://127.0.0.1:4224"
 
 	ch := make(chan bool, 1)
 	chch := make(chan bool, 1)
-	connHandler := func(_ *nats.Conn) {
+	connHandler := func(_ *gio.Conn) {
 		chch <- true
 	}
-	nc, err := nats.Connect(s1Url,
-		nats.ReconnectHandler(connHandler),
-		nats.DiscoveredServersHandler(func(_ *nats.Conn) {
+	nc, err := gio.Connect(s1Url,
+		gio.ReconnectHandler(connHandler),
+		gio.DiscoveredServersHandler(func(_ *gio.Conn) {
 			ch <- true
 		}))
 	if err != nil {
@@ -687,7 +687,7 @@ func TestServerPoolUpdatedWhenRouteGoesAway(t *testing.T) {
 	s2Opts.Port = s1Opts.Port + 1
 	s2Opts.Cluster.Host = "127.0.0.1"
 	s2Opts.Cluster.Port = 6223
-	s2Opts.Routes = server.RoutesFromStr("nats://127.0.0.1:6222,nats://127.0.0.1:6224")
+	s2Opts.Routes = server.RoutesFromStr("gio://127.0.0.1:6222,gio://127.0.0.1:6224")
 	s2 := test.RunServer(&s2Opts)
 	defer s2.Shutdown()
 
@@ -734,7 +734,7 @@ func TestServerPoolUpdatedWhenRouteGoesAway(t *testing.T) {
 	s3Opts.Port = s2Opts.Port + 1
 	s3Opts.Cluster.Host = "127.0.0.1"
 	s3Opts.Cluster.Port = 6224
-	s3Opts.Routes = server.RoutesFromStr("nats://127.0.0.1:6222,nats://127.0.0.1:6223")
+	s3Opts.Routes = server.RoutesFromStr("gio://127.0.0.1:6222,gio://127.0.0.1:6223")
 	s3 := test.RunServer(&s3Opts)
 	defer s3.Shutdown()
 
@@ -798,12 +798,12 @@ func TestServerPoolUpdatedWhenRouteGoesAway(t *testing.T) {
 
 	// Create a client connection with special dialer.
 	d := &checkPoolUpdatedDialer{first: true}
-	nc, err = nats.Connect(s1Url,
-		nats.MaxReconnects(10),
-		nats.ReconnectWait(15*time.Millisecond),
-		nats.SetCustomDialer(d),
-		nats.ReconnectHandler(connHandler),
-		nats.ClosedHandler(connHandler))
+	nc, err = gio.Connect(s1Url,
+		gio.MaxReconnects(10),
+		gio.ReconnectWait(15*time.Millisecond),
+		gio.SetCustomDialer(d),
+		gio.ReconnectHandler(connHandler),
+		gio.ClosedHandler(connHandler))
 	if err != nil {
 		t.Fatalf("Error on connect")
 	}

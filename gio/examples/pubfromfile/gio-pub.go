@@ -11,12 +11,11 @@ import (
 	"strings"
 )
 
-// NOTE: Use tls scheme for TLS, e.g. nats-pub -s tls://demo.nats.io:4443 foo hello
 func usage() {
-	log.Fatalf("Usage: gio-pub [-s server (%s)] <subject> <msg> \n", nats.DefaultURL)
+	log.Fatalf("Usage: gio-pub [-s server (%s)] <subject> <msg> \n", gio.DefaultURL)
 }
 
-func doPublish(nc *nats.Conn, subj string) error {
+func doPublish(nc *gio.Conn, subj string) error {
 	file, err := os.Open("file.csv")
 	if err != nil {
 		log.Fatal(err)
@@ -49,14 +48,13 @@ func publishMsg(subj string) {
 	//	usage()
 	//}
 
-	nc, err := nats.Connect(*urls)
+	nc, err := gio.Connect(*urls)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer nc.Close()
 
 	doPublish(nc, subj)
-
 
 	if err := nc.LastError(); err != nil {
 		log.Fatal(err)

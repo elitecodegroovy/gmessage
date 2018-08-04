@@ -1,4 +1,3 @@
-
 package main
 
 import (
@@ -10,12 +9,11 @@ import (
 	"github.com/elitecodegroovy/gmessage/gio"
 )
 
-// NOTE: Use tls scheme for TLS, e.g. gio-qsub -s tls://demo.nats.io:4443 foo
 func usage() {
 	log.Fatalf("Usage: gio-qsub [-s server] [-t] <subject> <queue-group>\n")
 }
 
-func printMsg(m *nats.Msg, i int) {
+func printMsg(m *gio.Msg, i int) {
 	log.Printf("[#%d] Received on [%s] Queue[%s] Pid[%d]: '%s'\n", i, m.Subject, m.Sub.Queue, os.Getpid(), string(m.Data))
 }
 
@@ -32,14 +30,14 @@ func main() {
 		usage()
 	}
 
-	nc, err := nats.Connect(*urls)
+	nc, err := gio.Connect(*urls)
 	if err != nil {
 		log.Fatalf("Can't connect: %v\n", err)
 	}
 
 	subj, queue, i := args[0], args[1], 0
 
-	nc.QueueSubscribe(subj, queue, func(msg *nats.Msg) {
+	nc.QueueSubscribe(subj, queue, func(msg *gio.Msg) {
 		i++
 		printMsg(msg, i)
 	})

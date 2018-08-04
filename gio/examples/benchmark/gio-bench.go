@@ -15,6 +15,7 @@ import (
 
 // Some sane defaults
 const (
+	DefaultGMessage    = "nats://192.168.1.225:6222"
 	DefaultNumMsgs     = 100000
 	DefaultNumPubs     = 1
 	DefaultNumSubs     = 0
@@ -22,13 +23,13 @@ const (
 )
 
 func usage() {
-	log.Fatalf("Usage: gio-bench [-s server (%s)] [--tls] [-np NUM_PUBLISHERS] [-ns NUM_SUBSCRIBERS] [-n NUM_MSGS] [-ms MESSAGE_SIZE] [-csv csvfile] <subject>\n", nats.DefaultURL)
+	log.Fatalf("Usage: gio-bench [-s server (%s)] [--tls] [-np NUM_PUBLISHERS] [-ns NUM_SUBSCRIBERS] [-n NUM_MSGS] [-ms MESSAGE_SIZE] [-csv csvfile] <subject>\n", DefaultGMessage)
 }
 
 var benchmark *bench.Benchmark
 
 func startDoBenchmark() {
-	var urls = flag.String("s", "nats://192.168.1.225:6222", "The gmessage server URLs (separated by comma)")
+	var urls = flag.String("s", DefaultGMessage, "The gmessage server URLs (separated by comma)")
 	var tls = flag.Bool("tls", false, "Use TLS Secure Connection")
 	var numPubs = flag.Int("np", DefaultNumPubs, "Number of Concurrent Publishers")
 	var numSubs = flag.Int("ns", DefaultNumSubs, "Number of Concurrent Subscribers")
@@ -50,14 +51,14 @@ func startDoBenchmark() {
 	}
 
 	// Setup the option block
-	opts := nats.GetDefaultOptions()
+	opts := gio.GetDefaultOptions()
 	opts.Servers = strings.Split(*urls, ",")
 	for i, s := range opts.Servers {
 		opts.Servers[i] = strings.Trim(s, " ")
 	}
 	opts.Secure = *tls
 
-	benchmark = bench.NewBenchmark("NATS", *numSubs, *numPubs)
+	benchmark = bench.NewBenchmark("GMessage", *numSubs, *numPubs)
 
 	var startwg sync.WaitGroup
 	var donewg sync.WaitGroup
@@ -94,7 +95,7 @@ func startDoBenchmark() {
 	}
 }
 
-func runPublisher(startwg, donewg *sync.WaitGroup, opts nats.Options, numMsgs int, msgSize int) {
+func runPublisher(startwg, donewg *sync.WaitGroup, opts gio.Options, numMsgs int, msgSize int) {
 	nc, err := opts.Connect()
 	if err != nil {
 		log.Fatalf("Can't connect: %v\n", err)
@@ -120,7 +121,7 @@ func runPublisher(startwg, donewg *sync.WaitGroup, opts nats.Options, numMsgs in
 	donewg.Done()
 }
 
-func runSubscriber(startwg, donewg *sync.WaitGroup, opts nats.Options, numMsgs int, msgSize int) {
+func runSubscriber(startwg, donewg *sync.WaitGroup, opts gio.Options, numMsgs int, msgSize int) {
 	nc, err := opts.Connect()
 	if err != nil {
 		log.Fatalf("Can't connect: %v\n", err)
@@ -131,7 +132,7 @@ func runSubscriber(startwg, donewg *sync.WaitGroup, opts nats.Options, numMsgs i
 
 	received := 0
 	start := time.Now()
-	nc.Subscribe(subj, func(msg *nats.Msg) {
+	nc.Subscribe(subj, func(msg *gio.Msg) {
 		received++
 		if received >= numMsgs {
 			benchmark.AddSubSample(bench.NewSample(numMsgs, msgSize, start, time.Now(), nc))

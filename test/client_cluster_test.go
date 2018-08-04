@@ -1,4 +1,4 @@
-// Copyright 2013-2018 The NATS Authors
+// Copyright 2013-2018 The gio Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -21,22 +21,22 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nats-io/go-nats"
+	"github.com/elitecodegroovy/gmessage/gio"
 )
 
 func TestServerRestartReSliceIssue(t *testing.T) {
 	srvA, srvB, optsA, optsB := runServers(t)
 	defer srvA.Shutdown()
 
-	urlA := fmt.Sprintf("nats://%s:%d/", optsA.Host, optsA.Port)
-	urlB := fmt.Sprintf("nats://%s:%d/", optsB.Host, optsB.Port)
+	urlA := fmt.Sprintf("gio://%s:%d/", optsA.Host, optsA.Port)
+	urlB := fmt.Sprintf("gio://%s:%d/", optsB.Host, optsB.Port)
 
 	// msg to send..
 	msg := []byte("Hello World")
 
 	servers := []string{urlA, urlB}
 
-	opts := nats.GetDefaultOptions()
+	opts := gio.GetDefaultOptions()
 	opts.Timeout = (5 * time.Second)
 	opts.ReconnectWait = (50 * time.Millisecond)
 	opts.MaxReconnect = 1000
@@ -45,12 +45,12 @@ func TestServerRestartReSliceIssue(t *testing.T) {
 
 	reconnects := int32(0)
 	reconnectsDone := make(chan bool, numClients)
-	opts.ReconnectedCB = func(nc *nats.Conn) {
+	opts.ReconnectedCB = func(nc *gio.Conn) {
 		atomic.AddInt32(&reconnects, 1)
 		reconnectsDone <- true
 	}
 
-	clients := make([]*nats.Conn, numClients)
+	clients := make([]*gio.Conn, numClients)
 
 	// Create 20 random clients.
 	// Half connected to A and half to B..
@@ -66,7 +66,7 @@ func TestServerRestartReSliceIssue(t *testing.T) {
 		// Create 10 subscriptions each..
 		for x := 0; x < 10; x++ {
 			subject := fmt.Sprintf("foo.%d", (rand.Int()%50)+1)
-			nc.Subscribe(subject, func(m *nats.Msg) {
+			nc.Subscribe(subject, func(m *gio.Msg) {
 				// Just eat it..
 			})
 		}
@@ -108,7 +108,7 @@ func TestServerRestartReSliceIssue(t *testing.T) {
 	// exectue first, which would cause clients that have reconnected to
 	// it to try to reconnect (causing delays on Windows). So let's
 	// explicitly close them here.
-	// NOTE: With fix of NATS GO client (reconnect loop yields to Close()),
+	// NOTE: With fix of gio GO client (reconnect loop yields to Close()),
 	//       this change would not be required, however, it still speeeds up
 	//       the test, from more than 7s to less than one.
 	for i := 0; i < numClients; i++ {
@@ -122,11 +122,11 @@ func TestServerRestartReSliceIssue(t *testing.T) {
 func TestServerRestartAndQueueSubs(t *testing.T) {
 	srvA, srvB, optsA, optsB := runServers(t)
 
-	urlA := fmt.Sprintf("nats://%s:%d/", optsA.Host, optsA.Port)
-	urlB := fmt.Sprintf("nats://%s:%d/", optsB.Host, optsB.Port)
+	urlA := fmt.Sprintf("gio://%s:%d/", optsA.Host, optsA.Port)
+	urlB := fmt.Sprintf("gio://%s:%d/", optsB.Host, optsB.Port)
 
 	// Client options
-	opts := nats.GetDefaultOptions()
+	opts := gio.GetDefaultOptions()
 	opts.Timeout = (5 * time.Second)
 	opts.ReconnectWait = (50 * time.Millisecond)
 	opts.MaxReconnect = 1000
@@ -134,7 +134,7 @@ func TestServerRestartAndQueueSubs(t *testing.T) {
 
 	// Allow us to block on a reconnect completion.
 	reconnectsDone := make(chan bool)
-	opts.ReconnectedCB = func(nc *nats.Conn) {
+	opts.ReconnectedCB = func(nc *gio.Conn) {
 		reconnectsDone <- true
 	}
 
@@ -167,9 +167,9 @@ func TestServerRestartAndQueueSubs(t *testing.T) {
 		t.Fatalf("Failed to create connection for nc2: %v\n", err)
 	}
 
-	c1, _ := nats.NewEncodedConn(nc1, "json")
+	c1, _ := gio.NewEncodedConn(nc1, "json")
 	defer c1.Close()
-	c2, _ := nats.NewEncodedConn(nc2, "json")
+	c2, _ := gio.NewEncodedConn(nc2, "json")
 	defer c2.Close()
 
 	// Flusher helper function.
@@ -288,27 +288,27 @@ func TestRequestsAcrossRoutes(t *testing.T) {
 	defer srvA.Shutdown()
 	defer srvB.Shutdown()
 
-	urlA := fmt.Sprintf("nats://%s:%d/", optsA.Host, optsA.Port)
-	urlB := fmt.Sprintf("nats://%s:%d/", optsB.Host, optsB.Port)
+	urlA := fmt.Sprintf("gio://%s:%d/", optsA.Host, optsA.Port)
+	urlB := fmt.Sprintf("gio://%s:%d/", optsB.Host, optsB.Port)
 
-	nc1, err := nats.Connect(urlA)
+	nc1, err := gio.Connect(urlA)
 	if err != nil {
 		t.Fatalf("Failed to create connection for nc1: %v\n", err)
 	}
 	defer nc1.Close()
 
-	nc2, err := nats.Connect(urlB)
+	nc2, err := gio.Connect(urlB)
 	if err != nil {
 		t.Fatalf("Failed to create connection for nc2: %v\n", err)
 	}
 	defer nc2.Close()
 
-	ec2, _ := nats.NewEncodedConn(nc2, nats.JSON_ENCODER)
+	ec2, _ := gio.NewEncodedConn(nc2, gio.JSON_ENCODER)
 
 	response := []byte("I will help you")
 
 	// Connect responder to srvA
-	nc1.Subscribe("foo-req", func(m *nats.Msg) {
+	nc1.Subscribe("foo-req", func(m *gio.Msg) {
 		nc1.Publish(m.Reply, response)
 	})
 	// Make sure the route and the subscription are propagated.
@@ -329,35 +329,35 @@ func TestRequestsAcrossRoutesToQueues(t *testing.T) {
 	defer srvA.Shutdown()
 	defer srvB.Shutdown()
 
-	urlA := fmt.Sprintf("nats://%s:%d/", optsA.Host, optsA.Port)
-	urlB := fmt.Sprintf("nats://%s:%d/", optsB.Host, optsB.Port)
+	urlA := fmt.Sprintf("gio://%s:%d/", optsA.Host, optsA.Port)
+	urlB := fmt.Sprintf("gio://%s:%d/", optsB.Host, optsB.Port)
 
-	nc1, err := nats.Connect(urlA)
+	nc1, err := gio.Connect(urlA)
 	if err != nil {
 		t.Fatalf("Failed to create connection for nc1: %v\n", err)
 	}
 	defer nc1.Close()
 
-	nc2, err := nats.Connect(urlB)
+	nc2, err := gio.Connect(urlB)
 	if err != nil {
 		t.Fatalf("Failed to create connection for nc2: %v\n", err)
 	}
 	defer nc2.Close()
 
-	ec1, _ := nats.NewEncodedConn(nc1, nats.JSON_ENCODER)
-	ec2, _ := nats.NewEncodedConn(nc2, nats.JSON_ENCODER)
+	ec1, _ := gio.NewEncodedConn(nc1, gio.JSON_ENCODER)
+	ec2, _ := gio.NewEncodedConn(nc2, gio.JSON_ENCODER)
 
 	response := []byte("I will help you")
 
 	// Connect one responder to srvA
-	nc1.QueueSubscribe("foo-req", "booboo", func(m *nats.Msg) {
+	nc1.QueueSubscribe("foo-req", "booboo", func(m *gio.Msg) {
 		nc1.Publish(m.Reply, response)
 	})
 	// Make sure the route and the subscription are propagated.
 	nc1.Flush()
 
 	// Connect the other responder to srvB
-	nc2.QueueSubscribe("foo-req", "booboo", func(m *nats.Msg) {
+	nc2.QueueSubscribe("foo-req", "booboo", func(m *gio.Msg) {
 		nc2.Publish(m.Reply, response)
 	})
 
