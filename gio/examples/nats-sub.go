@@ -21,7 +21,7 @@ func printMsg(m *nats.Msg, i int) {
 }
 
 func main() {
-	var urls = flag.String("s", "nats://192.168.1.224:6222", "The nats server URLs (separated by comma)")
+	var urls = flag.String("s", "nats://192.168.1.225:6222", "The nats server URLs (separated by comma)")
 	var showTime = flag.Bool("t", false, "Display timestamps")
 
 	log.SetFlags(0)
