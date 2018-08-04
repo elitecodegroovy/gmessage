@@ -422,7 +422,7 @@ type connectInfo struct {
 // asynchronous subscribers.
 type MsgHandler func(msg *Msg)
 
-// Connect will attempt to connect to the NATS system.
+// Connect will attempt to connect to the gmessage system.
 // The url can contain username/password semantics. e.g. nats://derek:pass@localhost:4222
 // Comma separated arrays are also supported, e.g. urlA, urlB.
 // Options start with the defaults but can be overridden.
