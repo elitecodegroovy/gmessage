@@ -146,112 +146,140 @@ type Options struct {
 	// Url represents a single NATS server url to which the client
 	// will be connecting. If the Servers option is also set, it
 	// then becomes the first server in the Servers array.
+	// 1
 	Url string
 
 	// Servers is a configured set of servers which this client
 	// will use when attempting to connect.
+	// 2
 	Servers []string
 
 	// NoRandomize configures whether we will randomize the
 	// server pool.
+	// 3
 	NoRandomize bool
 
 	// Name is an optional name label which will be sent to the server
 	// on CONNECT to identify the client.
+	// 4
 	Name string
 
 	// Verbose signals the server to send an OK ack for commands
 	// successfully processed by the server.
+	// 5
 	Verbose bool
 
 	// Pedantic signals the server whether it should be doing further
 	// validation of subjects.
+	// 6
 	Pedantic bool
 
 	// Secure enables TLS secure connections that skip server
 	// verification by default. NOT RECOMMENDED.
+	// 7
 	Secure bool
 
 	// TLSConfig is a custom TLS configuration to use for secure
 	// transports.
+	// 8
 	TLSConfig *tls.Config
 
 	// AllowReconnect enables reconnection logic to be used when we
 	// encounter a disconnect from the current server.
+	// 9
 	AllowReconnect bool
 
 	// MaxReconnect sets the number of reconnect attempts that will be
 	// tried before giving up. If negative, then it will never give up
 	// trying to reconnect.
+	// 10
 	MaxReconnect int
 
 	// ReconnectWait sets the time to backoff after attempting a reconnect
 	// to a server that we were already connected to previously.
+	// 11
 	ReconnectWait time.Duration
 
 	// Timeout sets the timeout for a Dial operation on a connection.
+	// 12
 	Timeout time.Duration
 
 	// FlusherTimeout is the maximum time to wait for the flusher loop
 	// to be able to finish writing to the underlying connection.
+	// 13
 	FlusherTimeout time.Duration
 
 	// PingInterval is the period at which the client will be sending ping
 	// commands to the server, disabled if 0 or negative.
+	// 14
 	PingInterval time.Duration
 
 	// MaxPingsOut is the maximum number of pending ping commands that can
 	// be awaiting a response before raising an ErrStaleConnection error.
+	// 15
 	MaxPingsOut int
 
 	// ClosedCB sets the closed handler that is called when a client will
 	// no longer be connected.
+	// 16
 	ClosedCB ConnHandler
 
 	// DisconnectedCB sets the disconnected handler that is called
 	// whenever the connection is disconnected.
+	// 17
 	DisconnectedCB ConnHandler
 
 	// ReconnectedCB sets the reconnected handler called whenever
 	// the connection is successfully reconnected.
+	// 18
 	ReconnectedCB ConnHandler
 
 	// DiscoveredServersCB sets the callback that is invoked whenever a new
 	// server has joined the cluster.
+	// 19
 	DiscoveredServersCB ConnHandler
 
 	// AsyncErrorCB sets the async error handler (e.g. slow consumer errors)
+	// 20
 	AsyncErrorCB ErrHandler
 
 	// ReconnectBufSize is the size of the backing bufio during reconnect.
 	// Once this has been exhausted publish operations will return an error.
+	// 21
 	ReconnectBufSize int
 
 	// SubChanLen is the size of the buffered channel used between the socket
 	// Go routine and the message delivery for SyncSubscriptions.
 	// NOTE: This does not affect AsyncSubscriptions which are
 	// dictated by PendingLimits()
+	// 22
 	SubChanLen int
 
 	// User sets the username to be used when connecting to the server.
+	// 23
 	User string
 
 	// Password sets the password to be used when connecting to a server.
+	// 24
 	Password string
 
 	// Token sets the token to be used when connecting to a server.
+	// 25
 	Token string
 
 	// Dialer allows a custom net.Dialer when forming connections.
 	// DEPRECATED: should use CustomDialer instead.
+	// 26
 	Dialer *net.Dialer
 
 	// CustomDialer allows to specify a custom dialer (not necessarily
 	// a *net.Dialer).
+	// 27
 	CustomDialer CustomDialer
 
 	// UseOldRequestStyle forces the old method of Requests that utilize
 	// a new Inbox and a new Subscription for each request.
+	// 28
 	UseOldRequestStyle bool
 }
 
@@ -1073,7 +1101,7 @@ func (nc *Conn) processConnectInit() error {
 	return nil
 }
 
-// Main connect function. Will connect to the nats-server
+// Main connect function. Will connect to the gmessage-server
 func (nc *Conn) connect() error {
 	var returnedErr error
 
