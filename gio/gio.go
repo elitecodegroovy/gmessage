@@ -128,6 +128,9 @@ type asyncCallbacksHandler struct {
 	tail *asyncCB
 }
 
+
+
+
 // Option is a function on the options for a connection.
 type Option func(*Options) error
 
