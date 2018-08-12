@@ -42,7 +42,7 @@ func RunServer(opts *server.Options) *server.Server {
 	}
 	s := server.New(opts)
 	if s == nil {
-		panic("No NATS Server object returned.")
+		panic("No gMessage Server object returned.")
 	}
 
 	// Run server in Go routine.
@@ -50,7 +50,7 @@ func RunServer(opts *server.Options) *server.Server {
 
 	// Wait for accept loop(s) to be started
 	if !s.ReadyForConnections(10 * time.Second) {
-		panic("Unable to start NATS Server in Go Routine")
+		panic("Unable to start gMessage Server in Go Routine")
 	}
 	return s
 }
