@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/elitecodegroovy/gmessage/gio"
+	"nats-io/go-nats"
 )
 
 func checkFor(t *testing.T, totalWait, sleepDur time.Duration, f func() error) {
@@ -393,20 +394,20 @@ func TestMaxSubscriptions(t *testing.T) {
 	defer s.Shutdown()
 
 	addr := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
-	nc, err := nats.Connect(addr)
+	nc, err :=  gio.Connect(addr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v\n", err)
 	}
 	defer nc.Close()
 
 	for i := 0; i < 10; i++ {
-		_, err := nc.Subscribe(fmt.Sprintf("foo.%d", i), func(*nats.Msg) {})
+		_, err := nc.Subscribe(fmt.Sprintf("foo.%d", i), func(*gio.Msg) {})
 		if err != nil {
 			t.Fatalf("Error subscribing: %v\n", err)
 		}
 	}
 	// This should cause the error.
-	nc.Subscribe("foo.22", func(*nats.Msg) {})
+	nc.Subscribe("foo.22", func(*gio.Msg) {})
 	nc.Flush()
 	if err := nc.LastError(); err == nil {
 		t.Fatal("Expected an error but got none\n")
@@ -480,7 +481,7 @@ func TestWriteDeadline(t *testing.T) {
 	c.(*net.TCPConn).SetReadBuffer(4)
 
 	url := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
-	sender, err := nats.Connect(url)
+	sender, err := gio.Connect(url)
 	if err != nil {
 		t.Fatalf("Error on connect: %v", err)
 	}
@@ -618,12 +619,12 @@ func TestCustomClientAuthentication(t *testing.T) {
 
 	addr := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
 
-	nc, err := nats.Connect(addr, nats.UserInfo("valid", ""))
+	nc, err := gio.Connect(addr, gio.UserInfo("valid", ""))
 	if err != nil {
 		t.Fatalf("Expected client to connect, got: %s", err)
 	}
 	nc.Close()
-	if _, err := nats.Connect(addr, nats.UserInfo("invalid", "")); err == nil {
+	if _, err := gio.Connect(addr, gio.UserInfo("invalid", "")); err == nil {
 		t.Fatal("Expected client to fail to connect")
 	}
 }

@@ -18,7 +18,7 @@ import (
 	"time"
 
 	"github.com/elitecodegroovy/gmessage/server"
-	gnatsd "github.com/elitecodegroovy/gmessage/test"
+	giotest "github.com/elitecodegroovy/gmessage/test"
 )
 
 // Dumb wait program to sync on callbacks, etc... Will timeout
@@ -64,13 +64,13 @@ var reconnectOpts = Options{
 
 // test utility func
 func RunServerOnPort(port int) *server.Server {
-	opts := gnatsd.DefaultTestOptions
+	opts := giotest.DefaultTestOptions
 	opts.Port = port
 	return RunServerWithOptions(opts)
 }
 
 func RunServerWithOptions(opts server.Options) *server.Server {
-	return gnatsd.RunServer(&opts)
+	return giotest.RunServer(&opts)
 }
 
 //test reconnect
@@ -1081,6 +1081,7 @@ func TestConnServers(t *testing.T) {
 	validateURLs(c.Servers(), "nats://localhost:4333", "nats://localhost:4444")
 }
 
+// Test Connection async callback deadlock case
 func TestConnAsyncCBDeadlock(t *testing.T) {
 	s := RunServerOnPort(TEST_PORT)
 	defer s.Shutdown()
