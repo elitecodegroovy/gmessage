@@ -42,11 +42,7 @@ func RunServer(opts *server.Options) *server.Server {
 	}
 	s := server.New(opts)
 	if s == nil {
-<<<<<<< HEAD
-		panic("No Gmessage Server object returned.")
-=======
 		panic("No gMessage Server object returned.")
->>>>>>> eb64bc65e650ae7d1dd07e0d67496c21f35aa69e
 	}
 
 	// Run server in Go routine.
