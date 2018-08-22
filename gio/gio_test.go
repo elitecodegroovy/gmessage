@@ -62,6 +62,7 @@ var reconnectOpts = Options{
 	Timeout:        DefaultTimeout,
 }
 
+// test utility func
 func RunServerOnPort(port int) *server.Server {
 	opts := gnatsd.DefaultTestOptions
 	opts.Port = port
@@ -891,7 +892,7 @@ func TestAsyncINFO(t *testing.T) {
 	expectedServer := serverInfo{
 		Id:           "test",
 		Host:         "localhost",
-		Port:         4222,
+		Port:         6222,
 		Version:      "1.2.3",
 		AuthRequired: true,
 		TLSRequired:  true,
@@ -965,30 +966,30 @@ func TestAsyncINFO(t *testing.T) {
 	// Reinitialize the parser
 	c.ps = &parseState{}
 
-	info = []byte("INFO {\"connect_urls\":[\"localhost:4222\", \"localhost:5222\"]}\r\n")
+	info = []byte("INFO {\"connect_urls\":[\"localhost:6222\", \"localhost:5222\"]}\r\n")
 	err = c.parse(info)
 	if err != nil || c.ps.state != OP_START {
 		t.Fatalf("Unexpected: %d : %v\n", c.ps.state, err)
 	}
-	// Pool now should contain localhost:4222 (the default URL) and localhost:5222
-	checkPool("localhost:4222", "localhost:5222")
+	// Pool now should contain localhost:6222 (the default URL) and localhost:5222
+	checkPool("localhost:6222", "localhost:5222")
 
 	// Make sure that if client receives the same, it is not added again.
 	err = c.parse(info)
 	if err != nil || c.ps.state != OP_START {
 		t.Fatalf("Unexpected: %d : %v\n", c.ps.state, err)
 	}
-	// Pool should still contain localhost:4222 (the default URL) and localhost:5222
-	checkPool("localhost:4222", "localhost:5222")
+	// Pool should still contain localhost:6222 (the default URL) and localhost:5222
+	checkPool("localhost:6222", "localhost:5222")
 
 	// Receive a new URL
-	info = []byte("INFO {\"connect_urls\":[\"localhost:4222\", \"localhost:5222\", \"localhost:6222\"]}\r\n")
+	info = []byte("INFO {\"connect_urls\":[\"localhost:6222\", \"localhost:5222\", \"localhost:6222\"]}\r\n")
 	err = c.parse(info)
 	if err != nil || c.ps.state != OP_START {
 		t.Fatalf("Unexpected: %d : %v\n", c.ps.state, err)
 	}
-	// Pool now should contain localhost:4222 (the default URL) localhost:5222 and localhost:6222
-	checkPool("localhost:4222", "localhost:5222", "localhost:6222")
+	// Pool now should contain localhost:6222 (the default URL) localhost:5222 and localhost:6222
+	checkPool("localhost:6222", "localhost:5222", "localhost:6222")
 
 	// Check that pool may be randomized on setup, but new URLs are always
 	// added at end of pool.
@@ -1056,7 +1057,7 @@ func TestConnServers(t *testing.T) {
 	}
 
 	// check the default url
-	validateURLs(c.Servers(), "nats://localhost:4222")
+	validateURLs(c.Servers(), "nats://localhost:6222")
 	if len(c.DiscoveredServers()) != 0 {
 		t.Fatalf("Expected no discovered servers")
 	}
@@ -1067,7 +1068,7 @@ func TestConnServers(t *testing.T) {
 		t.Fatalf("Unexpected: %d : %v\n", c.ps.state, err)
 	}
 	// Server list should now contain both the default and the new url.
-	validateURLs(c.Servers(), "nats://localhost:4222", "nats://localhost:5222")
+	validateURLs(c.Servers(), "nats://localhost:6222", "nats://localhost:5222")
 	// Discovered servers should only contain the new url.
 	validateURLs(c.DiscoveredServers(), "nats://localhost:5222")
 

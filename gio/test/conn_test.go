@@ -1501,7 +1501,7 @@ func TestCustomFlusherTimeout(t *testing.T) {
 func TestNewServers(t *testing.T) {
 	s1Opts := test.DefaultTestOptions
 	s1Opts.Host = "127.0.0.1"
-	s1Opts.Port = 4222
+	s1Opts.Port = 6222
 	s1Opts.Cluster.Host = "localhost"
 	s1Opts.Cluster.Port = 6222
 	s1 := test.RunServer(&s1Opts)
@@ -1866,7 +1866,7 @@ func TestReceiveInfoWithEmptyConnectURLs(t *testing.T) {
 	go func() {
 		defer wg.Done()
 
-		ports := []int{4222, 4223}
+		ports := []int{6222, 4223}
 		for i := 0; i < 2; i++ {
 			l, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", ports[i]))
 			if err != nil {
@@ -1901,7 +1901,7 @@ func TestReceiveInfoWithEmptyConnectURLs(t *testing.T) {
 				// Send PONG and following INFO in one go (or at least try).
 				// The processing of PONG in sendConnect() should leave the
 				// rest for the readLoop to process.
-				c.Write([]byte("PONG\r\nINFO {\"server_id\":\"server1\",\"connect_urls\":[\"127.0.0.1:4222\", \"127.0.0.1:4223\", \"127.0.0.1:4224\"]}\r\n"))
+				c.Write([]byte("PONG\r\nINFO {\"server_id\":\"server1\",\"connect_urls\":[\"127.0.0.1:6222\", \"127.0.0.1:4223\", \"127.0.0.1:4224\"]}\r\n"))
 				// Wait for the notication
 				<-ch
 				// Close the connection in our side and go back into accept
@@ -1926,7 +1926,7 @@ func TestReceiveInfoWithEmptyConnectURLs(t *testing.T) {
 	}
 
 	rch := make(chan bool)
-	nc, err := gio.Connect("gio://127.0.0.1:4222",
+	nc, err := gio.Connect("gio://127.0.0.1:6222",
 		gio.ReconnectWait(50*time.Millisecond),
 		gio.ReconnectHandler(func(_ *gio.Conn) {
 			rch <- true

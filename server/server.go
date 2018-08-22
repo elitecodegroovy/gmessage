@@ -247,7 +247,7 @@ func (s *Server) logPid() error {
 // Start up the server, this will block.
 // Start via a Go routine if needed.
 func (s *Server) Start() {
-	s.Noticef("Starting nats-server version %s", VERSION)
+	s.Noticef("Starting message-server version %s", VERSION)
 	s.Debugf("Go build version %s", s.info.GoVersion)
 	gc := gitCommit
 	if gc == "" {

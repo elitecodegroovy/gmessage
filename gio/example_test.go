@@ -13,7 +13,7 @@ func ExampleConnect() {
 	nc, _ := gio.Connect(nats.DefaultURL)
 	nc.Close()
 
-	nc, _ = gio.Connect("nats://derek:secretpassword@demo.nats.io:4222")
+	nc, _ = gio.Connect("nats://derek:secretpassword@demo.nats.io:6222")
 	nc.Close()
 
 	nc, _ = gio.Connect("tls://derek:secretpassword@demo.nats.io:4443")

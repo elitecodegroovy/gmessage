@@ -17,7 +17,7 @@ Usage: gmessage [options]
 
 Server Options:
     -a, --addr <host>                Bind to host address (default: 0.0.0.0)
-    -p, --port <port>                Use port for clients (default: 4222)
+    -p, --port <port>                Use port for clients (default: 6222)
     -P, --pid <file>                 File to store PID
     -m, --http_port <port>           Use port for http monitoring
     -ms,--https_port <port>          Use port for https monitoring

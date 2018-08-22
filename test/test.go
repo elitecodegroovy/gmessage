@@ -24,7 +24,7 @@ type tLogger interface {
 // DefaultTestOptions are default options for the unit tests.
 var DefaultTestOptions = server.Options{
 	Host:           "127.0.0.1",
-	Port:           4222,
+	Port:           6222,
 	NoLog:          true,
 	NoSigs:         true,
 	MaxControlLine: 256,
@@ -42,7 +42,7 @@ func RunServer(opts *server.Options) *server.Server {
 	}
 	s := server.New(opts)
 	if s == nil {
-		panic("No NATS Server object returned.")
+		panic("No Gmessage Server object returned.")
 	}
 
 	// Run server in Go routine.

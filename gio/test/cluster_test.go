@@ -657,14 +657,14 @@ func TestServerPoolUpdatedWhenRouteGoesAway(t *testing.T) {
 	}
 	s1Opts := test.DefaultTestOptions
 	s1Opts.Host = "127.0.0.1"
-	s1Opts.Port = 4222
+	s1Opts.Port = 6222
 	s1Opts.Cluster.Host = "127.0.0.1"
 	s1Opts.Cluster.Port = 6222
 	s1Opts.Routes = server.RoutesFromStr("gio://127.0.0.1:6223,gio://127.0.0.1:6224")
 	s1 := test.RunServer(&s1Opts)
 	defer s1.Shutdown()
 
-	s1Url := "gio://127.0.0.1:4222"
+	s1Url := "gio://127.0.0.1:6222"
 	s2Url := "gio://127.0.0.1:4223"
 	s3Url := "gio://127.0.0.1:4224"
 

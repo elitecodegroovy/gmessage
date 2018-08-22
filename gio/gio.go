@@ -27,8 +27,8 @@ import (
 // Default Constants
 const (
 	Version                 = "1.0.0"
-	DefaultURL              = "nats://localhost:4222"
-	DefaultPort             = 4222
+	DefaultURL              = "nats://localhost:6222"
+	DefaultPort             = 6222
 	DefaultMaxReconnect     = 60
 	DefaultReconnectWait    = 2 * time.Second
 	DefaultTimeout          = 2 * time.Second
@@ -140,7 +140,7 @@ type CustomDialer interface {
 // Options can be used to create a customized connection.
 type Options struct {
 
-	// Url represents a single NATS server url to which the client
+	// Url represents a single gmessage server url to which the client
 	// will be connecting. If the Servers option is also set, it
 	// then becomes the first server in the Servers array.
 	Url string
@@ -423,7 +423,7 @@ type connectInfo struct {
 type MsgHandler func(msg *Msg)
 
 // Connect will attempt to connect to the NATS system.
-// The url can contain username/password semantics. e.g. nats://derek:pass@localhost:4222
+// The url can contain username/password semantics. e.g. nats://derek:pass@localhost:6222
 // Comma separated arrays are also supported, e.g. urlA, urlB.
 // Options start with the defaults but can be overridden.
 func Connect(url string, options ...Option) (*Conn, error) {

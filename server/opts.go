@@ -909,6 +909,7 @@ func getInterfaceIPs() ([]net.IP, error) {
 	return localIPs, nil
 }
 
+// process the option settings
 func processOptions(opts *Options) {
 	// Setup non-standard Go defaults
 	if opts.Host == "" {

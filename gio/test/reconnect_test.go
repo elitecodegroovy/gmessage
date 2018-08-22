@@ -580,7 +580,7 @@ func TestReconnectBufSizeOption(t *testing.T) {
 	s := RunDefaultServer()
 	defer s.Shutdown()
 
-	nc, err := gio.Connect("gio://localhost:4222", gio.ReconnectBufSize(32))
+	nc, err := gio.Connect("gio://localhost:6222", gio.ReconnectBufSize(32))
 	if err != nil {
 		t.Fatalf("Should have connected ok: %v", err)
 	}

@@ -198,7 +198,7 @@ func TestTlsCipher(t *testing.T) {
 
 func TestGetConnectURLs(t *testing.T) {
 	opts := DefaultOptions()
-	opts.Port = 4222
+	opts.Port = 6222
 
 	var globalIP net.IP
 
@@ -225,7 +225,7 @@ func TestGetConnectURLs(t *testing.T) {
 			if ip.IsUnspecified() {
 				t.Fatalf("IP %v is unspecified", ip.String())
 			}
-			addr := strings.TrimSuffix(u, ":4222")
+			addr := strings.TrimSuffix(u, ":6222")
 			if addr == opts.Host {
 				t.Fatalf("Returned url is not right: %v", u)
 			}
@@ -274,7 +274,7 @@ func TestGetConnectURLs(t *testing.T) {
 //Test client advertised connect
 func TestClientAdvertiseConnectURL(t *testing.T) {
 	opts := DefaultOptions()
-	opts.Port = 4222
+	opts.Port = 6222
 	opts.ClientAdvertise = "nats.example.com"
 	s := New(opts)
 	defer s.Shutdown()
@@ -286,8 +286,8 @@ func TestClientAdvertiseConnectURL(t *testing.T) {
 		t.Fatalf("Expected to get one url, got none: %v with ClientAdvertise %v",
 			opts.Host, opts.ClientAdvertise)
 	}
-	if urls[0] != "nats.example.com:4222" {
-		t.Fatalf("Expected to get '%s', got: '%v'", "nats.example.com:4222", urls[0])
+	if urls[0] != "nats.example.com:6222" {
+		t.Fatalf("Expected to get '%s', got: '%v'", "nats.example.com:6222", urls[0])
 	}
 	s.Shutdown()
 
@@ -348,7 +348,7 @@ func TestClientAdvertiseErrorOnStartup(t *testing.T) {
 func TestNoDeadlockOnStartFailure(t *testing.T) {
 	opts := DefaultOptions()
 	opts.Host = "x.x.x.x" // bad host
-	opts.Port = 4222
+	opts.Port = 6222
 	opts.HTTPHost = opts.Host
 	opts.Cluster.Host = "127.0.0.1"
 	opts.Cluster.Port = -1
@@ -356,7 +356,7 @@ func TestNoDeadlockOnStartFailure(t *testing.T) {
 	s := New(opts)
 
 	// This should return since it should fail to start a listener
-	// on x.x.x.x:4222
+	// on x.x.x.x:6222
 	s.Start()
 
 	// We should be able to shutdown
@@ -418,7 +418,7 @@ func TestProcessCommandLineArgs(t *testing.T) {
 	var port int
 	cmd := flag.NewFlagSet("gmessage", flag.ExitOnError)
 	cmd.StringVar(&host, "a", "0.0.0.0", "Host.")
-	cmd.IntVar(&port, "p", 4222, "Port.")
+	cmd.IntVar(&port, "p", 6222, "Port.")
 
 	cmd.Parse([]string{"-a", "127.0.0.1", "-p", "9090"})
 	showVersion, showHelp, err := ProcessCommandLineArgs(cmd)
@@ -574,8 +574,8 @@ func TestRandomPorts(t *testing.T) {
 		t.Fatal("Should have dynamically assigned server port.")
 	}
 
-	if s.Addr() == nil || s.Addr().(*net.TCPAddr).Port == 4222 {
-		t.Fatal("Should not have dynamically assigned default port: 4222.")
+	if s.Addr() == nil || s.Addr().(*net.TCPAddr).Port == 6222 {
+		t.Fatal("Should not have dynamically assigned default port: 6222.")
 	}
 
 	t.Logf("monitor port : %d", s.MonitorAddr().Port)

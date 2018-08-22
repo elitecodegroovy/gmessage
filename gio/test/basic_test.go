@@ -111,7 +111,7 @@ func TestBadOptionTimeoutConnect(t *testing.T) {
 
 	opts := gio.GetDefaultOptions()
 	opts.Timeout = -1
-	opts.Url = "nats://localhost:4222"
+	opts.Url = "nats://localhost:6222"
 
 	_, err := opts.Connect()
 	if err == nil {
