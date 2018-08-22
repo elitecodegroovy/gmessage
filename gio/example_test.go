@@ -10,7 +10,7 @@ import (
 // Shows different ways to create a Conn
 func ExampleConnect() {
 
-	nc, _ := gio.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	nc.Close()
 
 	nc, _ = gio.Connect("nats://derek:secretpassword@demo.nats.io:6222")
@@ -42,7 +42,7 @@ func ExampleConn_Subscribe() {
 
 // This Example shows a synchronous subscriber.
 func ExampleConn_SubscribeSync() {
-	nc, _ := gio.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	defer nc.Close()
 
 	sub, _ := nc.SubscribeSync("foo")
@@ -55,7 +55,7 @@ func ExampleConn_SubscribeSync() {
 }
 
 func ExampleSubscription_NextMsg() {
-	nc, _ := gio.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	defer nc.Close()
 
 	sub, _ := nc.SubscribeSync("foo")
@@ -68,7 +68,7 @@ func ExampleSubscription_NextMsg() {
 }
 
 func ExampleSubscription_Unsubscribe() {
-	nc, _ := gio.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	defer nc.Close()
 
 	sub, _ := nc.SubscribeSync("foo")
@@ -77,14 +77,14 @@ func ExampleSubscription_Unsubscribe() {
 }
 
 func ExampleConn_Publish() {
-	nc, _ := gio.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	defer nc.Close()
 
 	nc.Publish("foo", []byte("Hello World!"))
 }
 
 func ExampleConn_PublishMsg() {
-	nc, _ := gio.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	defer nc.Close()
 
 	msg := &gio.Msg{Subject: "foo", Reply: "bar", Data: []byte("Hello World!")}
@@ -92,7 +92,7 @@ func ExampleConn_PublishMsg() {
 }
 
 func ExampleConn_Flush() {
-	nc, _ := gio.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	defer nc.Close()
 
 	msg := &gio.Msg{Subject: "foo", Reply: "bar", Data: []byte("Hello World!")}
@@ -106,7 +106,7 @@ func ExampleConn_Flush() {
 }
 
 func ExampleConn_FlushTimeout() {
-	nc, _ := gio.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	defer nc.Close()
 
 	msg := &gio.Msg{Subject: "foo", Reply: "bar", Data: []byte("Hello World!")}
@@ -121,7 +121,7 @@ func ExampleConn_FlushTimeout() {
 }
 
 func ExampleConn_Request() {
-	nc, _ := gio.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	defer nc.Close()
 
 	nc.Subscribe("foo", func(m *gio.Msg) {
@@ -131,7 +131,7 @@ func ExampleConn_Request() {
 }
 
 func ExampleConn_QueueSubscribe() {
-	nc, _ := gio.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	defer nc.Close()
 
 	received := 0
@@ -142,7 +142,7 @@ func ExampleConn_QueueSubscribe() {
 }
 
 func ExampleSubscription_AutoUnsubscribe() {
-	nc, _ := gio.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	defer nc.Close()
 
 	received, wanted, total := 0, 10, 100
@@ -161,13 +161,13 @@ func ExampleSubscription_AutoUnsubscribe() {
 }
 
 func ExampleConn_Close() {
-	nc, _ := gio.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	nc.Close()
 }
 
 // Shows how to wrap a Conn into an EncodedConn
 func ExampleNewEncodedConn() {
-	nc, _ := gio.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	c, _ := gio.NewEncodedConn(nc, "json")
 	c.Close()
 }
@@ -176,7 +176,7 @@ func ExampleNewEncodedConn() {
 // by passing it in. The encoder will be used to properly
 // encode the raw Go type
 func ExampleEncodedConn_Publish() {
-	nc, _ := gio.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	c, _ := gio.NewEncodedConn(nc, "json")
 	defer c.Close()
 
@@ -196,7 +196,7 @@ func ExampleEncodedConn_Publish() {
 // can also vary to include additional data, such as subject
 // and reply subjects.
 func ExampleEncodedConn_Subscribe() {
-	nc, _ := gio.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	c, _ := gio.NewEncodedConn(nc, "json")
 	defer c.Close()
 
@@ -218,11 +218,11 @@ func ExampleEncodedConn_Subscribe() {
 	c.Publish("hello", me)
 }
 
-// BindSendChan() allows binding of a Go channel to a nats
+// BindSendChan() allows binding of a Go channel to a gio
 // subject for publish operations. The Encoder attached to the
 // EncodedConn will be used for marshaling.
 func ExampleEncodedConn_BindSendChan() {
-	nc, _ := gio.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	c, _ := gio.NewEncodedConn(nc, "json")
 	defer c.Close()
 
@@ -239,11 +239,11 @@ func ExampleEncodedConn_BindSendChan() {
 	ch <- me
 }
 
-// BindRecvChan() allows binding of a Go channel to a nats
+// BindRecvChan() allows binding of a Go channel to a gio
 // subject for subscribe operations. The Encoder attached to the
 // EncodedConn will be used for un-marshaling.
 func ExampleEncodedConn_BindRecvChan() {
-	nc, _ := gio.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	c, _ := gio.NewEncodedConn(nc, "json")
 	defer c.Close()
 
