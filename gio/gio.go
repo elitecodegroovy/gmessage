@@ -2056,7 +2056,7 @@ func (nc *Conn) processErr(e string) {
 		nc.processAuthorizationViolation(e)
 	} else {
 		nc.mu.Lock()
-		nc.err = errors.New("nats: " + e)
+		nc.err = errors.New("GMessage: " + e)
 		nc.mu.Unlock()
 		nc.Close()
 	}

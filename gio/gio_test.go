@@ -1088,7 +1088,7 @@ func TestConnAsyncCBDeadlock(t *testing.T) {
 
 	ch := make(chan bool)
 	o := GetDefaultOptions()
-	o.Url = fmt.Sprintf("nats://127.0.0.1:%d", TEST_PORT)
+	o.Url = fmt.Sprintf("gmessage://127.0.0.1:%d", TEST_PORT)
 	o.ClosedCB = func(_ *Conn) {
 		ch <- true
 	}
@@ -1123,7 +1123,7 @@ func TestPingTimerLeakedOnClose(t *testing.T) {
 	s := RunServerOnPort(TEST_PORT)
 	defer s.Shutdown()
 
-	nc, err := Connect(fmt.Sprintf("nats://127.0.0.1:%d", TEST_PORT))
+	nc, err := Connect(fmt.Sprintf("gmessage://127.0.0.1:%d", TEST_PORT))
 	if err != nil {
 		t.Fatalf("Error on connect: %v", err)
 	}
