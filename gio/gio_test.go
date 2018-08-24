@@ -19,6 +19,7 @@ import (
 
 	"github.com/elitecodegroovy/gmessage/server"
 	giotest "github.com/elitecodegroovy/gmessage/test"
+	"math"
 )
 
 // Dumb wait program to sync on callbacks, etc... Will timeout
@@ -1142,4 +1143,11 @@ func TestPingTimerLeakedOnClose(t *testing.T) {
 	if pingTimerSet {
 		t.Fatal("Pinger timer should not be set")
 	}
+}
+
+
+func TestExponent(t *testing.T){
+	fmt.Println("2^15= ", math.Pow(2, 15))
+
+	fmt.Println("2^15= ", 1 << 15)
 }
