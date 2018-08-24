@@ -300,7 +300,7 @@ const (
 	nuidSize = 22
 )
 
-// A Conn represents a bare connection to a nats-server.
+// A Conn represents a bare connection to a GMessage-server.
 // It can send and receive []byte payloads.
 type Conn struct {
 	// Keep all members for which we use atomic at the beginning of the
@@ -2099,7 +2099,7 @@ func (nc *Conn) PublishRequest(subj, reply string, data []byte) error {
 // Used for handrolled itoa
 const digits = "0123456789"
 
-// publish is the internal function to publish messages to a nats-server.
+// publish is the internal function to publish messages to a GMessage-server.
 // Sends a protocol data message by queuing into the bufio writer
 // and kicking the flush go routine. These writes should be protected.
 func (nc *Conn) publish(subj, reply string, data []byte) error {

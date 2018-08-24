@@ -23,7 +23,7 @@ import (
 )
 
 const (
-	gioEventSource = "NATS-Server"
+	gioEventSource = "GMessage-server"
 )
 
 // SysLogger logs to the windows event logger

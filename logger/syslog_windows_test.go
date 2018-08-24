@@ -37,13 +37,13 @@ func checkPrivledges(t *testing.T) {
 }
 
 // lastLogEntryContains reads the last entry (/c:1 /rd:true) written
-// to the event log by the NATS-Server source, returning true if the
+// to the event log by the GMessage-server source, returning true if the
 // passed text was found, false otherwise.
 func lastLogEntryContains(t *testing.T, text string) bool {
 	var output []byte
 	var err error
 
-	cmd := exec.Command("wevtutil.exe", "qe", "Application", "/q:*[System[Provider[@Name='NATS-Server']]]",
+	cmd := exec.Command("wevtutil.exe", "qe", "Application", "/q:*[System[Provider[@Name='GMessage-server']]]",
 		"/rd:true", "/c:1")
 	if output, err = cmd.Output(); err != nil {
 		t.Fatalf("Unable to execute command: %v", err)
