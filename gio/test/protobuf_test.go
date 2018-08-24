@@ -1,4 +1,3 @@
-
 package test
 
 import (
@@ -6,14 +5,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nats-io/go-nats"
+	"github.com/elitecodegroovy/gmessage/gio"
 
-	"github.com/nats-io/go-nats/encoders/protobuf"
-	pb "github.com/nats-io/go-nats/encoders/protobuf/testdata"
+	"github.com/elitecodegroovy/gmessage/gio/encoders/protobuf"
+	pb "github.com/elitecodegroovy/gmessage/gio/encoders/protobuf/testdata"
 )
 
-func NewProtoEncodedConn(tl TestLogger) *nats.EncodedConn {
-	ec, err := nats.NewEncodedConn(NewConnection(tl, TEST_PORT), protobuf.PROTOBUF_ENCODER)
+func NewProtoEncodedConn(tl TestLogger) *gio.EncodedConn {
+	ec, err := gio.NewEncodedConn(NewConnection(tl, TEST_PORT), protobuf.PROTOBUF_ENCODER)
 	if err != nil {
 		tl.Fatalf("Failed to create an encoded connection: %v\n", err)
 	}

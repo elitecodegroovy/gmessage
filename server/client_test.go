@@ -17,7 +17,7 @@ import (
 	"crypto/rand"
 	"crypto/tls"
 
-	"github.com/nats-io/go-nats"
+	"github.com/elitecodegroovy/gmessage/gio"
 )
 
 type serverInfo struct {
@@ -428,7 +428,7 @@ func TestClientPubWithQueueSubNoEcho(t *testing.T) {
 	s := RunServer(opts)
 	defer s.Shutdown()
 
-	nc1, err := nats.Connect(fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port))
+	nc1, err := gio.Connect(fmt.Sprintf("gio://%s:%d", opts.Host, opts.Port))
 	if err != nil {
 		t.Fatalf("Error on connect: %v", err)
 	}
@@ -451,20 +451,20 @@ func TestClientPubWithQueueSubNoEcho(t *testing.T) {
 	c.mu.Unlock()
 
 	// Queue sub on nc1.
-	_, err = nc1.QueueSubscribe("foo", "bar", func(*nats.Msg) {})
+	_, err = nc1.QueueSubscribe("foo", "bar", func(*gio.Msg) {})
 	if err != nil {
 		t.Fatalf("Error on subscribe: %v", err)
 	}
 	nc1.Flush()
 
-	nc2, err := nats.Connect(fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port))
+	nc2, err := gio.Connect(fmt.Sprintf("gio://%s:%d", opts.Host, opts.Port))
 	if err != nil {
 		t.Fatalf("Error on connect: %v", err)
 	}
 	defer nc2.Close()
 
 	n := int32(0)
-	cb := func(m *nats.Msg) {
+	cb := func(m *gio.Msg) {
 		atomic.AddInt32(&n, 1)
 	}
 
@@ -713,23 +713,23 @@ func TestUnsubRace(t *testing.T) {
 	s := RunServer(opts)
 	defer s.Shutdown()
 
-	url := fmt.Sprintf("nats://%s:%d",
+	url := fmt.Sprintf("gio://%s:%d",
 		s.getOpts().Host,
 		s.Addr().(*net.TCPAddr).Port,
 	)
-	nc, err := nats.Connect(url)
+	nc, err := gio.Connect(url)
 	if err != nil {
 		t.Fatalf("Error creating client to %s: %v\n", url, err)
 	}
 	defer nc.Close()
 
-	ncp, err := nats.Connect(url)
+	ncp, err := gio.Connect(url)
 	if err != nil {
 		t.Fatalf("Error creating client: %v\n", err)
 	}
 	defer ncp.Close()
 
-	sub, _ := nc.Subscribe("foo", func(m *nats.Msg) {
+	sub, _ := nc.Subscribe("foo", func(m *gio.Msg) {
 		// Just eat it..
 	})
 	nc.Flush()
@@ -839,7 +839,7 @@ func TestWildcardCharsInLiteralSubjectWorks(t *testing.T) {
 	s := RunServer(opts)
 	defer s.Shutdown()
 
-	nc, err := nats.Connect(fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port))
+	nc, err := gio.Connect(fmt.Sprintf("gio://%s:%d", opts.Host, opts.Port))
 	if err != nil {
 		t.Fatalf("Error on connect: %v", err)
 	}
@@ -849,7 +849,7 @@ func TestWildcardCharsInLiteralSubjectWorks(t *testing.T) {
 	// This subject is a literal even though it contains `*` and `>`,
 	// they are not treated as wildcards.
 	subj := "foo.bar,*,>,baz"
-	cb := func(_ *nats.Msg) {
+	cb := func(_ *gio.Msg) {
 		ch <- true
 	}
 	for i := 0; i < 2; i++ {
@@ -882,7 +882,7 @@ func TestDynamicBuffers(t *testing.T) {
 	s := RunServer(opts)
 	defer s.Shutdown()
 
-	nc, err := nats.Connect(fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port))
+	nc, err := gio.Connect(fmt.Sprintf("gio://%s:%d", opts.Host, opts.Port))
 	if err != nil {
 		t.Fatalf("Error on connect: %v", err)
 	}
@@ -1001,7 +1001,7 @@ func TestDynamicBuffers(t *testing.T) {
 	}
 
 	// Create Subscription to test outbound buffer from server.
-	nc.Subscribe("foo", func(m *nats.Msg) {
+	nc.Subscribe("foo", func(m *gio.Msg) {
 		// Just eat it..
 	})
 	go recordMaxBufferSizes()
@@ -1030,18 +1030,18 @@ func TestQueueAutoUnsubscribe(t *testing.T) {
 	s := RunServer(opts)
 	defer s.Shutdown()
 
-	nc, err := nats.Connect(fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port))
+	nc, err := gio.Connect(fmt.Sprintf("gio://%s:%d", opts.Host, opts.Port))
 	if err != nil {
 		t.Fatalf("Error on connect: %v", err)
 	}
 	defer nc.Close()
 
 	rbar := int32(0)
-	barCb := func(m *nats.Msg) {
+	barCb := func(m *gio.Msg) {
 		atomic.AddInt32(&rbar, 1)
 	}
 	rbaz := int32(0)
-	bazCb := func(m *nats.Msg) {
+	bazCb := func(m *gio.Msg) {
 		atomic.AddInt32(&rbaz, 1)
 	}
 

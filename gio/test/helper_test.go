@@ -1,4 +1,3 @@
-
 package test
 
 import (
@@ -8,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elitecodegroovy/gmessage/server"
 	"github.com/elitecodegroovy/gmessage/gio"
+	"github.com/elitecodegroovy/gmessage/server"
 
 	gnatsd "github.com/elitecodegroovy/gmessage/test"
 )
@@ -60,14 +59,14 @@ func stackFatalf(t tLogger, f string, args ...interface{}) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // NewDefaultConnection
-func NewDefaultConnection(t tLogger) *nats.Conn {
-	return NewConnection(t, nats.DefaultPort)
+func NewDefaultConnection(t tLogger) *gio.Conn {
+	return NewConnection(t, gio.DefaultPort)
 }
 
 // NewConnection forms connection on a given port.
-func NewConnection(t tLogger, port int) *nats.Conn {
-	url := fmt.Sprintf("nats://localhost:%d", port)
-	nc, err := nats.Connect(url)
+func NewConnection(t tLogger, port int) *gio.Conn {
+	url := fmt.Sprintf("gio://localhost:%d", port)
+	nc, err := gio.Connect(url)
 	if err != nil {
 		t.Fatalf("Failed to create default connection: %v\n", err)
 		return nil
@@ -76,8 +75,8 @@ func NewConnection(t tLogger, port int) *nats.Conn {
 }
 
 // NewEConn
-func NewEConn(t tLogger) *nats.EncodedConn {
-	ec, err := nats.NewEncodedConn(NewDefaultConnection(t), nats.DEFAULT_ENCODER)
+func NewEConn(t tLogger) *gio.EncodedConn {
+	ec, err := gio.NewEncodedConn(NewDefaultConnection(t), gio.DEFAULT_ENCODER)
 	if err != nil {
 		t.Fatalf("Failed to create an encoded connection: %v\n", err)
 	}
@@ -85,12 +84,12 @@ func NewEConn(t tLogger) *nats.EncodedConn {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Running gnatsd server in separate Go routines
+// Running ggiod server in separate Go routines
 ////////////////////////////////////////////////////////////////////////////////
 
 // RunDefaultServer will run a server on the default port.
 func RunDefaultServer() *server.Server {
-	return RunServerOnPort(nats.DefaultPort)
+	return RunServerOnPort(gio.DefaultPort)
 }
 
 // RunServerOnPort will run a server on the given port.

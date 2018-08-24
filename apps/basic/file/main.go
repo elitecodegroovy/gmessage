@@ -1,14 +1,14 @@
 package main
 
 import (
-	"os"
-	"encoding/csv"
-	"github.com/kardianos/osext"
 	"bufio"
-	"io"
-	"fmt"
-	"log"
+	"encoding/csv"
 	"flag"
+	"fmt"
+	"github.com/kardianos/osext"
+	"io"
+	"log"
+	"os"
 	"path/filepath"
 )
 
@@ -34,10 +34,10 @@ func initWorkingDirectory() string {
 	return customPath
 }
 
-func readAndOutput(){
+func readAndOutput() {
 	filename := filepath.Join(binaryFilePath, "file.csv")
-	fmt.Println("[]:"+filename)
-	csvFile, _ := os.Open( filename)
+	fmt.Println("[]:" + filename)
+	csvFile, _ := os.Open(filename)
 	defer csvFile.Close()
 	reader := csv.NewReader(bufio.NewReader(csvFile))
 	fmt.Println("[")
@@ -53,13 +53,13 @@ func readAndOutput(){
 		}
 		if i == 1 {
 			fmt.Printf("[%s,%s,8,1]", line[0], line[1])
-		}else {
+		} else {
 			fmt.Printf(",\n[%s,%s,8,1]", line[0], line[1])
 		}
 	}
 
 }
 
-func main(){
+func main() {
 	readAndOutput()
 }

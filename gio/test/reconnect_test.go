@@ -1,4 +1,3 @@
-
 package test
 
 import (
@@ -7,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elitecodegroovy/gmessage/server"
 	"github.com/elitecodegroovy/gmessage/gio"
+	"github.com/elitecodegroovy/gmessage/server"
 )
 
 func startReconnectServer(t *testing.T) *server.Server {
@@ -29,10 +28,10 @@ func TestReconnectDisallowedFlags(t *testing.T) {
 	defer ts.Shutdown()
 
 	ch := make(chan bool)
-	opts := nats.GetDefaultOptions()
-	opts.Url = "nats://localhost:22222"
+	opts := gio.GetDefaultOptions()
+	opts.Url = "gio://localhost:22222"
 	opts.AllowReconnect = false
-	opts.ClosedCB = func(_ *nats.Conn) {
+	opts.ClosedCB = func(_ *gio.Conn) {
 		ch <- true
 	}
 	nc, err := opts.Connect()
@@ -53,16 +52,16 @@ func TestReconnectAllowedFlags(t *testing.T) {
 	defer ts.Shutdown()
 	ch := make(chan bool)
 	dch := make(chan bool)
-	opts := nats.GetDefaultOptions()
-	opts.Url = "nats://localhost:22222"
+	opts := gio.GetDefaultOptions()
+	opts.Url = "gio://localhost:22222"
 	opts.AllowReconnect = true
 	opts.MaxReconnect = 2
 	opts.ReconnectWait = 1 * time.Second
 
-	opts.ClosedCB = func(_ *nats.Conn) {
+	opts.ClosedCB = func(_ *gio.Conn) {
 		ch <- true
 	}
-	opts.DisconnectedCB = func(_ *nats.Conn) {
+	opts.DisconnectedCB = func(_ *gio.Conn) {
 		dch <- true
 	}
 	nc, err := opts.Connect()
@@ -93,12 +92,12 @@ func TestReconnectAllowedFlags(t *testing.T) {
 	nc.Opts.ClosedCB = nil
 }
 
-var reconnectOpts = nats.Options{
+var reconnectOpts = gio.Options{
 	Url:            "nats://localhost:22222",
 	AllowReconnect: true,
 	MaxReconnect:   10,
 	ReconnectWait:  100 * time.Millisecond,
-	Timeout:        nats.DefaultTimeout,
+	Timeout:        gio.DefaultTimeout,
 }
 
 func TestConnCloseBreaksReconnectLoop(t *testing.T) {
@@ -110,7 +109,7 @@ func TestConnCloseBreaksReconnectLoop(t *testing.T) {
 	opts := reconnectOpts
 	// Bump the max reconnect attempts
 	opts.MaxReconnect = 100
-	opts.ClosedCB = func(_ *nats.Conn) {
+	opts.ClosedCB = func(_ *gio.Conn) {
 		cch <- true
 	}
 	nc, err := opts.Connect()
@@ -148,7 +147,7 @@ func TestBasicReconnectFunctionality(t *testing.T) {
 
 	opts := reconnectOpts
 
-	opts.DisconnectedCB = func(_ *nats.Conn) {
+	opts.DisconnectedCB = func(_ *gio.Conn) {
 		dch <- true
 	}
 
@@ -157,7 +156,7 @@ func TestBasicReconnectFunctionality(t *testing.T) {
 		t.Fatalf("Should have connected ok: %v\n", err)
 	}
 	defer nc.Close()
-	ec, err := nats.NewEncodedConn(nc, nats.DEFAULT_ENCODER)
+	ec, err := gio.NewEncodedConn(nc, gio.DEFAULT_ENCODER)
 	if err != nil {
 		t.Fatalf("Failed to create an encoded connection: %v\n", err)
 	}
@@ -208,11 +207,11 @@ func TestExtendedReconnectFunctionality(t *testing.T) {
 
 	opts := reconnectOpts
 	dch := make(chan bool)
-	opts.DisconnectedCB = func(_ *nats.Conn) {
+	opts.DisconnectedCB = func(_ *gio.Conn) {
 		dch <- true
 	}
 	rch := make(chan bool)
-	opts.ReconnectedCB = func(_ *nats.Conn) {
+	opts.ReconnectedCB = func(_ *gio.Conn) {
 		rch <- true
 	}
 	nc, err := opts.Connect()
@@ -220,7 +219,7 @@ func TestExtendedReconnectFunctionality(t *testing.T) {
 		t.Fatalf("Should have connected ok: %v", err)
 	}
 	defer nc.Close()
-	ec, err := nats.NewEncodedConn(nc, nats.DEFAULT_ENCODER)
+	ec, err := gio.NewEncodedConn(nc, gio.DEFAULT_ENCODER)
 	if err != nil {
 		t.Fatalf("Failed to create an encoded connection: %v\n", err)
 	}
@@ -305,7 +304,7 @@ func TestQueueSubsOnReconnect(t *testing.T) {
 
 	// Allow us to block on reconnect complete.
 	reconnectsDone := make(chan bool)
-	opts.ReconnectedCB = func(nc *nats.Conn) {
+	opts.ReconnectedCB = func(nc *gio.Conn) {
 		reconnectsDone <- true
 	}
 
@@ -316,7 +315,7 @@ func TestQueueSubsOnReconnect(t *testing.T) {
 	}
 	defer nc.Close()
 
-	ec, err := nats.NewEncodedConn(nc, nats.JSON_ENCODER)
+	ec, err := gio.NewEncodedConn(nc, gio.JSON_ENCODER)
 	if err != nil {
 		t.Fatalf("Failed to create an encoded connection: %v\n", err)
 	}
@@ -415,16 +414,16 @@ func TestIsReconnectingAndStatus(t *testing.T) {
 
 	disconnectedch := make(chan bool)
 	reconnectch := make(chan bool)
-	opts := nats.GetDefaultOptions()
-	opts.Url = "nats://localhost:22222"
+	opts := gio.GetDefaultOptions()
+	opts.Url = "gio://localhost:22222"
 	opts.AllowReconnect = true
 	opts.MaxReconnect = 10000
 	opts.ReconnectWait = 100 * time.Millisecond
 
-	opts.DisconnectedCB = func(_ *nats.Conn) {
+	opts.DisconnectedCB = func(_ *gio.Conn) {
 		disconnectedch <- true
 	}
-	opts.ReconnectedCB = func(_ *nats.Conn) {
+	opts.ReconnectedCB = func(_ *gio.Conn) {
 		reconnectch <- true
 	}
 
@@ -438,7 +437,7 @@ func TestIsReconnectingAndStatus(t *testing.T) {
 	if nc.IsReconnecting() {
 		t.Fatalf("IsReconnecting returned true when the connection is still open.")
 	}
-	if status := nc.Status(); status != nats.CONNECTED {
+	if status := nc.Status(); status != gio.CONNECTED {
 		t.Fatalf("Status returned %d when connected instead of CONNECTED", status)
 	}
 	ts.Shutdown()
@@ -450,7 +449,7 @@ func TestIsReconnectingAndStatus(t *testing.T) {
 	if !nc.IsReconnecting() {
 		t.Fatalf("IsReconnecting returned false when the client is reconnecting.")
 	}
-	if status := nc.Status(); status != nats.RECONNECTING {
+	if status := nc.Status(); status != gio.RECONNECTING {
 		t.Fatalf("Status returned %d when reconnecting instead of CONNECTED", status)
 	}
 
@@ -464,7 +463,7 @@ func TestIsReconnectingAndStatus(t *testing.T) {
 	if nc.IsReconnecting() {
 		t.Fatalf("IsReconnecting returned true after the connection was reconnected.")
 	}
-	if status := nc.Status(); status != nats.CONNECTED {
+	if status := nc.Status(); status != gio.CONNECTED {
 		t.Fatalf("Status returned %d when reconnected instead of CONNECTED", status)
 	}
 
@@ -473,7 +472,7 @@ func TestIsReconnectingAndStatus(t *testing.T) {
 	if nc.IsReconnecting() {
 		t.Fatalf("IsReconnecting returned true after Close() was called.")
 	}
-	if status := nc.Status(); status != nats.CLOSED {
+	if status := nc.Status(); status != gio.CLOSED {
 		t.Fatalf("Status returned %d after Close() was called instead of CLOSED", status)
 	}
 }
@@ -484,13 +483,13 @@ func TestFullFlushChanDuringReconnect(t *testing.T) {
 
 	reconnectch := make(chan bool)
 
-	opts := nats.GetDefaultOptions()
-	opts.Url = "nats://localhost:22222"
+	opts := gio.GetDefaultOptions()
+	opts.Url = "gio://localhost:22222"
 	opts.AllowReconnect = true
 	opts.MaxReconnect = 10000
 	opts.ReconnectWait = 100 * time.Millisecond
 
-	opts.ReconnectedCB = func(_ *nats.Conn) {
+	opts.ReconnectedCB = func(_ *gio.Conn) {
 		reconnectch <- true
 	}
 
@@ -545,10 +544,10 @@ func TestReconnectVerbose(t *testing.T) {
 	s := RunDefaultServer()
 	defer s.Shutdown()
 
-	o := nats.GetDefaultOptions()
+	o := gio.GetDefaultOptions()
 	o.Verbose = true
 	rch := make(chan bool)
-	o.ReconnectedCB = func(_ *nats.Conn) {
+	o.ReconnectedCB = func(_ *gio.Conn) {
 		rch <- true
 	}
 
@@ -581,7 +580,7 @@ func TestReconnectBufSizeOption(t *testing.T) {
 	s := RunDefaultServer()
 	defer s.Shutdown()
 
-	nc, err := nats.Connect("nats://localhost:4222", nats.ReconnectBufSize(32))
+	nc, err := gio.Connect("gio://localhost:6222", gio.ReconnectBufSize(32))
 	if err != nil {
 		t.Fatalf("Should have connected ok: %v", err)
 	}
@@ -596,11 +595,11 @@ func TestReconnectBufSize(t *testing.T) {
 	s := RunDefaultServer()
 	defer s.Shutdown()
 
-	o := nats.GetDefaultOptions()
+	o := gio.GetDefaultOptions()
 	o.ReconnectBufSize = 32 // 32 bytes
 
 	dch := make(chan bool)
-	o.DisconnectedCB = func(_ *nats.Conn) {
+	o.DisconnectedCB = func(_ *gio.Conn) {
 		dch <- true
 	}
 

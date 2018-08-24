@@ -11,12 +11,13 @@ import (
 const (
 	GmVersion = "1.0.0"
 )
+
 var usageStr = `
 Usage: gmessage [options]
 
 Server Options:
     -a, --addr <host>                Bind to host address (default: 0.0.0.0)
-    -p, --port <port>                Use port for clients (default: 4222)
+    -p, --port <port>                Use port for clients (default: 6222)
     -P, --pid <file>                 File to store PID
     -m, --http_port <port>           Use port for http monitoring
     -ms,--https_port <port>          Use port for https monitoring
@@ -59,7 +60,6 @@ Common Options:
         --help_tls                   TLS help
 `
 
-
 // usage will print out the flag options for the server.
 func usage() {
 	fmt.Printf("%s\n", usageStr)
@@ -84,9 +84,9 @@ func main() {
 
 	// Configure the options from the flags/config file
 	opts, err := server.ConfigureOptions(fs, os.Args[1:],
-										PrintGMServerAndExit,
-										usage,
-										server.PrintTLSHelpAndExit)
+		PrintGMServerAndExit,
+		usage,
+		server.PrintTLSHelpAndExit)
 	if err != nil {
 		PrintAndExit(err.Error() + "\n" + usageStr)
 	}

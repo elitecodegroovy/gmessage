@@ -1,4 +1,3 @@
-
 package server
 
 import (
@@ -362,7 +361,7 @@ func (c *client) writeLoop() {
 // TODO >> VIP read operations
 func (c *client) readLoop() {
 	// Grab the connection off the client, it will be cleared on a close.
- 	// We check for that after the loop, but want to avoid a nil dereference
+	// We check for that after the loop, but want to avoid a nil dereference
 	c.mu.Lock()
 	nc := c.nc
 	s := c.srv

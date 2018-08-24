@@ -1,4 +1,3 @@
-
 // Customized heavily from
 // https://github.com/BurntSushi/toml/blob/master/lex.go, which is based on
 // Rob Pike's talk: http://cuddle.googlecode.com/hg/talk/lex.html
@@ -1016,7 +1015,7 @@ func lexFloat(lx *lexer) stateFn {
 	return lx.pop()
 }
 
-// lexIPAddr consumes IP addrs, like 127.0.0.1:4222
+// lexIPAddr consumes IP addrs, like 127.0.0.1:6222
 func lexIPAddr(lx *lexer) stateFn {
 	r := lx.next()
 	if unicode.IsDigit(r) || r == '.' || r == ':' || r == '-' {

@@ -25,8 +25,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elitecodegroovy/gmessage/server"
 	"github.com/elitecodegroovy/gmessage/gio"
+	"github.com/elitecodegroovy/gmessage/server"
 )
 
 func TestTLSConnection(t *testing.T) {
@@ -35,14 +35,14 @@ func TestTLSConnection(t *testing.T) {
 
 	endpoint := fmt.Sprintf("%s:%d", opts.Host, opts.Port)
 	nurl := fmt.Sprintf("tls://%s:%s@%s/", opts.Username, opts.Password, endpoint)
-	nc, err := nats.Connect(nurl)
+	nc, err := gio.Connect(nurl)
 	if err == nil {
 		nc.Close()
 		t.Fatalf("Expected error trying to connect to secure server")
 	}
 
 	// Do simple SecureConnect
-	nc, err = nats.Connect(fmt.Sprintf("tls://%s/", endpoint))
+	nc, err = gio.Connect(fmt.Sprintf("tls://%s/", endpoint))
 	if err == nil {
 		nc.Close()
 		t.Fatalf("Expected error trying to connect to secure server with no auth")
@@ -50,7 +50,7 @@ func TestTLSConnection(t *testing.T) {
 
 	// Now do more advanced checking, verifying servername and using rootCA.
 
-	nc, err = nats.Connect(nurl, nats.RootCAs("./configs/certs/ca.pem"))
+	nc, err = gio.Connect(nurl, gio.RootCAs("./configs/certs/ca.pem"))
 	if err != nil {
 		t.Fatalf("Got an error on Connect with Secure Options: %+v\n", err)
 	}
@@ -73,7 +73,7 @@ func TestTLSClientCertificate(t *testing.T) {
 
 	nurl := fmt.Sprintf("tls://%s:%d", opts.Host, opts.Port)
 
-	_, err := nats.Connect(nurl)
+	_, err := gio.Connect(nurl)
 	if err == nil {
 		t.Fatalf("Expected error trying to connect to secure server without a certificate")
 	}
@@ -104,7 +104,7 @@ func TestTLSClientCertificate(t *testing.T) {
 		MinVersion:   tls.VersionTLS12,
 	}
 
-	copts := nats.GetDefaultOptions()
+	copts := gio.GetDefaultOptions()
 	copts.Url = nurl
 	copts.Secure = true
 	copts.TLSConfig = config
@@ -125,9 +125,9 @@ func TestTLSVerifyClientCertificate(t *testing.T) {
 
 	// The client is configured properly, but the server has no CA
 	// to verify the client certificate. Connection should fail.
-	nc, err := nats.Connect(nurl,
-		nats.ClientCert("./configs/certs/client-cert.pem", "./configs/certs/client-key.pem"),
-		nats.RootCAs("./configs/certs/ca.pem"))
+	nc, err := gio.Connect(nurl,
+		gio.ClientCert("./configs/certs/client-cert.pem", "./configs/certs/client-key.pem"),
+		gio.RootCAs("./configs/certs/ca.pem"))
 	if err == nil {
 		nc.Close()
 		t.Fatal("Expected failure to connect, did not")
@@ -184,7 +184,7 @@ func TestTLSAuthorizationShortTimeout(t *testing.T) {
 
 	// Expect an error here (no CA) but not a TLS oversized record error which
 	// indicates the authorization timeout fired too soon.
-	_, err := nats.Connect(nurl)
+	_, err := gio.Connect(nurl)
 	if err == nil {
 		t.Fatal("Expected error trying to connect to secure server")
 	}
@@ -199,7 +199,7 @@ func stressConnect(t *testing.T, wg *sync.WaitGroup, errCh chan error, url strin
 	subName := fmt.Sprintf("foo.%d", index)
 
 	for i := 0; i < 33; i++ {
-		nc, err := nats.Connect(url, nats.RootCAs("./configs/certs/ca.pem"))
+		nc, err := gio.Connect(url, gio.RootCAs("./configs/certs/ca.pem"))
 		if err != nil {
 			errCh <- fmt.Errorf("Unable to create TLS connection: %v\n", err)
 			return
@@ -278,11 +278,11 @@ func TestTLSBadAuthError(t *testing.T) {
 	endpoint := fmt.Sprintf("%s:%d", opts.Host, opts.Port)
 	nurl := fmt.Sprintf("tls://%s:%s@%s/", opts.Username, "NOT_THE_PASSWORD", endpoint)
 
-	_, err := nats.Connect(nurl, nats.RootCAs("./configs/certs/ca.pem"))
+	_, err := gio.Connect(nurl, gio.RootCAs("./configs/certs/ca.pem"))
 	if err == nil {
 		t.Fatalf("Expected error trying to connect to secure server")
 	}
-	if err.Error() != nats.ErrAuthorization.Error() {
+	if err.Error() != gio.ErrAuthorization.Error() {
 		t.Fatalf("Excpected and auth violation, got %v\n", err)
 	}
 }
@@ -301,14 +301,14 @@ func TestTLSConnectionCurvePref(t *testing.T) {
 
 	endpoint := fmt.Sprintf("%s:%d", opts.Host, opts.Port)
 	nurl := fmt.Sprintf("tls://%s:%s@%s/", opts.Username, opts.Password, endpoint)
-	nc, err := nats.Connect(nurl)
+	nc, err := gio.Connect(nurl)
 	if err == nil {
 		nc.Close()
 		t.Fatalf("Expected error trying to connect to secure server")
 	}
 
 	// Do simple SecureConnect
-	nc, err = nats.Connect(fmt.Sprintf("tls://%s/", endpoint))
+	nc, err = gio.Connect(fmt.Sprintf("tls://%s/", endpoint))
 	if err == nil {
 		nc.Close()
 		t.Fatalf("Expected error trying to connect to secure server with no auth")
@@ -316,7 +316,7 @@ func TestTLSConnectionCurvePref(t *testing.T) {
 
 	// Now do more advanced checking, verifying servername and using rootCA.
 
-	nc, err = nats.Connect(nurl, nats.RootCAs("./configs/certs/ca.pem"))
+	nc, err = gio.Connect(nurl, gio.RootCAs("./configs/certs/ca.pem"))
 	if err != nil {
 		t.Fatalf("Got an error on Connect with Secure Options: %+v\n", err)
 	}

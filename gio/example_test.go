@@ -1,26 +1,25 @@
-
-package nats_test
+package gio_test
 
 import (
 	"fmt"
 	"time"
 
-	"github.com/nats-io/go-nats"
+	"github.com/elitecodegroovy/gmessage/gio"
 )
 
 // Shows different ways to create a Conn
 func ExampleConnect() {
 
-	nc, _ := nats.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	nc.Close()
 
-	nc, _ = nats.Connect("nats://derek:secretpassword@demo.nats.io:4222")
+	nc, _ = gio.Connect("nats://derek:secretpassword@demo.nats.io:6222")
 	nc.Close()
 
-	nc, _ = nats.Connect("tls://derek:secretpassword@demo.nats.io:4443")
+	nc, _ = gio.Connect("tls://derek:secretpassword@demo.nats.io:4443")
 	nc.Close()
 
-	opts := nats.Options{
+	opts := gio.Options{
 		AllowReconnect: true,
 		MaxReconnect:   10,
 		ReconnectWait:  5 * time.Second,
@@ -33,17 +32,17 @@ func ExampleConnect() {
 
 // This Example shows an asynchronous subscriber.
 func ExampleConn_Subscribe() {
-	nc, _ := nats.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	defer nc.Close()
 
-	nc.Subscribe("foo", func(m *nats.Msg) {
+	nc.Subscribe("foo", func(m *gio.Msg) {
 		fmt.Printf("Received a message: %s\n", string(m.Data))
 	})
 }
 
 // This Example shows a synchronous subscriber.
 func ExampleConn_SubscribeSync() {
-	nc, _ := nats.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	defer nc.Close()
 
 	sub, _ := nc.SubscribeSync("foo")
@@ -56,7 +55,7 @@ func ExampleConn_SubscribeSync() {
 }
 
 func ExampleSubscription_NextMsg() {
-	nc, _ := nats.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	defer nc.Close()
 
 	sub, _ := nc.SubscribeSync("foo")
@@ -69,7 +68,7 @@ func ExampleSubscription_NextMsg() {
 }
 
 func ExampleSubscription_Unsubscribe() {
-	nc, _ := nats.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	defer nc.Close()
 
 	sub, _ := nc.SubscribeSync("foo")
@@ -78,25 +77,25 @@ func ExampleSubscription_Unsubscribe() {
 }
 
 func ExampleConn_Publish() {
-	nc, _ := nats.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	defer nc.Close()
 
 	nc.Publish("foo", []byte("Hello World!"))
 }
 
 func ExampleConn_PublishMsg() {
-	nc, _ := nats.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	defer nc.Close()
 
-	msg := &nats.Msg{Subject: "foo", Reply: "bar", Data: []byte("Hello World!")}
+	msg := &gio.Msg{Subject: "foo", Reply: "bar", Data: []byte("Hello World!")}
 	nc.PublishMsg(msg)
 }
 
 func ExampleConn_Flush() {
-	nc, _ := nats.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	defer nc.Close()
 
-	msg := &nats.Msg{Subject: "foo", Reply: "bar", Data: []byte("Hello World!")}
+	msg := &gio.Msg{Subject: "foo", Reply: "bar", Data: []byte("Hello World!")}
 	for i := 0; i < 1000; i++ {
 		nc.PublishMsg(msg)
 	}
@@ -107,10 +106,10 @@ func ExampleConn_Flush() {
 }
 
 func ExampleConn_FlushTimeout() {
-	nc, _ := nats.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	defer nc.Close()
 
-	msg := &nats.Msg{Subject: "foo", Reply: "bar", Data: []byte("Hello World!")}
+	msg := &gio.Msg{Subject: "foo", Reply: "bar", Data: []byte("Hello World!")}
 	for i := 0; i < 1000; i++ {
 		nc.PublishMsg(msg)
 	}
@@ -122,33 +121,33 @@ func ExampleConn_FlushTimeout() {
 }
 
 func ExampleConn_Request() {
-	nc, _ := nats.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	defer nc.Close()
 
-	nc.Subscribe("foo", func(m *nats.Msg) {
+	nc.Subscribe("foo", func(m *gio.Msg) {
 		nc.Publish(m.Reply, []byte("I will help you"))
 	})
 	nc.Request("foo", []byte("help"), 50*time.Millisecond)
 }
 
 func ExampleConn_QueueSubscribe() {
-	nc, _ := nats.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	defer nc.Close()
 
 	received := 0
 
-	nc.QueueSubscribe("foo", "worker_group", func(_ *nats.Msg) {
+	nc.QueueSubscribe("foo", "worker_group", func(_ *gio.Msg) {
 		received++
 	})
 }
 
 func ExampleSubscription_AutoUnsubscribe() {
-	nc, _ := nats.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	defer nc.Close()
 
 	received, wanted, total := 0, 10, 100
 
-	sub, _ := nc.Subscribe("foo", func(_ *nats.Msg) {
+	sub, _ := nc.Subscribe("foo", func(_ *gio.Msg) {
 		received++
 	})
 	sub.AutoUnsubscribe(wanted)
@@ -162,14 +161,14 @@ func ExampleSubscription_AutoUnsubscribe() {
 }
 
 func ExampleConn_Close() {
-	nc, _ := nats.Connect(nats.DefaultURL)
+	nc, _ := gio.Connect(gio.DefaultURL)
 	nc.Close()
 }
 
 // Shows how to wrap a Conn into an EncodedConn
 func ExampleNewEncodedConn() {
-	nc, _ := nats.Connect(nats.DefaultURL)
-	c, _ := nats.NewEncodedConn(nc, "json")
+	nc, _ := gio.Connect(gio.DefaultURL)
+	c, _ := gio.NewEncodedConn(nc, "json")
 	c.Close()
 }
 
@@ -177,8 +176,8 @@ func ExampleNewEncodedConn() {
 // by passing it in. The encoder will be used to properly
 // encode the raw Go type
 func ExampleEncodedConn_Publish() {
-	nc, _ := nats.Connect(nats.DefaultURL)
-	c, _ := nats.NewEncodedConn(nc, "json")
+	nc, _ := gio.Connect(gio.DefaultURL)
+	c, _ := gio.NewEncodedConn(nc, "json")
 	defer c.Close()
 
 	type person struct {
@@ -197,8 +196,8 @@ func ExampleEncodedConn_Publish() {
 // can also vary to include additional data, such as subject
 // and reply subjects.
 func ExampleEncodedConn_Subscribe() {
-	nc, _ := nats.Connect(nats.DefaultURL)
-	c, _ := nats.NewEncodedConn(nc, "json")
+	nc, _ := gio.Connect(gio.DefaultURL)
+	c, _ := gio.NewEncodedConn(nc, "json")
 	defer c.Close()
 
 	type person struct {
@@ -219,12 +218,12 @@ func ExampleEncodedConn_Subscribe() {
 	c.Publish("hello", me)
 }
 
-// BindSendChan() allows binding of a Go channel to a nats
+// BindSendChan() allows binding of a Go channel to a gio
 // subject for publish operations. The Encoder attached to the
 // EncodedConn will be used for marshaling.
 func ExampleEncodedConn_BindSendChan() {
-	nc, _ := nats.Connect(nats.DefaultURL)
-	c, _ := nats.NewEncodedConn(nc, "json")
+	nc, _ := gio.Connect(gio.DefaultURL)
+	c, _ := gio.NewEncodedConn(nc, "json")
 	defer c.Close()
 
 	type person struct {
@@ -240,12 +239,12 @@ func ExampleEncodedConn_BindSendChan() {
 	ch <- me
 }
 
-// BindRecvChan() allows binding of a Go channel to a nats
+// BindRecvChan() allows binding of a Go channel to a gio
 // subject for subscribe operations. The Encoder attached to the
 // EncodedConn will be used for un-marshaling.
 func ExampleEncodedConn_BindRecvChan() {
-	nc, _ := nats.Connect(nats.DefaultURL)
-	c, _ := nats.NewEncodedConn(nc, "json")
+	nc, _ := gio.Connect(gio.DefaultURL)
+	c, _ := gio.NewEncodedConn(nc, "json")
 	defer c.Close()
 
 	type person struct {

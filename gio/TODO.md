@@ -9,14 +9,14 @@
 - [ ] pooling for structs used? leaky bucket?
 - [ ] Timeout 0 should work as no timeout
 - [x] Ping timer
-- [x] Name in Connect for gnatsd
+- [x] Name in Connect for giod
 - [x] Asynchronous error handling
 - [x] Parser rewrite
 - [x] Reconnect
 - [x] Hide Lock
 - [x] Easier encoder interface
 - [x] QueueSubscribeSync
-- [x] Make nats specific errors prefixed with 'nats:'
+- [x] Make gio specific errors prefixed with 'gio:'
 - [x] API test for closed connection
 - [x] TLS/SSL
 - [x] Stats collection

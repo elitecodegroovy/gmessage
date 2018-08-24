@@ -1,27 +1,22 @@
-
-// +build ignore
-
 package main
 
 import (
 	"flag"
+	"github.com/elitecodegroovy/gmessage/gio"
 	"log"
 	"runtime"
-
-	"github.com/elitecodegroovy/gmessage/gio"
 )
 
-// NOTE: Use tls scheme for TLS, e.g. nats-rply -s tls://demo.nats.io:4443 foo hello
 func usage() {
-	log.Fatalf("Usage: nats-rply [-s server][-t] <subject> <response>\n")
+	log.Fatalf("Usage: gio-rply [-s server][-t] <subject> <response>\n")
 }
 
-func printMsg(m *nats.Msg, i int) {
+func printMsg(m *gio.Msg, i int) {
 	log.Printf("[#%d] Received on [%s]: '%s'\n", i, m.Subject, string(m.Data))
 }
 
-func main() {
-	var urls = flag.String("s", nats.DefaultURL, "The nats server URLs (separated by comma)")
+func doReply() {
+	var urls = flag.String("s", "nats://192.168.1.225:6222", "The gmessage server URLs (separated by comma)")
 	var showTime = flag.Bool("t", false, "Display timestamps")
 
 	log.SetFlags(0)
@@ -33,14 +28,14 @@ func main() {
 		usage()
 	}
 
-	nc, err := nats.Connect(*urls)
+	nc, err := gio.Connect(*urls)
 	if err != nil {
 		log.Fatalf("Can't connect: %v\n", err)
 	}
 
 	subj, reply, i := args[0], args[1], 0
 
-	nc.Subscribe(subj, func(msg *nats.Msg) {
+	nc.Subscribe(subj, func(msg *gio.Msg) {
 		i++
 		printMsg(msg, i)
 		nc.Publish(msg.Reply, []byte(reply))
@@ -57,4 +52,8 @@ func main() {
 	}
 
 	runtime.Goexit()
+}
+
+func main() {
+	doReply()
 }

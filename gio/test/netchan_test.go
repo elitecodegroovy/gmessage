@@ -1,4 +1,3 @@
-
 package test
 
 import (
@@ -24,11 +23,11 @@ func TestBadChan(t *testing.T) {
 		t.Fatalf("Expected an Error when sending a non-channel\n")
 	}
 
-	if err := ec.BindSendChan("foo", "not a chan"); err != nats.ErrChanArg {
+	if err := ec.BindSendChan("foo", "not a chan"); err != gio.ErrChanArg {
 		t.Fatalf("Expected an ErrChanArg when sending a non-channel\n")
 	}
 
-	if _, err := ec.BindRecvChan("foo", "not a chan"); err != nats.ErrChanArg {
+	if _, err := ec.BindRecvChan("foo", "not a chan"); err != gio.ErrChanArg {
 		t.Fatalf("Expected an ErrChanArg when sending a non-channel\n")
 	}
 }
@@ -79,7 +78,7 @@ func TestFailedChannelSend(t *testing.T) {
 	ch := make(chan bool)
 	wch := make(chan bool)
 
-	nc.Opts.AsyncErrorCB = func(c *nats.Conn, s *nats.Subscription, e error) {
+	nc.Opts.AsyncErrorCB = func(c *gio.Conn, s *gio.Subscription, e error) {
 		wch <- true
 	}
 
@@ -112,7 +111,7 @@ func TestFailedChannelSend(t *testing.T) {
 	nc = ec.Conn
 	bch := make(chan []byte)
 
-	nc.Opts.AsyncErrorCB = func(c *nats.Conn, s *nats.Subscription, e error) {
+	nc.Opts.AsyncErrorCB = func(c *gio.Conn, s *gio.Subscription, e error) {
 		wch <- true
 	}
 
@@ -193,7 +192,7 @@ func TestDecoderErrRecvChan(t *testing.T) {
 	nc := ec.Conn
 	wch := make(chan bool)
 
-	nc.Opts.AsyncErrorCB = func(c *nats.Conn, s *nats.Subscription, e error) {
+	nc.Opts.AsyncErrorCB = func(c *gio.Conn, s *gio.Subscription, e error) {
 		wch <- true
 	}
 
@@ -328,11 +327,11 @@ func BenchmarkPublishSpeedViaChan(b *testing.B) {
 	s := RunDefaultServer()
 	defer s.Shutdown()
 
-	nc, err := nats.Connect(nats.DefaultURL)
+	nc, err := gio.Connect(gio.DefaultURL)
 	if err != nil {
 		b.Fatalf("Could not connect: %v\n", err)
 	}
-	ec, err := nats.NewEncodedConn(nc, nats.DEFAULT_ENCODER)
+	ec, err := gio.NewEncodedConn(nc, gio.DEFAULT_ENCODER)
 	if err != nil {
 		b.Fatalf("Failed creating encoded connection: %v\n", err)
 	}

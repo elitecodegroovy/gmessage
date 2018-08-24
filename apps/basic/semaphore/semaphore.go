@@ -1,4 +1,3 @@
-
 package main
 
 import (
@@ -51,7 +50,6 @@ func init() {
 	// Seed the random number generator
 	rand.Seed(time.Now().Unix())
 }
-
 
 // start uses the generator pattern to create the readerWriter value. It launches
 // goroutines to process the work, returning the created ReaderWriter value.
@@ -237,6 +235,7 @@ func (s semaphore) Release(buffers int) {
 		<-s
 	}
 }
+
 // main is the entry point for the application
 func main() {
 	log.Println("程序开始")

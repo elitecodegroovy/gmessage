@@ -1,6 +1,4 @@
-
-
-package nats
+package gio
 
 import (
 	"errors"

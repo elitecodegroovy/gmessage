@@ -23,7 +23,7 @@ import (
 )
 
 const (
-	natsEventSource = "NATS-Server"
+	gioEventSource = "GMessage-server"
 )
 
 // SysLogger logs to the windows event logger
@@ -35,13 +35,13 @@ type SysLogger struct {
 
 // NewSysLogger creates a log using the windows event logger
 func NewSysLogger(debug, trace bool) *SysLogger {
-	if err := eventlog.InstallAsEventCreate(natsEventSource, eventlog.Info|eventlog.Error|eventlog.Warning); err != nil {
+	if err := eventlog.InstallAsEventCreate(gioEventSource, eventlog.Info|eventlog.Error|eventlog.Warning); err != nil {
 		if !strings.Contains(err.Error(), "registry key already exists") {
 			panic(fmt.Sprintf("could not access event log: %v", err))
 		}
 	}
 
-	w, err := eventlog.Open(natsEventSource)
+	w, err := eventlog.Open(gioEventSource)
 	if err != nil {
 		panic(fmt.Sprintf("could not open event log: %v", err))
 	}
@@ -55,7 +55,7 @@ func NewSysLogger(debug, trace bool) *SysLogger {
 
 // NewRemoteSysLogger creates a remote event logger
 func NewRemoteSysLogger(fqn string, debug, trace bool) *SysLogger {
-	w, err := eventlog.OpenRemote(fqn, natsEventSource)
+	w, err := eventlog.OpenRemote(fqn, gioEventSource)
 	if err != nil {
 		panic(fmt.Sprintf("could not open event log: %v", err))
 	}

@@ -20,8 +20,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/elitecodegroovy/gmessage/server"
 	"github.com/elitecodegroovy/gmessage/gio"
+	"github.com/elitecodegroovy/gmessage/server"
 )
 
 // IMPORTANT: Tests in this file are not executed when running with the -race flag.
@@ -34,7 +34,7 @@ func TestHighFanoutOrdering(t *testing.T) {
 	s := RunServer(opts)
 	defer s.Shutdown()
 
-	url := fmt.Sprintf("nats://%s", s.Addr())
+	url := fmt.Sprintf("gio://%s", s.Addr())
 
 	const (
 		nconns = 100
@@ -43,22 +43,22 @@ func TestHighFanoutOrdering(t *testing.T) {
 	)
 
 	// make unique
-	subj := nats.NewInbox()
+	subj := gio.NewInbox()
 
 	var wg sync.WaitGroup
 	wg.Add(nconns * nsubs)
 
 	for i := 0; i < nconns; i++ {
-		nc, err := nats.Connect(url)
+		nc, err := gio.Connect(url)
 		if err != nil {
 			t.Fatalf("Expected a successful connect on %d, got %v\n", i, err)
 		}
 
-		nc.SetErrorHandler(func(c *nats.Conn, s *nats.Subscription, e error) {
+		nc.SetErrorHandler(func(c *gio.Conn, s *gio.Subscription, e error) {
 			t.Fatalf("Got an error %v for %+v\n", s, err)
 		})
 
-		ec, _ := nats.NewEncodedConn(nc, nats.DEFAULT_ENCODER)
+		ec, _ := gio.NewEncodedConn(nc, gio.DEFAULT_ENCODER)
 
 		for y := 0; y < nsubs; y++ {
 			expected := 0
@@ -76,8 +76,8 @@ func TestHighFanoutOrdering(t *testing.T) {
 		defer ec.Close()
 	}
 
-	nc, _ := nats.Connect(url)
-	ec, _ := nats.NewEncodedConn(nc, nats.DEFAULT_ENCODER)
+	nc, _ := gio.Connect(url)
+	ec, _ := gio.NewEncodedConn(nc, gio.DEFAULT_ENCODER)
 
 	for i := 0; i < npubs; i++ {
 		ec.Publish(subj, i)

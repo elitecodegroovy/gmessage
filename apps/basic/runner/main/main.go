@@ -4,10 +4,10 @@
 package main
 
 import (
+	"github.com/elitecodegroovy/gmessage/apps/basic/runner"
 	"log"
 	"os"
 	"time"
-	"github.com/elitecodegroovy/gmessage/apps/basic/runner"
 )
 
 // timeout is the number of second the program has to finish.

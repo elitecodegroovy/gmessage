@@ -1,8 +1,8 @@
 package channel_test
 
 import (
-	"testing"
 	"github.com/elitecodegroovy/gmessage/apps/basic/channel"
+	"testing"
 )
 
 func TestDoFuncChan(t *testing.T) {

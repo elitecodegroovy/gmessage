@@ -1,8 +1,7 @@
-
 // +build go1.7
 
-// A Go client for the NATS messaging system (https://nats.io).
-package nats
+// A Go client for the message platform
+package gio
 
 import (
 	"context"

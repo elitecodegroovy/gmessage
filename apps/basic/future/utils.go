@@ -120,7 +120,7 @@ func getAct(pr *Promise, act interface{}) (f func() (r interface{}, err error)) 
 		return nil
 	}
 
-	//If paramters of act function has a Canceller interface, the Future will can be cancelled.
+	//If parameters of act function has a Canceller interface, the Future will can be cancelled.
 	var canceller Canceller = nil
 	if pr != nil && canCancel {
 		//pr.EnableCanceller()

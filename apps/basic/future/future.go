@@ -53,7 +53,7 @@ type Canceller interface {
 }
 
 //canceller provides an implement of Canceller interface.
-//It will be passed to future task function as paramter
+//It will be passed to future task function as parameter
 type canceller struct {
 	f *Future
 }
@@ -141,7 +141,7 @@ func (this *Future) Get() (val interface{}, err error) {
 
 //GetOrTimeout is similar to Get(), but GetOrTimeout will not block after timeout.
 //If GetOrTimeout returns with a timeout, timeout value will be true in return values.
-//The unit of paramter is millisecond.
+//The unit of parameter is millisecond.
 func (this *Future) GetOrTimeout(mm uint) (val interface{}, err error, timout bool) {
 	if mm == 0 {
 		mm = 10
@@ -167,7 +167,7 @@ func (this *Future) Cancel() (e error) {
 
 //OnSuccess registers a callback function that will be called when Promise is resolved.
 //If promise is already resolved, the callback will immediately called.
-//The value of Promise will be paramter of Done callback function.
+//The value of Promise will be parameter of Done callback function.
 func (this *Future) OnSuccess(callback func(v interface{})) *Future {
 	this.addCallback(callback, CALLBACK_DONE)
 	return this
@@ -175,7 +175,7 @@ func (this *Future) OnSuccess(callback func(v interface{})) *Future {
 
 //OnFailure registers a callback function that will be called when Promise is rejected.
 //If promise is already rejected, the callback will immediately called.
-//The error of Promise will be paramter of Fail callback function.
+//The error of Promise will be parameter of Fail callback function.
 func (this *Future) OnFailure(callback func(v interface{})) *Future {
 	this.addCallback(callback, CALLBACK_FAIL)
 	return this
@@ -183,8 +183,8 @@ func (this *Future) OnFailure(callback func(v interface{})) *Future {
 
 //OnComplete register a callback function that will be called when Promise is rejected or resolved.
 //If promise is already rejected or resolved, the callback will immediately called.
-//According to the status of Promise, value or error will be paramter of Always callback function.
-//Value is the paramter if Promise is resolved, or error is the paramter if Promise is rejected.
+//According to the status of Promise, value or error will be parameter of Always callback function.
+//Value is the parameter if Promise is resolved, or error is the parameter if Promise is rejected.
 //Always callback will be not called if Promise be called.
 func (this *Future) OnComplete(callback func(v interface{})) *Future {
 	this.addCallback(callback, CALLBACK_ALWAYS)

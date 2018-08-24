@@ -1,4 +1,3 @@
-
 package test
 
 import (
@@ -10,8 +9,8 @@ import (
 	"github.com/elitecodegroovy/gmessage/gio/encoders/builtin"
 )
 
-func NewJsonEncodedConn(tl TestLogger) *nats.EncodedConn {
-	ec, err := nats.NewEncodedConn(NewConnection(tl, TEST_PORT), nats.JSON_ENCODER)
+func NewJsonEncodedConn(tl TestLogger) *gio.EncodedConn {
+	ec, err := gio.NewEncodedConn(NewConnection(tl, TEST_PORT), gio.JSON_ENCODER)
 	if err != nil {
 		tl.Fatalf("Failed to create an encoded connection: %v\n", err)
 	}

@@ -1,11 +1,10 @@
-
 package protobuf
 
 import (
 	"errors"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/elitecodegroovy/gmessage/gio"
+	"github.com/golang/protobuf/proto"
 )
 
 // Additional index for registered Encoders.
@@ -15,7 +14,7 @@ const (
 
 func init() {
 	// Register protobuf encoder
-	nats.RegisterEncoder(PROTOBUF_ENCODER, &ProtobufEncoder{})
+	gio.RegisterEncoder(PROTOBUF_ENCODER, &ProtobufEncoder{})
 }
 
 // ProtobufEncoder is a protobuf implementation for EncodedConn

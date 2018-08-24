@@ -19,7 +19,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/nats-io/go-nats"
+	"github.com/elitecodegroovy/gmessage/gio"
 )
 
 func TestMultipleUserAuth(t *testing.T) {
@@ -39,7 +39,7 @@ func TestMultipleUserAuth(t *testing.T) {
 		opts.Users[0].Password,
 		opts.Host, opts.Port)
 
-	nc, err := nats.Connect(url)
+	nc, err := gio.Connect(url)
 	if err != nil {
 		t.Fatalf("Expected a successful connect, got %v\n", err)
 	}
@@ -50,12 +50,12 @@ func TestMultipleUserAuth(t *testing.T) {
 	}
 
 	// Test second user
-	url = fmt.Sprintf("nats://%s:%s@%s:%d/",
+	url = fmt.Sprintf("gio://%s:%s@%s:%d/",
 		opts.Users[1].Username,
 		opts.Users[1].Password,
 		opts.Host, opts.Port)
 
-	nc, err = nats.Connect(url)
+	nc, err = gio.Connect(url)
 	if err != nil {
 		t.Fatalf("Expected a successful connect, got %v\n", err)
 	}
@@ -80,8 +80,8 @@ func TestTokenInConfig(t *testing.T) {
 	s, opts := RunServerWithConfig(confFileName)
 	defer s.Shutdown()
 
-	url := fmt.Sprintf("nats://test@%s:%d/", opts.Host, opts.Port)
-	nc, err := nats.Connect(url)
+	url := fmt.Sprintf("gio://test@%s:%d/", opts.Host, opts.Port)
+	nc, err := gio.Connect(url)
 	if err != nil {
 		t.Fatalf("Expected a successful connect, got %v\n", err)
 	}

@@ -1,13 +1,13 @@
 package main
 
 import (
-	"os"
-	"net/http"
 	"fmt"
 	"io/ioutil"
+	"net/http"
+	"os"
 )
 
-func fetch(){
+func fetch() {
 	for _, url := range os.Args[1:] {
 		resp, err := http.Get(url)
 		if err != nil {
@@ -24,6 +24,6 @@ func fetch(){
 	}
 }
 
-func main(){
+func main() {
 	fetch()
 }

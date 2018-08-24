@@ -1,4 +1,3 @@
-
 // +build go1.5,!go1.7
 
 package util

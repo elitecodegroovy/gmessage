@@ -65,7 +65,7 @@ func (this *Promise) Reject(err error) (e error) {
 
 //OnSuccess registers a callback function that will be called when Promise is resolved.
 //If promise is already resolved, the callback will immediately called.
-//The value of Promise will be paramter of Done callback function.
+//The value of Promise will be parameter of Done callback function.
 func (this *Promise) OnSuccess(callback func(v interface{})) *Promise {
 	this.Future.OnSuccess(callback)
 	return this
@@ -73,7 +73,7 @@ func (this *Promise) OnSuccess(callback func(v interface{})) *Promise {
 
 //OnFailure registers a callback function that will be called when Promise is rejected.
 //If promise is already rejected, the callback will immediately called.
-//The error of Promise will be paramter of Fail callback function.
+//The error of Promise will be parameter of Fail callback function.
 func (this *Promise) OnFailure(callback func(v interface{})) *Promise {
 	this.Future.OnFailure(callback)
 	return this
@@ -81,8 +81,8 @@ func (this *Promise) OnFailure(callback func(v interface{})) *Promise {
 
 //OnComplete register a callback function that will be called when Promise is rejected or resolved.
 //If promise is already rejected or resolved, the callback will immediately called.
-//According to the status of Promise, value or error will be paramter of Always callback function.
-//Value is the paramter if Promise is resolved, or error is the paramter if Promise is rejected.
+//According to the status of Promise, value or error will be parameter of Always callback function.
+//Value is the parameter if Promise is resolved, or error is the parameter if Promise is rejected.
 //Always callback will be not called if Promise be called.
 func (this *Promise) OnComplete(callback func(v interface{})) *Promise {
 	this.Future.OnComplete(callback)

@@ -1,4 +1,3 @@
-
 package server
 
 import (
@@ -32,7 +31,7 @@ const (
 	PROTO = 1
 
 	// DEFAULT_PORT is the default port for client connections.
-	DEFAULT_PORT = 4222
+	DEFAULT_PORT = 6222
 
 	// RANDOM_PORT is the value for port that, when supplied, will cause the
 	// server to listen on a randomly-chosen available port. The resolved port

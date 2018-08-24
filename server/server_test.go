@@ -1,4 +1,3 @@
-
 package server
 
 import (
@@ -11,6 +10,7 @@ import (
 	"time"
 
 	"github.com/elitecodegroovy/gmessage/gio"
+	"nats-io/go-nats"
 )
 
 func checkFor(t *testing.T, totalWait, sleepDur time.Duration, f func() error) {
@@ -199,7 +199,7 @@ func TestTlsCipher(t *testing.T) {
 
 func TestGetConnectURLs(t *testing.T) {
 	opts := DefaultOptions()
-	opts.Port = 4222
+	opts.Port = 6222
 
 	var globalIP net.IP
 
@@ -226,7 +226,7 @@ func TestGetConnectURLs(t *testing.T) {
 			if ip.IsUnspecified() {
 				t.Fatalf("IP %v is unspecified", ip.String())
 			}
-			addr := strings.TrimSuffix(u, ":4222")
+			addr := strings.TrimSuffix(u, ":6222")
 			if addr == opts.Host {
 				t.Fatalf("Returned url is not right: %v", u)
 			}
@@ -275,7 +275,7 @@ func TestGetConnectURLs(t *testing.T) {
 //Test client advertised connect
 func TestClientAdvertiseConnectURL(t *testing.T) {
 	opts := DefaultOptions()
-	opts.Port = 4222
+	opts.Port = 6222
 	opts.ClientAdvertise = "nats.example.com"
 	s := New(opts)
 	defer s.Shutdown()
@@ -287,8 +287,8 @@ func TestClientAdvertiseConnectURL(t *testing.T) {
 		t.Fatalf("Expected to get one url, got none: %v with ClientAdvertise %v",
 			opts.Host, opts.ClientAdvertise)
 	}
-	if urls[0] != "nats.example.com:4222" {
-		t.Fatalf("Expected to get '%s', got: '%v'", "nats.example.com:4222", urls[0])
+	if urls[0] != "nats.example.com:6222" {
+		t.Fatalf("Expected to get '%s', got: '%v'", "nats.example.com:6222", urls[0])
 	}
 	s.Shutdown()
 
@@ -349,7 +349,7 @@ func TestClientAdvertiseErrorOnStartup(t *testing.T) {
 func TestNoDeadlockOnStartFailure(t *testing.T) {
 	opts := DefaultOptions()
 	opts.Host = "x.x.x.x" // bad host
-	opts.Port = 4222
+	opts.Port = 6222
 	opts.HTTPHost = opts.Host
 	opts.Cluster.Host = "127.0.0.1"
 	opts.Cluster.Port = -1
@@ -357,7 +357,7 @@ func TestNoDeadlockOnStartFailure(t *testing.T) {
 	s := New(opts)
 
 	// This should return since it should fail to start a listener
-	// on x.x.x.x:4222
+	// on x.x.x.x:6222
 	s.Start()
 
 	// We should be able to shutdown
@@ -394,33 +394,32 @@ func TestMaxSubscriptions(t *testing.T) {
 	defer s.Shutdown()
 
 	addr := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
-	nc, err := nats.Connect(addr)
+	nc, err :=  gio.Connect(addr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v\n", err)
 	}
 	defer nc.Close()
 
 	for i := 0; i < 10; i++ {
-		_, err := nc.Subscribe(fmt.Sprintf("foo.%d", i), func(*nats.Msg) {})
+		_, err := nc.Subscribe(fmt.Sprintf("foo.%d", i), func(*gio.Msg) {})
 		if err != nil {
 			t.Fatalf("Error subscribing: %v\n", err)
 		}
 	}
 	// This should cause the error.
-	nc.Subscribe("foo.22", func(*nats.Msg) {})
+	nc.Subscribe("foo.22", func(*gio.Msg) {})
 	nc.Flush()
 	if err := nc.LastError(); err == nil {
 		t.Fatal("Expected an error but got none\n")
 	}
 }
 
-
 func TestProcessCommandLineArgs(t *testing.T) {
 	var host string
 	var port int
 	cmd := flag.NewFlagSet("gmessage", flag.ExitOnError)
 	cmd.StringVar(&host, "a", "0.0.0.0", "Host.")
-	cmd.IntVar(&port, "p", 4222, "Port.")
+	cmd.IntVar(&port, "p", 6222, "Port.")
 
 	cmd.Parse([]string{"-a", "127.0.0.1", "-p", "9090"})
 	showVersion, showHelp, err := ProcessCommandLineArgs(cmd)
@@ -482,7 +481,7 @@ func TestWriteDeadline(t *testing.T) {
 	c.(*net.TCPConn).SetReadBuffer(4)
 
 	url := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
-	sender, err := nats.Connect(url)
+	sender, err := gio.Connect(url)
 	if err != nil {
 		t.Fatalf("Error on connect: %v", err)
 	}
@@ -576,11 +575,11 @@ func TestRandomPorts(t *testing.T) {
 		t.Fatal("Should have dynamically assigned server port.")
 	}
 
-	if s.Addr() == nil || s.Addr().(*net.TCPAddr).Port == 4222 {
-		t.Fatal("Should not have dynamically assigned default port: 4222.")
+	if s.Addr() == nil || s.Addr().(*net.TCPAddr).Port == 6222 {
+		t.Fatal("Should not have dynamically assigned default port: 6222.")
 	}
 
-	t.Logf("monitor port : %d", s.MonitorAddr().Port )
+	t.Logf("monitor port : %d", s.MonitorAddr().Port)
 	if s.MonitorAddr() == nil || s.MonitorAddr().Port <= 0 {
 		t.Fatal("Should have dynamically assigned monitoring port.")
 	}
@@ -620,12 +619,12 @@ func TestCustomClientAuthentication(t *testing.T) {
 
 	addr := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
 
-	nc, err := nats.Connect(addr, nats.UserInfo("valid", ""))
+	nc, err := gio.Connect(addr, gio.UserInfo("valid", ""))
 	if err != nil {
 		t.Fatalf("Expected client to connect, got: %s", err)
 	}
 	nc.Close()
-	if _, err := nats.Connect(addr, nats.UserInfo("invalid", "")); err == nil {
+	if _, err := gio.Connect(addr, gio.UserInfo("invalid", "")); err == nil {
 		t.Fatal("Expected client to fail to connect")
 	}
 }

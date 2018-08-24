@@ -25,8 +25,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elitecodegroovy/gmessage/server"
 	"github.com/elitecodegroovy/gmessage/gio"
+	"github.com/elitecodegroovy/gmessage/server"
 )
 
 const clientProtoInfo = 1
@@ -869,13 +869,13 @@ func TestRouteBasicPermissions(t *testing.T) {
 	checkClusterFormed(t, srvA, srvB)
 
 	// Create a connection to server B
-	ncb, err := nats.Connect(fmt.Sprintf("nats://127.0.0.1:%d", optsB.Port))
+	ncb, err := gio.Connect(fmt.Sprintf("gio://127.0.0.1:%d", optsB.Port))
 	if err != nil {
 		t.Fatalf("Error on connect: %v", err)
 	}
 	defer ncb.Close()
 	ch := make(chan bool, 1)
-	cb := func(_ *nats.Msg) {
+	cb := func(_ *gio.Msg) {
 		ch <- true
 	}
 	// Subscribe on on "bar" and "baz", which should be accepted by server A
@@ -895,7 +895,7 @@ func TestRouteBasicPermissions(t *testing.T) {
 	}
 
 	// Create a connection to server A
-	nca, err := nats.Connect(fmt.Sprintf("nats://127.0.0.1:%d", optsA.Port))
+	nca, err := gio.Connect(fmt.Sprintf("gio://127.0.0.1:%d", optsA.Port))
 	if err != nil {
 		t.Fatalf("Error on connect: %v", err)
 	}
@@ -1024,7 +1024,7 @@ func TestRouteBasicPermissions(t *testing.T) {
 	}
 
 	// Connect to B and send on "foo" and make sure we receive
-	ncb, err = nats.Connect(fmt.Sprintf("nats://127.0.0.1:%d", optsB.Port))
+	ncb, err = gio.Connect(fmt.Sprintf("gio://127.0.0.1:%d", optsB.Port))
 	if err != nil {
 		t.Fatalf("Error on connect: %v", err)
 	}

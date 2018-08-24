@@ -1,4 +1,3 @@
-
 // +build go1.7
 
 package test
@@ -13,7 +12,7 @@ import (
 )
 
 func TestContextRequestWithNilConnection(t *testing.T) {
-	var nc *nats.Conn
+	var nc *gio.Conn
 
 	ctx, cancelCB := context.WithTimeout(context.Background(), 100*time.Millisecond)
 	defer cancelCB() // should always be called, not discarded, to prevent context leak
@@ -22,18 +21,18 @@ func TestContextRequestWithNilConnection(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected request with context and nil connection to fail\n")
 	}
-	if err != nats.ErrInvalidConnection {
-		t.Fatalf("Expected nats.ErrInvalidConnection, got %v\n", err)
+	if err != gio.ErrInvalidConnection {
+		t.Fatalf("Expected gio.ErrInvalidConnection, got %v\n", err)
 	}
 }
 
-func testContextRequestWithTimeout(t *testing.T, nc *nats.Conn) {
-	nc.Subscribe("slow", func(m *nats.Msg) {
+func testContextRequestWithTimeout(t *testing.T, nc *gio.Conn) {
+	nc.Subscribe("slow", func(m *gio.Msg) {
 		// Simulates latency into the client so that timeout is hit.
 		time.Sleep(200 * time.Millisecond)
 		nc.Publish(m.Reply, []byte("NG"))
 	})
-	nc.Subscribe("fast", func(m *nats.Msg) {
+	nc.Subscribe("fast", func(m *gio.Msg) {
 		nc.Publish(m.Reply, []byte("OK"))
 	})
 
@@ -93,7 +92,7 @@ func TestOldContextRequestWithTimeout(t *testing.T) {
 	s := RunDefaultServer()
 	defer s.Shutdown()
 
-	nc, err := nats.Connect(nats.DefaultURL, nats.UseOldRequestStyle())
+	nc, err := gio.Connect(gio.DefaultURL, gio.UseOldRequestStyle())
 	if err != nil {
 		t.Fatalf("Failed to connect: %v", err)
 	}
@@ -102,11 +101,11 @@ func TestOldContextRequestWithTimeout(t *testing.T) {
 	testContextRequestWithTimeout(t, nc)
 }
 
-func testContextRequestWithTimeoutCanceled(t *testing.T, nc *nats.Conn) {
+func testContextRequestWithTimeoutCanceled(t *testing.T, nc *gio.Conn) {
 	ctx, cancelCB := context.WithTimeout(context.Background(), 100*time.Millisecond)
 	defer cancelCB()
 
-	nc.Subscribe("fast", func(m *nats.Msg) {
+	nc.Subscribe("fast", func(m *gio.Msg) {
 		nc.Publish(m.Reply, []byte("OK"))
 	})
 
@@ -163,7 +162,7 @@ func TestOldContextRequestWithTimeoutCanceled(t *testing.T) {
 	s := RunDefaultServer()
 	defer s.Shutdown()
 
-	nc, err := nats.Connect(nats.DefaultURL, nats.UseOldRequestStyle())
+	nc, err := gio.Connect(gio.DefaultURL, gio.UseOldRequestStyle())
 	if err != nil {
 		t.Fatalf("Failed to connect: %v", err)
 	}
@@ -172,7 +171,7 @@ func TestOldContextRequestWithTimeoutCanceled(t *testing.T) {
 	testContextRequestWithTimeoutCanceled(t, nc)
 }
 
-func testContextRequestWithCancel(t *testing.T, nc *nats.Conn) {
+func testContextRequestWithCancel(t *testing.T, nc *gio.Conn) {
 	ctx, cancelCB := context.WithCancel(context.Background())
 	defer cancelCB() // should always be called, not discarded, to prevent context leak
 
@@ -181,12 +180,12 @@ func testContextRequestWithCancel(t *testing.T, nc *nats.Conn) {
 		cancelCB()
 	})
 
-	nc.Subscribe("slow", func(m *nats.Msg) {
+	nc.Subscribe("slow", func(m *gio.Msg) {
 		// simulates latency into the client so that timeout is hit.
 		time.Sleep(40 * time.Millisecond)
 		nc.Publish(m.Reply, []byte("OK"))
 	})
-	nc.Subscribe("slower", func(m *nats.Msg) {
+	nc.Subscribe("slower", func(m *gio.Msg) {
 		// we know this request will take longer so extend the timeout
 		expirationTimer.Reset(100 * time.Millisecond)
 
@@ -257,7 +256,7 @@ func TestOldContextRequestWithCancel(t *testing.T) {
 	s := RunDefaultServer()
 	defer s.Shutdown()
 
-	nc, err := nats.Connect(nats.DefaultURL, nats.UseOldRequestStyle())
+	nc, err := gio.Connect(gio.DefaultURL, gio.UseOldRequestStyle())
 	if err != nil {
 		t.Fatalf("Failed to connect: %v", err)
 	}
@@ -266,12 +265,12 @@ func TestOldContextRequestWithCancel(t *testing.T) {
 	testContextRequestWithCancel(t, nc)
 }
 
-func testContextRequestWithDeadline(t *testing.T, nc *nats.Conn) {
+func testContextRequestWithDeadline(t *testing.T, nc *gio.Conn) {
 	deadline := time.Now().Add(100 * time.Millisecond)
 	ctx, cancelCB := context.WithDeadline(context.Background(), deadline)
 	defer cancelCB() // should always be called, not discarded, to prevent context leak
 
-	nc.Subscribe("slow", func(m *nats.Msg) {
+	nc.Subscribe("slow", func(m *gio.Msg) {
 		// simulates latency into the client so that timeout is hit.
 		time.Sleep(40 * time.Millisecond)
 		nc.Publish(m.Reply, []byte("OK"))
@@ -325,7 +324,7 @@ func TestOldContextRequestWithDeadline(t *testing.T) {
 	s := RunDefaultServer()
 	defer s.Shutdown()
 
-	nc, err := nats.Connect(nats.DefaultURL, nats.UseOldRequestStyle())
+	nc, err := gio.Connect(gio.DefaultURL, gio.UseOldRequestStyle())
 	if err != nil {
 		t.Fatalf("Failed to connect: %v", err)
 	}
@@ -581,7 +580,7 @@ func TestContextEncodedRequestWithTimeout(t *testing.T) {
 	defer s.Shutdown()
 
 	nc := NewDefaultConnection(t)
-	c, err := nats.NewEncodedConn(nc, nats.JSON_ENCODER)
+	c, err := gio.NewEncodedConn(nc, gio.JSON_ENCODER)
 	if err != nil {
 		t.Fatalf("Unable to create encoded connection: %v", err)
 	}
@@ -652,7 +651,7 @@ func TestContextEncodedRequestWithTimeoutCanceled(t *testing.T) {
 	defer s.Shutdown()
 
 	nc := NewDefaultConnection(t)
-	c, err := nats.NewEncodedConn(nc, nats.JSON_ENCODER)
+	c, err := gio.NewEncodedConn(nc, gio.JSON_ENCODER)
 	if err != nil {
 		t.Fatalf("Unable to create encoded connection: %v", err)
 	}
@@ -723,7 +722,7 @@ func TestContextEncodedRequestWithCancel(t *testing.T) {
 	defer s.Shutdown()
 
 	nc := NewDefaultConnection(t)
-	c, err := nats.NewEncodedConn(nc, nats.JSON_ENCODER)
+	c, err := gio.NewEncodedConn(nc, gio.JSON_ENCODER)
 	if err != nil {
 		t.Fatalf("Unable to create encoded connection: %v", err)
 	}
@@ -828,7 +827,7 @@ func TestContextEncodedRequestWithDeadline(t *testing.T) {
 	defer s.Shutdown()
 
 	nc := NewDefaultConnection(t)
-	c, err := nats.NewEncodedConn(nc, nats.JSON_ENCODER)
+	c, err := gio.NewEncodedConn(nc, gio.JSON_ENCODER)
 	if err != nil {
 		t.Fatalf("Unable to create encoded connection: %v", err)
 	}
@@ -911,7 +910,7 @@ func TestContextRequestConnClosed(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected request to fail with error")
 	}
-	if err != nats.ErrConnectionClosed {
+	if err != gio.ErrConnectionClosed {
 		t.Errorf("Expected request to fail with connection closed error: %s", err)
 	}
 }
@@ -928,7 +927,7 @@ func TestContextBadSubscription(t *testing.T) {
 		cancelCB()
 	})
 
-	sub, err := nc.Subscribe("foo", func(_ *nats.Msg) {})
+	sub, err := nc.Subscribe("foo", func(_ *gio.Msg) {})
 	if err != nil {
 		t.Fatalf("Expected to be able to subscribe: %s", err)
 	}
@@ -943,7 +942,7 @@ func TestContextBadSubscription(t *testing.T) {
 		t.Fatalf("Expected to fail getting next message with context")
 	}
 
-	if err != nats.ErrBadSubscription {
+	if err != gio.ErrBadSubscription {
 		t.Errorf("Expected request to fail with connection closed error: %s", err)
 	}
 }
@@ -953,7 +952,7 @@ func TestContextInvalid(t *testing.T) {
 	defer s.Shutdown()
 
 	nc := NewDefaultConnection(t)
-	c, err := nats.NewEncodedConn(nc, nats.JSON_ENCODER)
+	c, err := gio.NewEncodedConn(nc, gio.JSON_ENCODER)
 	if err != nil {
 		t.Fatalf("Unable to create encoded connection: %v", err)
 	}
@@ -963,11 +962,11 @@ func TestContextInvalid(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected request to fail with error")
 	}
-	if err != nats.ErrInvalidContext {
+	if err != gio.ErrInvalidContext {
 		t.Errorf("Expected request to fail with connection closed error: %s", err)
 	}
 
-	sub, err := nc.Subscribe("foo", func(_ *nats.Msg) {})
+	sub, err := nc.Subscribe("foo", func(_ *gio.Msg) {})
 	if err != nil {
 		t.Fatalf("Expected to be able to subscribe: %s", err)
 	}
@@ -976,7 +975,7 @@ func TestContextInvalid(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected request to fail with error")
 	}
-	if err != nats.ErrInvalidContext {
+	if err != gio.ErrInvalidContext {
 		t.Errorf("Expected request to fail with connection closed error: %s", err)
 	}
 
@@ -992,7 +991,7 @@ func TestContextInvalid(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected request with context to reach deadline: %s", err)
 	}
-	if err != nats.ErrInvalidContext {
+	if err != gio.ErrInvalidContext {
 		t.Errorf("Expected request to fail with connection closed error: %s", err)
 	}
 }

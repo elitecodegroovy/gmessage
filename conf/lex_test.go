@@ -934,10 +934,10 @@ func TestBlockStringMultiLine(t *testing.T) {
 func TestUnquotedIPAddr(t *testing.T) {
 	expectedItems := []item{
 		{itemKey, "listen", 1},
-		{itemString, "127.0.0.1:4222", 1},
+		{itemString, "127.0.0.1:6222", 1},
 		{itemEOF, "", 1},
 	}
-	lx := lex("listen: 127.0.0.1:4222")
+	lx := lex("listen: 127.0.0.1:6222")
 	expect(t, lx, expectedItems)
 
 	expectedItems = []item{
@@ -991,12 +991,12 @@ func TestUnquotedIPAddr(t *testing.T) {
 	expectedItems = []item{
 		{itemKey, "listen", 1},
 		{itemArrayStart, "", 1},
-		{itemString, "localhost:4222", 1},
+		{itemString, "localhost:6222", 1},
 		{itemString, "localhost:4333", 1},
 		{itemArrayEnd, "", 1},
 		{itemEOF, "", 1},
 	}
-	lx = lex("listen = [localhost:4222, localhost:4333]")
+	lx = lex("listen = [localhost:6222, localhost:4333]")
 	expect(t, lx, expectedItems)
 }
 
@@ -1157,7 +1157,7 @@ func TestJSONCompat(t *testing.T) {
 		},
 		{
 			name: "should support uglified JSON with inner blocks",
-			input: `{"http_port": 8227,"port": 4227,"write_deadline": "1h","cluster": {"port": 6222,"routes": ["nats://127.0.0.1:4222","nats://127.0.0.1:4223","nats://127.0.0.1:4224"]}}
+			input: `{"http_port": 8227,"port": 4227,"write_deadline": "1h","cluster": {"port": 6222,"routes": ["nats://127.0.0.1:6222","nats://127.0.0.1:4223","nats://127.0.0.1:4224"]}}
                         `,
 			expected: []item{
 				{itemKey, "http_port", 1},
@@ -1172,7 +1172,7 @@ func TestJSONCompat(t *testing.T) {
 				{itemInteger, "6222", 1},
 				{itemKey, "routes", 1},
 				{itemArrayStart, "", 1},
-				{itemString, "nats://127.0.0.1:4222", 1},
+				{itemString, "nats://127.0.0.1:6222", 1},
 				{itemString, "nats://127.0.0.1:4223", 1},
 				{itemString, "nats://127.0.0.1:4224", 1},
 				{itemArrayEnd, "", 1},
@@ -1189,7 +1189,7 @@ func TestJSONCompat(t *testing.T) {
                           "cluster": {
                             "port": 6222,
                             "routes": [
-                              "nats://127.0.0.1:4222",
+                              "nats://127.0.0.1:6222",
                               "nats://127.0.0.1:4223",
                               "nats://127.0.0.1:4224"
                             ]
@@ -1209,7 +1209,7 @@ func TestJSONCompat(t *testing.T) {
 				{itemInteger, "6222", 7},
 				{itemKey, "routes", 8},
 				{itemArrayStart, "", 8},
-				{itemString, "nats://127.0.0.1:4222", 9},
+				{itemString, "nats://127.0.0.1:6222", 9},
 				{itemString, "nats://127.0.0.1:4223", 10},
 				{itemString, "nats://127.0.0.1:4224", 11},
 				{itemArrayEnd, "", 12},

@@ -1,13 +1,13 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"github.com/gorilla/mux"
-	"net/http"
 	"encoding/json"
 	"encoding/xml"
+	"fmt"
+	"github.com/gorilla/mux"
 	"html/template"
+	"log"
+	"net/http"
 	"time"
 )
 

@@ -1,4 +1,3 @@
-
 // Package sublist is a routing mechanism to handle subject distribution
 // and provides a facility to match subjects from published messages to
 // interested subscribers. Subscribers can have wildcard subjects to match
