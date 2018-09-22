@@ -11,6 +11,7 @@ go get github.com/gorilla/mux
 
 A High Performance [gMessage](https://github.com/elitecodegroovy) Server written in [Go.](http://golang.org)
 
+If you want to run gRPC service at windows platform , please copy the execute file (apps/protoc.exe) to the directory `$GOPATH/bin`.
 
 ## gmonitor
 
