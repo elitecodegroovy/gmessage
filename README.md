@@ -3,7 +3,7 @@
 
 ## gMessage is a distributed message platform.
 
-## 依赖
+## dependency
 
 ```
 go get github.com/gorilla/mux
