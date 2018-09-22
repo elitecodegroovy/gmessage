@@ -1,4 +1,4 @@
-## <img src="logos/gMessage.jpg" width="300">
+## <img src="logos/gmessage.jpg" width="300">
 
 
 ## gMessage is a distributed message platform.
