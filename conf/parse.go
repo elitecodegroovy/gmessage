@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package conf supports a configuration file format used by gnatsd. It is
+// Package conf supports a configuration file format used by gmessage. It is
 // a flexible format that combines the best of traditional
 // configuration formats and newer styles such as JSON and YAML.
 package conf
