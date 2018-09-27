@@ -7,6 +7,9 @@
 
 ```
 go get github.com/gorilla/mux
+# 需要翻墙
+go get golang.org/x/crypto/ssh/terminal
+go get golang.org/x/crypto/bcrypt
 ```
 
 A High Performance [gMessage](https://github.com/elitecodegroovy) Server written in [Go.](http://golang.org)
