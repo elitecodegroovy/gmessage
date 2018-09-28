@@ -1060,7 +1060,7 @@ func (nc *Conn) setup() {
 }
 
 // Process a connected connection and initialize properly.
-func (nc *Conn) processConnectInit() error {
+func (nc *Conn)  processConnectInit() error {
 
 	// Set out deadline for the whole connect process
 	nc.conn.SetDeadline(time.Now().Add(nc.Opts.Timeout))
@@ -1946,8 +1946,7 @@ func (nc *Conn) processOK() {
 	// do nothing
 }
 
-// processInfo is used to parse the info messages sent
-// from the server.
+// processInfo is used to parse the info messages sent from the server.
 // This function may update the server pool.
 func (nc *Conn) processInfo(info string) error {
 	if info == _EMPTY_ {
@@ -1980,6 +1979,7 @@ func (nc *Conn) processInfo(info string) error {
 	}
 	// Walk the pool and removed the implicit servers that are no longer in the
 	// given array/map
+	// 从nc.srcPool中删除已经过期的url连接，依据是来自服务端的urls(nc.info.ConnectURLs)
 	sp := nc.srvPool
 	for i := 0; i < len(sp); i++ {
 		srv := sp[i]
@@ -2002,6 +2002,7 @@ func (nc *Conn) processInfo(info string) error {
 			i--
 		}
 	}
+	// 新增加的服务节点，需要添加到原有服务器连接池中。
 	// If there are any left in the tmp map, these are new (or restarted) servers
 	// and need to be added to the pool.
 	for curl := range tmp {

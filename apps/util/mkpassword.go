@@ -1,5 +1,3 @@
-// +build ignore
-
 package main
 
 import (
@@ -38,9 +36,9 @@ func main() {
 	var password string
 
 	if *pw {
-		fmt.Printf("Enter Password: ")
+		fmt.Printf("输入密码: ")
 		bytePassword, _ := terminal.ReadPassword(0)
-		fmt.Printf("\nReenter Password: ")
+		fmt.Printf("\n重复输入密码: ")
 		bytePassword2, _ := terminal.ReadPassword(0)
 		if !bytes.Equal(bytePassword, bytePassword2) {
 			log.Fatalf("Error, passwords do not match\n")
@@ -56,11 +54,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error producing bcrypt hash: %v\n", err)
 	}
-	fmt.Printf("bcrypt hash: %s\n", cb)
+	fmt.Printf("加密哈希值: %s\n", cb)
 }
 
 func genPassword() string {
-	var ch = []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@$#%^&*()")
+	var ch = []byte("1234567890!@#$%^&*()")
 	b := make([]byte, PasswordLength)
 	max := big.NewInt(int64(len(ch)))
 	for i := range b {

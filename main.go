@@ -13,51 +13,51 @@ const (
 )
 
 var usageStr = `
-Usage: gmessage [options]
+使用: gmessage [可选项]
 
-Server Options:
-    -a, --addr <host>                Bind to host address (default: 0.0.0.0)
-    -p, --port <port>                Use port for clients (default: 6222)
-    -P, --pid <file>                 File to store PID
-    -m, --http_port <port>           Use port for http monitoring
-    -ms,--https_port <port>          Use port for https monitoring
-    -c, --config <file>              Configuration file
-    -sl,--signal <signal>[=<pid>]    Send signal to gmessage process (stop, quit, reopen, reload)
-        --client_advertise <string>  Client URL to advertise to other servers
+服务器可选项:
+    -a, --addr <host>                绑定主机地址 (默认: 0.0.0.0)
+    -p, --port <port>                为客户端连接的端口 (默认: 6222)
+    -P, --pid <file>                 存储PID的文件
+    -m, --http_port <port>           http监控端口
+    -ms,--https_port <port>          https监控端口
+    -c, --config <file>              配置文件
+    -sl,--signal <signal>[=<pid>]    发送信号给系统进程 (停止、退出、重新打开，重新加载)
+        --client_advertise <string>  客户端的URL告知给其他服务器
 
-Logging Options:
-    -l, --log <file>                 File to redirect log output
-    -T, --logtime                    Timestamp log entries (default: true)
-    -s, --syslog                     Log to syslog or windows event log
-    -r, --remote_syslog <addr>       Syslog server addr (udp://localhost:514)
-    -D, --debug                      Enable debugging output
-    -V, --trace                      Trace the raw protocol
-    -DV                              Debug and trace
+日志可选项:
+    -l, --log <file>                 文件重定向到日志输出
+    -T, --logtime                    时间戳日志条目 (默认: true)
+    -s, --syslog                     记录日志到系统日志或者windows事件日志中
+    -r, --remote_syslog <addr>       系统日志服务地址(例如：udp://localhost:514)
+    -D, --debug                      启动调试输出信息
+    -V, --trace                      跟踪原始协议
+    -DV                              调试和跟踪
 
-Authorization Options:
-        --user <user>                User required for connections
-        --pass <password>            Password required for connections
-        --auth <token>               Authorization token required for connections
+授权可选项:
+        --user <user>                连接时刻需要的用户名称
+        --pass <password>            连接时刻需要的密码
+        --auth <token>               连接时刻需要的授权标识符
 
-TLS Options:
-        --tls                        Enable TLS, do not verify clients (default: false)
-        --tlscert <file>             Server certificate file
-        --tlskey <file>              Private key for server certificate
-        --tlsverify                  Enable TLS, verify client certificates
-        --tlscacert <file>           Client certificate CA for verification
+TLS可选项:
+        --tls                        启动TLS, 不必验证客户端(默认: false)
+        --tlscert <file>             服务器证书文件
+        --tlskey <file>              服务器证书私有密钥
+        --tlsverify                  启动 TLS, 验证客户端证书
+        --tlscacert <file>           验证时刻提供的客户端证书
 
-Cluster Options:
-        --routes <rurl-1, rurl-2>    Routes to solicit and connect
-        --cluster <cluster-url>      Cluster URL for solicited routes
-        --no_advertise <bool>        Advertise known cluster IPs to clients
-        --cluster_advertise <string> Cluster URL to advertise to other servers
-        --connect_retries <number>   For implicit routes, number of connect retries
+集群可选项:
+        --routes <rurl-1, rurl-2>    连接时刻的路由（Routes）
+        --cluster <cluster-url>      恳求路由的集群URL链接
+        --no_advertise <bool>        告知已知集群IP到客户端
+        --cluster_advertise <string> 集群URL去告知其他服务器
+        --connect_retries <number>   对于隐含的路由，设置重连次数
 
 
-Common Options:
-    -h, --help                       Show this message
-    -v, --version                    Show version
-        --help_tls                   TLS help
+一般可选项:
+    -h, --help                       显示这个消息
+    -v, --version                    显示版本
+        --help_tls                   TLS 帮助
 `
 
 // usage will print out the flag options for the server.

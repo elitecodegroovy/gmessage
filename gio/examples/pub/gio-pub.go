@@ -12,7 +12,7 @@ func usage() {
 }
 
 func publishMsg() {
-	var urls = flag.String("s", "nats://192.168.1.225:6222", "The gmessage server URLs (separated by comma)")
+	var urls = flag.String("s", "gmessage://192.168.1.225:6222", "The gmessage server URLs (separated by comma)")
 	log.SetFlags(0)
 	flag.Usage = usage
 	flag.Parse()
