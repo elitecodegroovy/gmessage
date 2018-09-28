@@ -903,7 +903,7 @@ func (nc *Conn) setupServerPool() error {
 			nc.srvPool[0], nc.srvPool[last] = nc.srvPool[last], nc.srvPool[0]
 		}
 	} else if len(nc.srvPool) <= 0 {
-		// Place default URL if pool is empty.
+		// Place default server URL if server pool is empty.
 		if err := nc.addURLToPool(DefaultURL, false); err != nil {
 			return err
 		}
