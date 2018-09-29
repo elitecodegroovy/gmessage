@@ -1,11 +1,17 @@
-package basic_sub
+package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/elitecodegroovy/gmessage/gio"
 	"log"
+	"runtime"
+	"os"
 )
+
+
+func printMsg(m *gio.Msg, i int) {
+	log.Printf("[#%d] Received on [%s] Queue[%s] Pid[%d]: '%s'\n", i, m.Subject, m.Sub.Queue, os.Getpid(), string(m.Data))
+}
 
 func doSimpleSubsriber(subject string) {
 	var urls = flag.String("s",
@@ -13,18 +19,34 @@ func doSimpleSubsriber(subject string) {
 		"gmessage 服务器URL地址(使用逗号分隔多个地址)")
 
 	log.SetFlags(0)
+	//flag.Usage = usage
+	flag.Parse()
+
+	flag.Args()
 
 	nc, err := gio.Connect(*urls)
 	if err != nil {
 		log.Fatalf("无法连接: %v\n", err)
 	}
 
-	defer nc.Close()
+	i := 0
 	// Simple Async Subscriber
-	nc.Subscribe(subject, func(m *gio.Msg) {
-		fmt.Printf("接受到的消息 %s\n", string(m.Data))
+	nc.Subscribe(subject, func(msg *gio.Msg) {
+		i++
+		printMsg(msg, i)
 	})
+	nc.Flush()
 
+	if err := nc.LastError(); err != nil {
+		log.Fatal(err)
+	}
+
+	log.SetFlags(log.LstdFlags)
+	log.Printf("Listening on [%s]\n", subject)
+
+
+
+	runtime.Goexit()
 }
 
 func main() {
