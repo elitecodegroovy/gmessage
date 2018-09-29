@@ -23,7 +23,7 @@ const (
 )
 
 func usage() {
-	log.Fatalf("Usage: gio-bench [-s server (%s)] [--tls] [-np NUM_PUBLISHERS] [-ns NUM_SUBSCRIBERS] [-n NUM_MSGS] [-ms MESSAGE_SIZE] [-csv csvfile] <subject>\n", DefaultGMessage)
+	log.Fatalf("用法: gio-bench [-s server (%s)] [--tls] [-np NUM_PUBLISHERS] [-ns NUM_SUBSCRIBERS] [-n NUM_MSGS] [-ms MESSAGE_SIZE] [-csv csvfile] <subject>(主题)\n", DefaultGMessage)
 }
 
 var benchmark *bench.Benchmark
