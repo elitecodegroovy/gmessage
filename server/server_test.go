@@ -276,7 +276,7 @@ func TestGetConnectURLs(t *testing.T) {
 func TestClientAdvertiseConnectURL(t *testing.T) {
 	opts := DefaultOptions()
 	opts.Port = 6222
-	opts.ClientAdvertise = "nats.example.com"
+	opts.ClientAdvertise = "gio.example.com"
 	s := New(opts)
 	defer s.Shutdown()
 
@@ -287,12 +287,12 @@ func TestClientAdvertiseConnectURL(t *testing.T) {
 		t.Fatalf("Expected to get one url, got none: %v with ClientAdvertise %v",
 			opts.Host, opts.ClientAdvertise)
 	}
-	if urls[0] != "nats.example.com:6222" {
-		t.Fatalf("Expected to get '%s', got: '%v'", "nats.example.com:6222", urls[0])
+	if urls[0] != "gio.example.com:6222" {
+		t.Fatalf("Expected to get '%s', got: '%v'", "gio.example.com:6222", urls[0])
 	}
 	s.Shutdown()
 
-	opts.ClientAdvertise = "nats.example.com:7777"
+	opts.ClientAdvertise = "gio.example.com:7777"
 	s = New(opts)
 	s.mu.Lock()
 	urls = s.getClientConnectURLs()
@@ -301,11 +301,11 @@ func TestClientAdvertiseConnectURL(t *testing.T) {
 		t.Fatalf("Expected to get one url, got none: %v with ClientAdvertise %v",
 			opts.Host, opts.ClientAdvertise)
 	}
-	if urls[0] != "nats.example.com:7777" {
-		t.Fatalf("Expected 'nats.example.com:7777', got: '%v'", urls[0])
+	if urls[0] != "gio.example.com:7777" {
+		t.Fatalf("Expected 'gio.example.com:7777', got: '%v'", urls[0])
 	}
-	if s.info.Host != "nats.example.com" {
-		t.Fatalf("Expected host to be set to nats.example.com")
+	if s.info.Host != "gio.example.com" {
+		t.Fatalf("Expected host to be set to gio.example.com")
 	}
 	if s.info.Port != 7777 {
 		t.Fatalf("Expected port to be set to 7777")
@@ -314,10 +314,10 @@ func TestClientAdvertiseConnectURL(t *testing.T) {
 
 	opts = DefaultOptions()
 	opts.Port = 0
-	opts.ClientAdvertise = "nats.example.com:7777"
+	opts.ClientAdvertise = "gio.example.com:7777"
 	s = New(opts)
-	if s.info.Host != "nats.example.com" && s.info.Port != 7777 {
-		t.Fatalf("Expected Client Advertise Host:Port to be nats.example.com:7777, got: %s:%d",
+	if s.info.Host != "gio.example.com" && s.info.Port != 7777 {
+		t.Fatalf("Expected Client Advertise Host:Port to be gio.example.com:7777, got: %s:%d",
 			s.info.Host, s.info.Port)
 	}
 	s.Shutdown()
@@ -373,13 +373,13 @@ func TestMaxConnections(t *testing.T) {
 
 	addr := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
 	t.Logf("addr:%s", addr)
-	nc, err := nats.Connect(addr)
+	nc, err := gio.Connect(addr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v\n", err)
 	}
 	defer nc.Close()
 
-	nc2, err := nats.Connect(addr)
+	nc2, err := gio.Connect(addr)
 	if err == nil {
 		nc2.Close()
 		t.Fatal("Expected connection to fail")
@@ -394,7 +394,7 @@ func TestMaxSubscriptions(t *testing.T) {
 	defer s.Shutdown()
 
 	addr := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
-	nc, err :=  gio.Connect(addr)
+	nc, err := gio.Connect(addr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v\n", err)
 	}
@@ -532,7 +532,7 @@ func TestSlowConsumerPendingBytes(t *testing.T) {
 	c.(*net.TCPConn).SetReadBuffer(128)
 
 	url := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
-	sender, err := nats.Connect(url)
+	sender, err := gio.Connect(url)
 	if err != nil {
 		t.Fatalf("Error on connect: %v", err)
 	}

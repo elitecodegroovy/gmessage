@@ -335,7 +335,7 @@ func TestConnzWithSubs(t *testing.T) {
 	nc := createClientConnSubscribeAndPublish(t, s)
 	defer nc.Close()
 
-	nc.Subscribe("hello.foo", func(m *nats.Msg) {})
+	nc.Subscribe("hello.foo", func(m *gio.Msg) {})
 	ensureServerActivityRecorded(t, nc)
 
 	url := fmt.Sprintf("http://127.0.0.1:%d/", s.MonitorAddr().Port)
@@ -362,8 +362,8 @@ func TestConnzWithCID(t *testing.T) {
 		nc := createClientConnSubscribeAndPublish(t, s)
 		defer nc.Close()
 		if i == cid {
-			nc.Subscribe("hello.foo", func(m *nats.Msg) {})
-			nc.Subscribe("hello.bar", func(m *nats.Msg) {})
+			nc.Subscribe("hello.foo", func(m *gio.Msg) {})
+			nc.Subscribe("hello.bar", func(m *gio.Msg) {})
 			ensureServerActivityRecorded(t, nc)
 		}
 	}
@@ -410,7 +410,7 @@ func getFooAndBar(t *testing.T, cm map[string]*ConnInfo) (*ConnInfo, *ConnInfo) 
 	return cm["foo"], cm["bar"]
 }
 
-func ensureServerActivityRecorded(t *testing.T, nc *nats.Conn) {
+func ensureServerActivityRecorded(t *testing.T, nc *gio.Conn) {
 	nc.Flush()
 	err := nc.Flush()
 	if err != nil {
@@ -509,7 +509,7 @@ func TestConnzLastActivity(t *testing.T) {
 		ensureServerActivityRecorded(t, ncBar)
 
 		// Sub should trigger update.
-		sub, _ := ncFoo.Subscribe("hello.world", func(m *nats.Msg) {})
+		sub, _ := ncFoo.Subscribe("hello.world", func(m *gio.Msg) {})
 		ensureServerActivityRecorded(t, ncFoo)
 
 		ciFoo, _ = getFooAndBar(t, createConnMap(t, pollConz(t, s, mode, url, opts)))
@@ -634,7 +634,7 @@ func TestConnzDefaultSorted(t *testing.T) {
 	s := runMonitorServer()
 	defer s.Shutdown()
 
-	clients := make([]*nats.Conn, 4)
+	clients := make([]*gio.Conn, 4)
 	for i := range clients {
 		clients[i] = createClientConnSubscribeAndPublish(t, s)
 		defer clients[i].Close()
@@ -655,7 +655,7 @@ func TestConnzSortedByCid(t *testing.T) {
 	s := runMonitorServer()
 	defer s.Shutdown()
 
-	clients := make([]*nats.Conn, 4)
+	clients := make([]*gio.Conn, 4)
 	for i := range clients {
 		clients[i] = createClientConnSubscribeAndPublish(t, s)
 		defer clients[i].Close()
@@ -677,7 +677,7 @@ func TestConnzSortedByStart(t *testing.T) {
 	s := runMonitorServer()
 	defer s.Shutdown()
 
-	clients := make([]*nats.Conn, 4)
+	clients := make([]*gio.Conn, 4)
 	for i := range clients {
 		clients[i] = createClientConnSubscribeAndPublish(t, s)
 		defer clients[i].Close()
@@ -707,7 +707,7 @@ func TestConnzSortedByBytesAndMsgs(t *testing.T) {
 	defer firstClient.Close()
 	firstClient.Flush()
 
-	clients := make([]*nats.Conn, 3)
+	clients := make([]*gio.Conn, 3)
 	for i := range clients {
 		clients[i] = createClientConnSubscribeAndPublish(t, s)
 		defer clients[i].Close()
@@ -754,8 +754,8 @@ func TestConnzSortedByPending(t *testing.T) {
 	defer s.Shutdown()
 
 	firstClient := createClientConnSubscribeAndPublish(t, s)
-	firstClient.Subscribe("hello.world", func(m *nats.Msg) {})
-	clients := make([]*nats.Conn, 3)
+	firstClient.Subscribe("hello.world", func(m *gio.Msg) {})
+	clients := make([]*gio.Conn, 3)
 	for i := range clients {
 		clients[i] = createClientConnSubscribeAndPublish(t, s)
 		defer clients[i].Close()
@@ -779,10 +779,10 @@ func TestConnzSortedBySubs(t *testing.T) {
 	defer s.Shutdown()
 
 	firstClient := createClientConnSubscribeAndPublish(t, s)
-	firstClient.Subscribe("hello.world", func(m *nats.Msg) {})
+	firstClient.Subscribe("hello.world", func(m *gio.Msg) {})
 	defer firstClient.Close()
 
-	clients := make([]*nats.Conn, 3)
+	clients := make([]*gio.Conn, 3)
 	for i := range clients {
 		clients[i] = createClientConnSubscribeAndPublish(t, s)
 		defer clients[i].Close()
@@ -807,10 +807,10 @@ func TestConnzSortedByLast(t *testing.T) {
 
 	firstClient := createClientConnSubscribeAndPublish(t, s)
 	defer firstClient.Close()
-	firstClient.Subscribe("hello.world", func(m *nats.Msg) {})
+	firstClient.Subscribe("hello.world", func(m *gio.Msg) {})
 	firstClient.Flush()
 
-	clients := make([]*nats.Conn, 3)
+	clients := make([]*gio.Conn, 3)
 	for i := range clients {
 		clients[i] = createClientConnSubscribeAndPublish(t, s)
 		defer clients[i].Close()
@@ -905,7 +905,7 @@ func TestConnzSortedByStopOnOpen(t *testing.T) {
 
 	// 4 clients
 	for i := 0; i < 4; i++ {
-		c, err := nats.Connect(url)
+		c, err := gio.Connect(url)
 		if err != nil {
 			t.Fatalf("Could not create client: %v\n", err)
 		}
@@ -927,7 +927,7 @@ func TestConnzSortedByStopTimeClosedConn(t *testing.T) {
 
 	// 4 clients
 	for i := 0; i < 4; i++ {
-		c, err := nats.Connect(url)
+		c, err := gio.Connect(url)
 		if err != nil {
 			t.Fatalf("Could not create client: %v\n", err)
 		}
@@ -972,7 +972,7 @@ func TestConnzSortedByReason(t *testing.T) {
 
 	// 20 clients
 	for i := 0; i < 20; i++ {
-		c, err := nats.Connect(url)
+		c, err := gio.Connect(url)
 		if err != nil {
 			t.Fatalf("Could not create client: %v\n", err)
 		}
@@ -1011,7 +1011,7 @@ func TestConnzSortedByReasonOnOpen(t *testing.T) {
 
 	// 4 clients
 	for i := 0; i < 4; i++ {
-		c, err := nats.Connect(url)
+		c, err := gio.Connect(url)
 		if err != nil {
 			t.Fatalf("Could not create client: %v\n", err)
 		}
@@ -1033,7 +1033,7 @@ func TestConnzSortedByIdle(t *testing.T) {
 	testIdle := func(mode int) {
 		firstClient := createClientConnSubscribeAndPublish(t, s)
 		defer firstClient.Close()
-		firstClient.Subscribe("client.1", func(m *nats.Msg) {})
+		firstClient.Subscribe("client.1", func(m *gio.Msg) {})
 		firstClient.Flush()
 
 		secondClient := createClientConnSubscribeAndPublish(t, s)
@@ -1097,8 +1097,8 @@ func TestConnzSortBadRequest(t *testing.T) {
 	defer s.Shutdown()
 
 	firstClient := createClientConnSubscribeAndPublish(t, s)
-	firstClient.Subscribe("hello.world", func(m *nats.Msg) {})
-	clients := make([]*nats.Conn, 3)
+	firstClient.Subscribe("hello.world", func(m *gio.Msg) {})
+	clients := make([]*gio.Conn, 3)
 	for i := range clients {
 		clients[i] = createClientConnSubscribeAndPublish(t, s)
 		defer clients[i].Close()
@@ -1169,7 +1169,7 @@ func TestConnzWithRoutes(t *testing.T) {
 	nc := createClientConnSubscribeAndPublish(t, sc)
 	defer nc.Close()
 
-	nc.Subscribe("hello.bar", func(m *nats.Msg) {})
+	nc.Subscribe("hello.bar", func(m *gio.Msg) {})
 	nc.Flush()
 	checkExpectedSubs(t, 1, s, sc)
 
@@ -1264,9 +1264,9 @@ func TestSubszDetails(t *testing.T) {
 	nc := createClientConnSubscribeAndPublish(t, s)
 	defer nc.Close()
 
-	nc.Subscribe("foo.*", func(m *nats.Msg) {})
-	nc.Subscribe("foo.bar", func(m *nats.Msg) {})
-	nc.Subscribe("foo.foo", func(m *nats.Msg) {})
+	nc.Subscribe("foo.*", func(m *gio.Msg) {})
+	nc.Subscribe("foo.bar", func(m *gio.Msg) {})
+	nc.Subscribe("foo.foo", func(m *gio.Msg) {})
 
 	nc.Publish("foo.bar", []byte("Hello"))
 	nc.Publish("foo.baz", []byte("Hello"))
@@ -1298,7 +1298,7 @@ func TestSubszWithOffsetAndLimit(t *testing.T) {
 	defer nc.Close()
 
 	for i := 0; i < 200; i++ {
-		nc.Subscribe(fmt.Sprintf("foo.%d", i), func(m *nats.Msg) {})
+		nc.Subscribe(fmt.Sprintf("foo.%d", i), func(m *gio.Msg) {})
 	}
 	nc.Flush()
 
@@ -1330,9 +1330,9 @@ func TestSubszTestPubSubject(t *testing.T) {
 	nc := createClientConnSubscribeAndPublish(t, s)
 	defer nc.Close()
 
-	nc.Subscribe("foo.*", func(m *nats.Msg) {})
-	nc.Subscribe("foo.bar", func(m *nats.Msg) {})
-	nc.Subscribe("foo.foo", func(m *nats.Msg) {})
+	nc.Subscribe("foo.*", func(m *gio.Msg) {})
+	nc.Subscribe("foo.bar", func(m *gio.Msg) {})
+	nc.Subscribe("foo.foo", func(m *gio.Msg) {})
 	nc.Flush()
 
 	url := fmt.Sprintf("http://127.0.0.1:%d/", s.MonitorAddr().Port)
@@ -1423,10 +1423,10 @@ func TestConnzWithStateForClosedConns(t *testing.T) {
 	// Create 10 closed, and 10 to leave open.
 	for i := 0; i < numEach; i++ {
 		nc := createClientConnSubscribeAndPublish(t, s)
-		nc.Subscribe("hello.closed.conns", func(m *nats.Msg) {})
+		nc.Subscribe("hello.closed.conns", func(m *gio.Msg) {})
 		nc.Close()
 		nc = createClientConnSubscribeAndPublish(t, s)
-		nc.Subscribe("hello.open.conns", func(m *nats.Msg) {})
+		nc.Subscribe("hello.open.conns", func(m *gio.Msg) {})
 		defer nc.Close()
 	}
 
@@ -1618,9 +1618,9 @@ func TestConnzClosedConnsBadTLSClient(t *testing.T) {
 }
 
 // Create a connection to test ConnInfo
-func createClientConnSubscribeAndPublish(t *testing.T, s *Server) *nats.Conn {
+func createClientConnSubscribeAndPublish(t *testing.T, s *Server) *gio.Conn {
 	natsURL := fmt.Sprintf("nats://127.0.0.1:%d", s.Addr().(*net.TCPAddr).Port)
-	client := nats.DefaultOptions
+	client := gio.DefaultOptions
 	client.Servers = []string{natsURL}
 	nc, err := client.Connect()
 	if err != nil {
@@ -1628,8 +1628,8 @@ func createClientConnSubscribeAndPublish(t *testing.T, s *Server) *nats.Conn {
 	}
 
 	ch := make(chan bool)
-	inbox := nats.NewInbox()
-	sub, err := nc.Subscribe(inbox, func(m *nats.Msg) { ch <- true })
+	inbox := gio.NewInbox()
+	sub, err := nc.Subscribe(inbox, func(m *gio.Msg) { ch <- true })
 	if err != nil {
 		t.Fatalf("Error subscribing to `%s`: %v\n", inbox, err)
 	}
@@ -1642,10 +1642,10 @@ func createClientConnSubscribeAndPublish(t *testing.T, s *Server) *nats.Conn {
 	return nc
 }
 
-func createClientConnWithName(t *testing.T, name string, s *Server) *nats.Conn {
+func createClientConnWithName(t *testing.T, name string, s *Server) *gio.Conn {
 	natsURI := fmt.Sprintf("nats://127.0.0.1:%d", s.Addr().(*net.TCPAddr).Port)
 
-	client := nats.DefaultOptions
+	client := gio.DefaultOptions
 	client.Servers = []string{natsURI}
 	client.Name = name
 	nc, err := client.Connect()
@@ -1895,13 +1895,13 @@ func Benchmark_Connz(b *testing.B) {
 
 	// Create 250 connections with 100 subs each.
 	for i := 0; i < 250; i++ {
-		nc, err := nats.Connect(url)
+		nc, err := gio.Connect(url)
 		if err != nil {
 			b.Fatalf("Error on connection[%d] to %s: %v", i, url, err)
 		}
 		for x := 0; x < 100; x++ {
 			subj := fmt.Sprintf("foo.%d", x)
-			nc.Subscribe(subj, func(m *nats.Msg) {})
+			nc.Subscribe(subj, func(m *gio.Msg) {})
 		}
 		nc.Flush()
 		defer nc.Close()

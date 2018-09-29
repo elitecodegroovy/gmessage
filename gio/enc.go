@@ -35,7 +35,7 @@ func init() {
 	RegisterEncoder(DEFAULT_ENCODER, &DefaultEncoder{})
 }
 
-// EncodedConn are the preferred way to interface with NATS. They wrap a bare connection to
+// EncodedConn are the preferred way to interface with gio. They wrap a bare connection to
 // a nats server and have an extendable encoder system that will encode and decode messages
 // from raw Go types.
 type EncodedConn struct {

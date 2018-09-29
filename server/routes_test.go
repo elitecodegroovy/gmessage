@@ -158,7 +158,7 @@ func TestClientAdvertise(t *testing.T) {
 
 	checkClusterFormed(t, srvA, srvB)
 
-	nc, err := nats.Connect(fmt.Sprintf("nats://%s:%d", optsA.Host, optsA.Port))
+	nc, err := gio.Connect(fmt.Sprintf("nats://%s:%d", optsA.Host, optsA.Port))
 	if err != nil {
 		t.Fatalf("Error on connect: %v", err)
 	}
@@ -187,15 +187,15 @@ func TestServerRoutesWithClients(t *testing.T) {
 	urlA := fmt.Sprintf("nats://%s:%d/", optsA.Host, optsA.Port)
 	urlB := fmt.Sprintf("nats://%s:%d/", optsB.Host, optsB.Port)
 
-	nc1, err := nats.Connect(urlA)
+	nc1, err := gio.Connect(urlA)
 	if err != nil {
 		t.Fatalf("Error creating client: %v\n", err)
 	}
 	defer nc1.Close()
 
 	ch := make(chan bool)
-	sub, _ := nc1.Subscribe("foo", func(m *nats.Msg) { ch <- true })
-	nc1.QueueSubscribe("foo", "bar", func(m *nats.Msg) {})
+	sub, _ := nc1.Subscribe("foo", func(m *gio.Msg) { ch <- true })
+	nc1.QueueSubscribe("foo", "bar", func(m *gio.Msg) {})
 	nc1.Publish("foo", []byte("Hello"))
 	// Wait for message
 	<-ch
@@ -207,7 +207,7 @@ func TestServerRoutesWithClients(t *testing.T) {
 	// Wait for route to form.
 	checkClusterFormed(t, srvA, srvB)
 
-	nc2, err := nats.Connect(urlB)
+	nc2, err := gio.Connect(urlB)
 	if err != nil {
 		t.Fatalf("Error creating client: %v\n", err)
 	}
@@ -235,7 +235,7 @@ func TestServerRoutesWithAuthAndBCrypt(t *testing.T) {
 	urlA := fmt.Sprintf("nats://%s:%s@%s:%d/", optsA.Username, optsA.Password, optsA.Host, optsA.Port)
 	urlB := fmt.Sprintf("nats://%s:%s@%s:%d/", optsB.Username, optsB.Password, optsB.Host, optsB.Port)
 
-	nc1, err := nats.Connect(urlA)
+	nc1, err := gio.Connect(urlA)
 	if err != nil {
 		t.Fatalf("Error creating client: %v\n", err)
 	}
@@ -243,14 +243,14 @@ func TestServerRoutesWithAuthAndBCrypt(t *testing.T) {
 
 	// Test that we are connected.
 	ch := make(chan bool)
-	sub, err := nc1.Subscribe("foo", func(m *nats.Msg) { ch <- true })
+	sub, err := nc1.Subscribe("foo", func(m *gio.Msg) { ch <- true })
 	if err != nil {
 		t.Fatalf("Error creating subscription: %v\n", err)
 	}
 	nc1.Flush()
 	defer sub.Unsubscribe()
 
-	nc2, err := nats.Connect(urlB)
+	nc2, err := gio.Connect(urlB)
 	if err != nil {
 		t.Fatalf("Error creating client: %v\n", err)
 	}
@@ -306,7 +306,7 @@ func TestSeedSolicitWorks(t *testing.T) {
 
 	urlA := fmt.Sprintf("nats://%s:%d/", optsA.Host, srvA.ClusterAddr().Port)
 
-	nc1, err := nats.Connect(urlA)
+	nc1, err := gio.Connect(urlA)
 	if err != nil {
 		t.Fatalf("Error creating client: %v\n", err)
 	}
@@ -314,7 +314,7 @@ func TestSeedSolicitWorks(t *testing.T) {
 
 	// Test that we are connected.
 	ch := make(chan bool)
-	nc1.Subscribe("foo", func(m *nats.Msg) { ch <- true })
+	nc1.Subscribe("foo", func(m *gio.Msg) { ch <- true })
 	nc1.Flush()
 
 	optsB := nextServerOpts(optsA)
@@ -326,7 +326,7 @@ func TestSeedSolicitWorks(t *testing.T) {
 
 	urlB := fmt.Sprintf("nats://%s:%d/", optsB.Host, srvB.ClusterAddr().Port)
 
-	nc2, err := nats.Connect(urlB)
+	nc2, err := gio.Connect(urlB)
 	if err != nil {
 		t.Fatalf("Error creating client: %v\n", err)
 	}
@@ -362,7 +362,7 @@ func TestTLSSeedSolicitWorks(t *testing.T) {
 
 	urlA := fmt.Sprintf("nats://%s:%d/", optsA.Host, srvA.Addr().(*net.TCPAddr).Port)
 
-	nc1, err := nats.Connect(urlA)
+	nc1, err := gio.Connect(urlA)
 	if err != nil {
 		t.Fatalf("Error creating client: %v\n", err)
 	}
@@ -370,7 +370,7 @@ func TestTLSSeedSolicitWorks(t *testing.T) {
 
 	// Test that we are connected.
 	ch := make(chan bool)
-	nc1.Subscribe("foo", func(m *nats.Msg) { ch <- true })
+	nc1.Subscribe("foo", func(m *gio.Msg) { ch <- true })
 	nc1.Flush()
 
 	optsB := nextServerOpts(optsA)
@@ -381,7 +381,7 @@ func TestTLSSeedSolicitWorks(t *testing.T) {
 
 	urlB := fmt.Sprintf("nats://%s:%d/", optsB.Host, srvB.Addr().(*net.TCPAddr).Port)
 
-	nc2, err := nats.Connect(urlB)
+	nc2, err := gio.Connect(urlB)
 	if err != nil {
 		t.Fatalf("Error creating client: %v\n", err)
 	}
@@ -417,7 +417,7 @@ func TestChainedSolicitWorks(t *testing.T) {
 
 	urlSeed := fmt.Sprintf("nats://%s:%d/", optsSeed.Host, srvA.Addr().(*net.TCPAddr).Port)
 
-	nc1, err := nats.Connect(urlSeed)
+	nc1, err := gio.Connect(urlSeed)
 	if err != nil {
 		t.Fatalf("Error creating client: %v\n", err)
 	}
@@ -425,7 +425,7 @@ func TestChainedSolicitWorks(t *testing.T) {
 
 	// Test that we are connected.
 	ch := make(chan bool)
-	nc1.Subscribe("foo", func(m *nats.Msg) { ch <- true })
+	nc1.Subscribe("foo", func(m *gio.Msg) { ch <- true })
 	nc1.Flush()
 
 	optsB := nextServerOpts(optsA)
@@ -438,7 +438,7 @@ func TestChainedSolicitWorks(t *testing.T) {
 
 	urlB := fmt.Sprintf("nats://%s:%d/", optsB.Host, srvB.Addr().(*net.TCPAddr).Port)
 
-	nc2, err := nats.Connect(urlB)
+	nc2, err := gio.Connect(urlB)
 	if err != nil {
 		t.Fatalf("Error creating client: %v\n", err)
 	}
@@ -488,7 +488,7 @@ func TestTLSChainedSolicitWorks(t *testing.T) {
 
 	urlSeed := fmt.Sprintf("nats://%s:%d/", optsSeed.Host, srvSeed.Addr().(*net.TCPAddr).Port)
 
-	nc1, err := nats.Connect(urlSeed)
+	nc1, err := gio.Connect(urlSeed)
 	if err != nil {
 		t.Fatalf("Error creating client: %v\n", err)
 	}
@@ -496,7 +496,7 @@ func TestTLSChainedSolicitWorks(t *testing.T) {
 
 	// Test that we are connected.
 	ch := make(chan bool)
-	nc1.Subscribe("foo", func(m *nats.Msg) { ch <- true })
+	nc1.Subscribe("foo", func(m *gio.Msg) { ch <- true })
 	nc1.Flush()
 
 	optsB := nextServerOpts(optsA)
@@ -512,7 +512,7 @@ func TestTLSChainedSolicitWorks(t *testing.T) {
 
 	urlB := fmt.Sprintf("nats://%s:%d/", optsB.Host, srvB.Addr().(*net.TCPAddr).Port)
 
-	nc2, err := nats.Connect(urlB)
+	nc2, err := gio.Connect(urlB)
 	if err != nil {
 		t.Fatalf("Error creating client: %v\n", err)
 	}
@@ -626,13 +626,13 @@ func TestClientConnectToRoutePort(t *testing.T) {
 	// When connecting to the ROUTE port, the client library will receive the
 	// CLIENT port in the INFO protocol. This URL is added to the client's pool
 	// and will be tried after the initial connect failure. So all those
-	// nats.Connect() should succeed.
+	// gio.Connect() should succeed.
 	// The only reason for a failure would be if there are too many FDs in time-wait
 	// which would delay the creation of TCP connection. So keep the total of
 	// attempts rather small.
 	total := 10
 	for i := 0; i < total; i++ {
-		nc, err := nats.Connect(url)
+		nc, err := gio.Connect(url)
 		if err != nil {
 			t.Fatalf("Unexepected error on connect: %v", err)
 		}
@@ -649,7 +649,7 @@ func TestClientConnectToRoutePort(t *testing.T) {
 	defer s.Shutdown()
 
 	for i := 0; i < total; i++ {
-		nc, err := nats.Connect(url)
+		nc, err := gio.Connect(url)
 		if err == nil {
 			nc.Close()
 			t.Fatal("Expected error on connect, got none")
@@ -746,12 +746,12 @@ func TestServerPoolUpdatedWhenRouteGoesAway(t *testing.T) {
 
 	ch := make(chan bool, 1)
 	chch := make(chan bool, 1)
-	connHandler := func(_ *nats.Conn) {
+	connHandler := func(_ *gio.Conn) {
 		chch <- true
 	}
-	nc, err := nats.Connect(s1Url,
-		nats.ReconnectHandler(connHandler),
-		nats.DiscoveredServersHandler(func(_ *nats.Conn) {
+	nc, err := gio.Connect(s1Url,
+		gio.ReconnectHandler(connHandler),
+		gio.DiscoveredServersHandler(func(_ *gio.Conn) {
 			ch <- true
 		}))
 	if err != nil {
@@ -864,30 +864,30 @@ func TestRoutedQueueAutoUnsubscribe(t *testing.T) {
 	checkClusterFormed(t, srvA, srvB)
 
 	// Have a client connection to each server
-	ncA, err := nats.Connect(fmt.Sprintf("nats://%s:%d", optsA.Host, optsA.Port))
+	ncA, err := gio.Connect(fmt.Sprintf("nats://%s:%d", optsA.Host, optsA.Port))
 	if err != nil {
 		t.Fatalf("Error on connect: %v", err)
 	}
 	defer ncA.Close()
 
-	ncB, err := nats.Connect(fmt.Sprintf("nats://%s:%d", optsB.Host, optsB.Port))
+	ncB, err := gio.Connect(fmt.Sprintf("nats://%s:%d", optsB.Host, optsB.Port))
 	if err != nil {
 		t.Fatalf("Error on connect: %v", err)
 	}
 	defer ncB.Close()
 
 	rbar := int32(0)
-	barCb := func(m *nats.Msg) {
+	barCb := func(m *gio.Msg) {
 		atomic.AddInt32(&rbar, 1)
 	}
 	rbaz := int32(0)
-	bazCb := func(m *nats.Msg) {
+	bazCb := func(m *gio.Msg) {
 		atomic.AddInt32(&rbaz, 1)
 	}
 
 	// Create 125 queue subs with auto-unsubscribe to each server for
 	// group bar and group baz. So 250 total per queue group.
-	cons := []*nats.Conn{ncA, ncB}
+	cons := []*gio.Conn{ncA, ncB}
 	for _, c := range cons {
 		for i := 0; i < 125; i++ {
 			qsub, err := c.QueueSubscribe("foo", "bar", barCb)

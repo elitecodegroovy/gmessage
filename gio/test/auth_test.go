@@ -38,13 +38,13 @@ func TestAuth(t *testing.T) {
 	nc.Close()
 
 	// Use Options
-	nc, err = gio.Connect("nats://localhost:8232", nats.UserInfo("derek", "foo"))
+	nc, err = gio.Connect("nats://localhost:8232", gio.UserInfo("derek", "foo"))
 	if err != nil {
 		t.Fatalf("Should have connected successfully with a token: %v", err)
 	}
 	nc.Close()
 	// Verify that credentials in URL take precedence.
-	nc, err = gio.Connect("nats://derek:foo@localhost:8232", nats.UserInfo("foo", "bar"))
+	nc, err = gio.Connect("nats://derek:foo@localhost:8232", gio.UserInfo("foo", "bar"))
 	if err != nil {
 		t.Fatalf("Should have connected successfully with a token: %v", err)
 	}

@@ -39,7 +39,7 @@ func TestClosedConnsAccounting(t *testing.T) {
 
 	wait := 20 * time.Millisecond
 
-	nc, err := nats.Connect(fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port))
+	nc, err := gio.Connect(fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port))
 	if err != nil {
 		t.Fatalf("Error on connect: %v", err)
 	}
@@ -57,7 +57,7 @@ func TestClosedConnsAccounting(t *testing.T) {
 
 	// Now create 21 more
 	for i := 0; i < 21; i++ {
-		nc, err = nats.Connect(fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port))
+		nc, err = gio.Connect(fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port))
 		if err != nil {
 			t.Fatalf("Error on connect: %v", err)
 		}
@@ -91,7 +91,7 @@ func TestClosedConnsSubsAccounting(t *testing.T) {
 
 	url := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
 
-	nc, err := nats.Connect(url)
+	nc, err := gio.Connect(url)
 	if err != nil {
 		t.Fatalf("Error on subscribe: %v", err)
 	}
@@ -100,7 +100,7 @@ func TestClosedConnsSubsAccounting(t *testing.T) {
 	numSubs := 10
 	for i := 0; i < numSubs; i++ {
 		subj := fmt.Sprintf("foo.%d", i)
-		nc.Subscribe(subj, func(m *nats.Msg) {})
+		nc.Subscribe(subj, func(m *gio.Msg) {})
 	}
 	nc.Flush()
 	nc.Close()
@@ -154,7 +154,7 @@ func TestClosedAuthorizationViolation(t *testing.T) {
 	opts := s.getOpts()
 	url := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
 
-	nc, err := nats.Connect(url)
+	nc, err := gio.Connect(url)
 	if err == nil {
 		nc.Close()
 		t.Fatal("Expected failure for connection")
@@ -178,14 +178,14 @@ func TestClosedUPAuthorizationViolation(t *testing.T) {
 	opts := s.getOpts()
 	url := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
 
-	nc, err := nats.Connect(url)
+	nc, err := gio.Connect(url)
 	if err == nil {
 		nc.Close()
 		t.Fatal("Expected failure for connection")
 	}
 
 	url2 := fmt.Sprintf("nats://my_user:wrong_pass@%s:%d", opts.Host, opts.Port)
-	nc, err = nats.Connect(url2)
+	nc, err = gio.Connect(url2)
 	if err == nil {
 		nc.Close()
 		t.Fatal("Expected failure for connection")
@@ -248,7 +248,7 @@ func TestClosedSlowConsumerWriteDeadline(t *testing.T) {
 	c.(*net.TCPConn).SetReadBuffer(128)
 
 	url := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
-	sender, err := nats.Connect(url)
+	sender, err := gio.Connect(url)
 	if err != nil {
 		t.Fatalf("Error on connect: %v", err)
 	}
@@ -295,7 +295,7 @@ func TestClosedSlowConsumerPendingBytes(t *testing.T) {
 	c.(*net.TCPConn).SetReadBuffer(128)
 
 	url := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
-	sender, err := nats.Connect(url)
+	sender, err := gio.Connect(url)
 	if err != nil {
 		t.Fatalf("Error on connect: %v", err)
 	}
@@ -333,7 +333,7 @@ func TestClosedTLSHandshake(t *testing.T) {
 	s := RunServer(opts)
 	defer s.Shutdown()
 
-	nc, err := nats.Connect(fmt.Sprintf("tls://%s:%d", opts.Host, opts.Port))
+	nc, err := gio.Connect(fmt.Sprintf("tls://%s:%d", opts.Host, opts.Port))
 	if err == nil {
 		nc.Close()
 		t.Fatal("Expected failure for connection")

@@ -22,7 +22,7 @@ func TestPing(t *testing.T) {
 	s := RunServer(&DefaultPingOptions)
 	defer s.Shutdown()
 
-	nc, err := nats.Connect(fmt.Sprintf("nats://127.0.0.1:%d", PING_CLIENT_PORT))
+	nc, err := gio.Connect(fmt.Sprintf("nats://127.0.0.1:%d", PING_CLIENT_PORT))
 	if err != nil {
 		t.Fatalf("Error creating client: %v\n", err)
 	}

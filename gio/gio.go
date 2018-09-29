@@ -27,7 +27,7 @@ import (
 // Default Constants
 const (
 	Version                 = "1.0.0"
-	DefaultURL              = "nats://localhost:6222"
+	DefaultURL              = "gmessage://localhost:6222"
 	DefaultPort             = 6222
 	DefaultMaxReconnect     = 60
 	DefaultReconnectWait    = 2 * time.Second
@@ -43,38 +43,38 @@ const (
 // STALE_CONNECTION is for detection and proper handling of stale connections.
 const STALE_CONNECTION = "stale connection"
 
-// PERMISSIONS_ERR is for when nats server subject authorization has failed.
+// PERMISSIONS_ERR is for when gmessage server subject authorization has failed.
 const PERMISSIONS_ERR = "permissions violation"
 
-// AUTHORIZATION_ERR is for when nats server user authorization has failed.
+// AUTHORIZATION_ERR is for when gmessage server user authorization has failed.
 const AUTHORIZATION_ERR = "authorization violation"
 
 // Errors
 var (
-	ErrConnectionClosed     = errors.New("nats: connection closed")
-	ErrSecureConnRequired   = errors.New("nats: secure connection required")
-	ErrSecureConnWanted     = errors.New("nats: secure connection not available")
-	ErrBadSubscription      = errors.New("nats: invalid subscription")
-	ErrTypeSubscription     = errors.New("nats: invalid subscription type")
-	ErrBadSubject           = errors.New("nats: invalid subject")
-	ErrSlowConsumer         = errors.New("nats: slow consumer, messages dropped")
-	ErrTimeout              = errors.New("nats: timeout")
-	ErrBadTimeout           = errors.New("nats: timeout invalid")
-	ErrAuthorization        = errors.New("nats: authorization violation")
-	ErrNoServers            = errors.New("nats: no servers available for connection")
-	ErrJsonParse            = errors.New("nats: connect message, json parse error")
-	ErrChanArg              = errors.New("nats: argument needs to be a channel type")
-	ErrMaxPayload           = errors.New("nats: maximum payload exceeded")
-	ErrMaxMessages          = errors.New("nats: maximum messages delivered")
-	ErrSyncSubRequired      = errors.New("nats: illegal call on an async subscription")
-	ErrMultipleTLSConfigs   = errors.New("nats: multiple tls.Configs not allowed")
-	ErrNoInfoReceived       = errors.New("nats: protocol exception, INFO not received")
-	ErrReconnectBufExceeded = errors.New("nats: outbound buffer limit exceeded")
-	ErrInvalidConnection    = errors.New("nats: invalid connection")
-	ErrInvalidMsg           = errors.New("nats: invalid message or message nil")
-	ErrInvalidArg           = errors.New("nats: invalid argument")
-	ErrInvalidContext       = errors.New("nats: invalid context")
-	ErrStaleConnection      = errors.New("nats: " + STALE_CONNECTION)
+	ErrConnectionClosed     = errors.New("gmessage: connection closed")
+	ErrSecureConnRequired   = errors.New("gmessage: secure connection required")
+	ErrSecureConnWanted     = errors.New("gmessage: secure connection not available")
+	ErrBadSubscription      = errors.New("gmessage: invalid subscription")
+	ErrTypeSubscription     = errors.New("gmessage: invalid subscription type")
+	ErrBadSubject           = errors.New("gmessage: invalid subject")
+	ErrSlowConsumer         = errors.New("gmessage: slow consumer, messages dropped")
+	ErrTimeout              = errors.New("gmessage: timeout")
+	ErrBadTimeout           = errors.New("gmessage: timeout invalid")
+	ErrAuthorization        = errors.New("gmessage: authorization violation")
+	ErrNoServers            = errors.New("gmessage: no servers available for connection")
+	ErrJsonParse            = errors.New("gmessage: connect message, json parse error")
+	ErrChanArg              = errors.New("gmessage: argument needs to be a channel type")
+	ErrMaxPayload           = errors.New("gmessage: maximum payload exceeded")
+	ErrMaxMessages          = errors.New("gmessage: maximum messages delivered")
+	ErrSyncSubRequired      = errors.New("gmessage: illegal call on an async subscription")
+	ErrMultipleTLSConfigs   = errors.New("gmessage: multiple tls.Configs not allowed")
+	ErrNoInfoReceived       = errors.New("gmessage: protocol exception, INFO not received")
+	ErrReconnectBufExceeded = errors.New("gmessage: outbound buffer limit exceeded")
+	ErrInvalidConnection    = errors.New("gmessage: invalid connection")
+	ErrInvalidMsg           = errors.New("gmessage: invalid message or message nil")
+	ErrInvalidArg           = errors.New("gmessage: invalid argument")
+	ErrInvalidContext       = errors.New("gmessage: invalid context")
+	ErrStaleConnection      = errors.New("gmessage: " + STALE_CONNECTION)
 )
 
 // GetDefaultOptions returns default configuration options for the client.
@@ -127,9 +127,6 @@ type asyncCallbacksHandler struct {
 	head *asyncCB
 	tail *asyncCB
 }
-
-
-
 
 // Option is a function on the options for a connection.
 type Option func(*Options) error
@@ -300,7 +297,7 @@ const (
 	nuidSize = 22
 )
 
-// A Conn represents a bare connection to a nats-server.
+// A Conn represents a bare connection to a gmessage-server.
 // It can send and receive []byte payloads.
 type Conn struct {
 	// Keep all members for which we use atomic at the beginning of the
@@ -429,7 +426,7 @@ type serverInfo struct {
 
 const (
 	// clientProtoZero is the original client protocol from 2009.
-	// http://nats.io/documentation/internals/nats-protocol/
+	// http://gio.io/documentation/internals/gmessage-protocol/
 	/* clientProtoZero */ _ = iota
 	// clientProtoInfo signals a client can receive more then the original INFO block.
 	// This can be used to update clients on other cluster members, etc.
@@ -453,8 +450,8 @@ type connectInfo struct {
 // asynchronous subscribers.
 type MsgHandler func(msg *Msg)
 
-// Connect will attempt to connect to the NATS system.
-// The url can contain username/password semantics. e.g. nats://derek:pass@localhost:6222
+// Connect will attempt to connect to the gmessage system.
+// The url can contain username/password semantics. e.g. gmessage://derek:pass@localhost:6222
 
 // Comma separated arrays are also supported, e.g. urlA, urlB.
 // Options start with the defaults but can be overridden.
@@ -504,11 +501,11 @@ func RootCAs(file ...string) Option {
 		for _, f := range file {
 			rootPEM, err := ioutil.ReadFile(f)
 			if err != nil || rootPEM == nil {
-				return fmt.Errorf("nats: error loading or parsing rootCA file: %v", err)
+				return fmt.Errorf("gmessage: error loading or parsing rootCA file: %v", err)
 			}
 			ok := pool.AppendCertsFromPEM(rootPEM)
 			if !ok {
-				return fmt.Errorf("nats: failed to parse root certificate from %q", f)
+				return fmt.Errorf("gmessage: failed to parse root certificate from %q", f)
 			}
 		}
 		if o.TLSConfig == nil {
@@ -526,11 +523,11 @@ func ClientCert(certFile, keyFile string) Option {
 	return func(o *Options) error {
 		cert, err := tls.LoadX509KeyPair(certFile, keyFile)
 		if err != nil {
-			return fmt.Errorf("nats: error loading client certificate: %v", err)
+			return fmt.Errorf("gmessage: error loading client certificate: %v", err)
 		}
 		cert.Leaf, err = x509.ParseCertificate(cert.Certificate[0])
 		if err != nil {
-			return fmt.Errorf("nats: error parsing client certificate: %v", err)
+			return fmt.Errorf("gmessage: error parsing client certificate: %v", err)
 		}
 		if o.TLSConfig == nil {
 			o.TLSConfig = &tls.Config{MinVersion: tls.VersionTLS12}
@@ -746,7 +743,7 @@ func processUrlString(url string) []string {
 	return urls
 }
 
-// Connect will attempt to connect to a NATS server with multiple options.
+// Connect will attempt to connect to a gmessage server with multiple options.
 func (o Options) Connect() (*Conn, error) {
 	nc := &Conn{Opts: o}
 
@@ -1060,7 +1057,7 @@ func (nc *Conn) setup() {
 }
 
 // Process a connected connection and initialize properly.
-func (nc *Conn)  processConnectInit() error {
+func (nc *Conn) processConnectInit() error {
 
 	// Set out deadline for the whole connect process
 	nc.conn.SetDeadline(time.Now().Add(nc.Opts.Timeout))
@@ -1184,7 +1181,7 @@ func (nc *Conn) processExpectedInfo() error {
 		return err
 	}
 
-	// The nats protocol should send INFO first always.
+	// The gmessage protocol should send INFO first always.
 	if c.op != _INFO_OP_ {
 		return ErrNoInfoReceived
 	}
@@ -1301,11 +1298,11 @@ func (nc *Conn) sendConnect() error {
 		if strings.HasPrefix(proto, _ERR_OP_) {
 			// Remove -ERR, trim spaces and quotes, and convert to lower case.
 			proto = normalizeErr(proto)
-			return errors.New("nats: " + proto)
+			return errors.New("gmessage: " + proto)
 		}
 
 		// Notify that we got an unexpected protocol.
-		return fmt.Errorf("nats: expected '%s', got '%s'", _PONG_OP_, proto)
+		return fmt.Errorf("gmessage: expected '%s', got '%s'", _PONG_OP_, proto)
 	}
 
 	// This is where we are truly connected.
@@ -1852,7 +1849,7 @@ slowConsumer:
 func (nc *Conn) processPermissionsViolation(err string) {
 	nc.mu.Lock()
 	// create error here so we can pass it as a closure to the async cb dispatcher.
-	e := errors.New("nats: " + err)
+	e := errors.New("gmessage: " + err)
 	nc.err = e
 	if nc.Opts.AsyncErrorCB != nil {
 		nc.ach.push(func() { nc.Opts.AsyncErrorCB(nc, nil, e) })
@@ -2011,7 +2008,7 @@ func (nc *Conn) processInfo(info string) error {
 		if _, present := nc.urls[curl]; !present {
 			hasNew = true
 		}
-		nc.addURLToPool(fmt.Sprintf("nats://%s", curl), true)
+		nc.addURLToPool(fmt.Sprintf("gmessage://%s", curl), true)
 	}
 	if hasNew && !nc.initc && nc.Opts.DiscoveredServersCB != nil {
 		nc.ach.push(func() { nc.Opts.DiscoveredServersCB(nc) })
@@ -2100,7 +2097,7 @@ func (nc *Conn) PublishRequest(subj, reply string, data []byte) error {
 // Used for handrolled itoa
 const digits = "0123456789"
 
-// publish is the internal function to publish messages to a nats-server.
+// publish is the internal function to publish messages to a gmessage-server.
 // Sends a protocol data message by queuing into the bufio writer
 // and kicking the flush go routine. These writes should be protected.
 func (nc *Conn) publish(subj, reply string, data []byte) error {

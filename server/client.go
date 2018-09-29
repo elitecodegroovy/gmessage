@@ -23,7 +23,7 @@ const (
 
 const (
 	// Original Client protocol from 2009.
-	// http://nats.io/documentation/internals/nats-protocol/
+	// http://gio.io/documentation/internals/nats-protocol/
 	ClientProtoZero = iota
 	// This signals a client can receive more then the original INFO block.
 	// This can be used to update clients on other cluster members, etc.

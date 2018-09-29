@@ -19,13 +19,13 @@ func TestAvoidSlowConsumerBigMessages(t *testing.T) {
 	s := RunServer(opts)
 	defer s.Shutdown()
 
-	nc1, err := nats.Connect(fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port))
+	nc1, err := gio.Connect(fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port))
 	if err != nil {
 		t.Fatalf("Error on connect: %v", err)
 	}
 	defer nc1.Close()
 
-	nc2, err := nats.Connect(fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port))
+	nc2, err := gio.Connect(fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port))
 	if err != nil {
 		t.Fatalf("Error on connect: %v", err)
 	}
@@ -40,7 +40,7 @@ func TestAvoidSlowConsumerBigMessages(t *testing.T) {
 	done := make(chan bool)
 
 	// Create Subscription.
-	nc1.Subscribe("slow.consumer", func(m *nats.Msg) {
+	nc1.Subscribe("slow.consumer", func(m *gio.Msg) {
 		// Just eat it so that we are not measuring
 		// code time, just delivery.
 		atomic.AddInt32(&received, 1)
@@ -50,7 +50,7 @@ func TestAvoidSlowConsumerBigMessages(t *testing.T) {
 	})
 
 	// Create Error handler
-	nc1.SetErrorHandler(func(c *nats.Conn, s *nats.Subscription, err error) {
+	nc1.SetErrorHandler(func(c *gio.Conn, s *gio.Subscription, err error) {
 		t.Fatalf("Received an error on the subscription's connection: %v\n", err)
 	})
 

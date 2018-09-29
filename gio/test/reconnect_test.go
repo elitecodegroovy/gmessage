@@ -15,7 +15,7 @@ func startReconnectServer(t *testing.T) *server.Server {
 }
 
 func TestReconnectTotalTime(t *testing.T) {
-	opts := nats.GetDefaultOptions()
+	opts := gio.GetDefaultOptions()
 	totalReconnectTime := time.Duration(opts.MaxReconnect) * opts.ReconnectWait
 	if totalReconnectTime < (2 * time.Minute) {
 		t.Fatalf("Total reconnect time should be at least 2 mins: Currently %v\n",

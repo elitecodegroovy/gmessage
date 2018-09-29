@@ -958,10 +958,10 @@ func TestUnquotedIPAddr(t *testing.T) {
 
 	expectedItems = []item{
 		{itemKey, "listen", 1},
-		{itemString, "nats.io:-1", 1},
+		{itemString, "gio.io:-1", 1},
 		{itemEOF, "", 1},
 	}
-	lx = lex("listen: nats.io:-1")
+	lx = lex("listen: gio.io:-1")
 	expect(t, lx, expectedItems)
 
 	expectedItems = []item{

@@ -10,7 +10,7 @@ import (
 )
 
 func usage() {
-	log.Fatalf("Usage: gio-qsub [-s server] [-t] <subject> <queue-group>\n")
+	log.Fatalf("用法: gio-qsub [-s server] [-t] <subject> <queue-group>\n")
 }
 
 func printMsg(m *gio.Msg, i int) {
@@ -20,7 +20,7 @@ func printMsg(m *gio.Msg, i int) {
 func main() {
 	var urls = flag.String("s", "nats://192.168.1.225:6222",
 		"gmessage 服务器URL地址(使用逗号分隔多个地址)")
-	var showTime = flag.Bool("t", false, "Display timestamps")
+	var showTime = flag.Bool("t", false, "显示时间戳")
 
 	log.SetFlags(0)
 	flag.Usage = usage

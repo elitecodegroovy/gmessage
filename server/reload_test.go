@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nats-io/go-nats"
+	"github.com/elitecodegroovy/gmessage/gio"
 )
 
 // Ensure Reload returns an error when attempting to reload a server that did
@@ -311,7 +311,7 @@ func TestConfigReloadRotateTLS(t *testing.T) {
 	// Ensure we can connect as a sanity check.
 	addr := fmt.Sprintf("nats://%s:%d", opts.Host, server.Addr().(*net.TCPAddr).Port)
 
-	nc, err := nats.Connect(addr, nats.Secure())
+	nc, err := gio.Connect(addr, gio.Secure())
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -329,13 +329,13 @@ func TestConfigReloadRotateTLS(t *testing.T) {
 	}
 
 	// Ensure connecting fails.
-	if _, err := nats.Connect(addr, nats.Secure()); err == nil {
+	if _, err := gio.Connect(addr, gio.Secure()); err == nil {
 		t.Fatal("Expected connect to fail")
 	}
 
 	// Ensure connecting succeeds when client presents cert.
-	cert := nats.ClientCert("./configs/certs/cert.new.pem", "./configs/certs/key.new.pem")
-	conn, err := nats.Connect(addr, cert, nats.RootCAs("./configs/certs/cert.new.pem"))
+	cert := gio.ClientCert("./configs/certs/cert.new.pem", "./configs/certs/key.new.pem")
+	conn, err := gio.Connect(addr, cert, gio.RootCAs("./configs/certs/cert.new.pem"))
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -365,7 +365,7 @@ func TestConfigReloadEnableTLS(t *testing.T) {
 
 	// Ensure we can connect as a sanity check.
 	addr := fmt.Sprintf("nats://%s:%d", opts.Host, server.Addr().(*net.TCPAddr).Port)
-	nc, err := nats.Connect(addr)
+	nc, err := gio.Connect(addr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -378,12 +378,12 @@ func TestConfigReloadEnableTLS(t *testing.T) {
 	}
 
 	// Ensure connecting fails.
-	if _, err := nats.Connect(addr); err == nil {
+	if _, err := gio.Connect(addr); err == nil {
 		t.Fatal("Expected connect to fail")
 	}
 
 	// Ensure connecting succeeds when using secure.
-	nc, err = nats.Connect(addr, nats.Secure())
+	nc, err = gio.Connect(addr, gio.Secure())
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -401,7 +401,7 @@ func TestConfigReloadDisableTLS(t *testing.T) {
 
 	// Ensure we can connect as a sanity check.
 	addr := fmt.Sprintf("nats://%s:%d", opts.Host, server.Addr().(*net.TCPAddr).Port)
-	nc, err := nats.Connect(addr, nats.Secure())
+	nc, err := gio.Connect(addr, gio.Secure())
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -414,12 +414,12 @@ func TestConfigReloadDisableTLS(t *testing.T) {
 	}
 
 	// Ensure connecting fails.
-	if _, err := nats.Connect(addr, nats.Secure()); err == nil {
+	if _, err := gio.Connect(addr, gio.Secure()); err == nil {
 		t.Fatal("Expected connect to fail")
 	}
 
 	// Ensure connecting succeeds when not using secure.
-	nc, err = nats.Connect(addr)
+	nc, err = gio.Connect(addr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -438,17 +438,17 @@ func TestConfigReloadRotateUserAuthentication(t *testing.T) {
 
 	// Ensure we can connect as a sanity check.
 	addr := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
-	nc, err := nats.Connect(addr, nats.UserInfo("tyler", "T0pS3cr3t"))
+	nc, err := gio.Connect(addr, gio.UserInfo("tyler", "T0pS3cr3t"))
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
 	defer nc.Close()
 	disconnected := make(chan struct{})
 	asyncErr := make(chan error)
-	nc.SetErrorHandler(func(nc *nats.Conn, sub *nats.Subscription, err error) {
+	nc.SetErrorHandler(func(nc *gio.Conn, sub *gio.Subscription, err error) {
 		asyncErr <- err
 	})
-	nc.SetDisconnectHandler(func(*nats.Conn) {
+	nc.SetDisconnectHandler(func(*gio.Conn) {
 		disconnected <- struct{}{}
 	})
 
@@ -459,12 +459,12 @@ func TestConfigReloadRotateUserAuthentication(t *testing.T) {
 	}
 
 	// Ensure connecting fails.
-	if _, err := nats.Connect(addr, nats.UserInfo("tyler", "T0pS3cr3t")); err == nil {
+	if _, err := gio.Connect(addr, gio.UserInfo("tyler", "T0pS3cr3t")); err == nil {
 		t.Fatal("Expected connect to fail")
 	}
 
 	// Ensure connecting succeeds when using new credentials.
-	conn, err := nats.Connect(addr, nats.UserInfo("derek", "passw0rd"))
+	conn, err := gio.Connect(addr, gio.UserInfo("derek", "passw0rd"))
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -473,7 +473,7 @@ func TestConfigReloadRotateUserAuthentication(t *testing.T) {
 	// Ensure the previous connection received an authorization error.
 	select {
 	case err := <-asyncErr:
-		if err != nats.ErrAuthorization {
+		if err != gio.ErrAuthorization {
 			t.Fatalf("Expected ErrAuthorization, got %v", err)
 		}
 	case <-time.After(5 * time.Second):
@@ -499,17 +499,17 @@ func TestConfigReloadEnableUserAuthentication(t *testing.T) {
 
 	// Ensure we can connect as a sanity check.
 	addr := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
-	nc, err := nats.Connect(addr)
+	nc, err := gio.Connect(addr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
 	defer nc.Close()
 	disconnected := make(chan struct{})
 	asyncErr := make(chan error)
-	nc.SetErrorHandler(func(nc *nats.Conn, sub *nats.Subscription, err error) {
+	nc.SetErrorHandler(func(nc *gio.Conn, sub *gio.Subscription, err error) {
 		asyncErr <- err
 	})
-	nc.SetDisconnectHandler(func(*nats.Conn) {
+	nc.SetDisconnectHandler(func(*gio.Conn) {
 		disconnected <- struct{}{}
 	})
 
@@ -520,12 +520,12 @@ func TestConfigReloadEnableUserAuthentication(t *testing.T) {
 	}
 
 	// Ensure connecting fails.
-	if _, err := nats.Connect(addr); err == nil {
+	if _, err := gio.Connect(addr); err == nil {
 		t.Fatal("Expected connect to fail")
 	}
 
 	// Ensure connecting succeeds when using new credentials.
-	conn, err := nats.Connect(addr, nats.UserInfo("tyler", "T0pS3cr3t"))
+	conn, err := gio.Connect(addr, gio.UserInfo("tyler", "T0pS3cr3t"))
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -534,7 +534,7 @@ func TestConfigReloadEnableUserAuthentication(t *testing.T) {
 	// Ensure the previous connection received an authorization error.
 	select {
 	case err := <-asyncErr:
-		if err != nats.ErrAuthorization {
+		if err != gio.ErrAuthorization {
 			t.Fatalf("Expected ErrAuthorization, got %v", err)
 		}
 	case <-time.After(2 * time.Second):
@@ -561,12 +561,12 @@ func TestConfigReloadDisableUserAuthentication(t *testing.T) {
 
 	// Ensure we can connect as a sanity check.
 	addr := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
-	nc, err := nats.Connect(addr, nats.UserInfo("tyler", "T0pS3cr3t"))
+	nc, err := gio.Connect(addr, gio.UserInfo("tyler", "T0pS3cr3t"))
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
 	defer nc.Close()
-	nc.SetErrorHandler(func(nc *nats.Conn, sub *nats.Subscription, err error) {
+	nc.SetErrorHandler(func(nc *gio.Conn, sub *gio.Subscription, err error) {
 		t.Fatalf("Client received an unexpected error: %v", err)
 	})
 
@@ -577,7 +577,7 @@ func TestConfigReloadDisableUserAuthentication(t *testing.T) {
 	}
 
 	// Ensure connecting succeeds with no credentials.
-	conn, err := nats.Connect(addr)
+	conn, err := gio.Connect(addr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -595,12 +595,12 @@ func TestConfigReloadRotateTokenAuthentication(t *testing.T) {
 
 	disconnected := make(chan struct{})
 	asyncErr := make(chan error)
-	eh := func(nc *nats.Conn, sub *nats.Subscription, err error) { asyncErr <- err }
-	dh := func(*nats.Conn) { disconnected <- struct{}{} }
+	eh := func(nc *gio.Conn, sub *gio.Subscription, err error) { asyncErr <- err }
+	dh := func(*gio.Conn) { disconnected <- struct{}{} }
 
 	// Ensure we can connect as a sanity check.
 	addr := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
-	nc, err := nats.Connect(addr, nats.Token("T0pS3cr3t"), nats.ErrorHandler(eh), nats.DisconnectHandler(dh))
+	nc, err := gio.Connect(addr, gio.Token("T0pS3cr3t"), gio.ErrorHandler(eh), gio.DisconnectHandler(dh))
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -613,12 +613,12 @@ func TestConfigReloadRotateTokenAuthentication(t *testing.T) {
 	}
 
 	// Ensure connecting fails.
-	if _, err := nats.Connect(addr, nats.Token("T0pS3cr3t")); err == nil {
+	if _, err := gio.Connect(addr, gio.Token("T0pS3cr3t")); err == nil {
 		t.Fatal("Expected connect to fail")
 	}
 
 	// Ensure connecting succeeds when using new credentials.
-	conn, err := nats.Connect(addr, nats.Token("passw0rd"))
+	conn, err := gio.Connect(addr, gio.Token("passw0rd"))
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -627,7 +627,7 @@ func TestConfigReloadRotateTokenAuthentication(t *testing.T) {
 	// Ensure the previous connection received an authorization error.
 	select {
 	case err := <-asyncErr:
-		if err != nats.ErrAuthorization {
+		if err != gio.ErrAuthorization {
 			t.Fatalf("Expected ErrAuthorization, got %v", err)
 		}
 	case <-time.After(2 * time.Second):
@@ -653,17 +653,17 @@ func TestConfigReloadEnableTokenAuthentication(t *testing.T) {
 
 	// Ensure we can connect as a sanity check.
 	addr := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
-	nc, err := nats.Connect(addr)
+	nc, err := gio.Connect(addr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
 	defer nc.Close()
 	disconnected := make(chan struct{})
 	asyncErr := make(chan error)
-	nc.SetErrorHandler(func(nc *nats.Conn, sub *nats.Subscription, err error) {
+	nc.SetErrorHandler(func(nc *gio.Conn, sub *gio.Subscription, err error) {
 		asyncErr <- err
 	})
-	nc.SetDisconnectHandler(func(*nats.Conn) {
+	nc.SetDisconnectHandler(func(*gio.Conn) {
 		disconnected <- struct{}{}
 	})
 
@@ -674,12 +674,12 @@ func TestConfigReloadEnableTokenAuthentication(t *testing.T) {
 	}
 
 	// Ensure connecting fails.
-	if _, err := nats.Connect(addr); err == nil {
+	if _, err := gio.Connect(addr); err == nil {
 		t.Fatal("Expected connect to fail")
 	}
 
 	// Ensure connecting succeeds when using new credentials.
-	conn, err := nats.Connect(addr, nats.Token("T0pS3cr3t"))
+	conn, err := gio.Connect(addr, gio.Token("T0pS3cr3t"))
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -688,7 +688,7 @@ func TestConfigReloadEnableTokenAuthentication(t *testing.T) {
 	// Ensure the previous connection received an authorization error.
 	select {
 	case err := <-asyncErr:
-		if err != nats.ErrAuthorization {
+		if err != gio.ErrAuthorization {
 			t.Fatalf("Expected ErrAuthorization, got %v", err)
 		}
 	case <-time.After(2 * time.Second):
@@ -714,12 +714,12 @@ func TestConfigReloadDisableTokenAuthentication(t *testing.T) {
 
 	// Ensure we can connect as a sanity check.
 	addr := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
-	nc, err := nats.Connect(addr, nats.Token("T0pS3cr3t"))
+	nc, err := gio.Connect(addr, gio.Token("T0pS3cr3t"))
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
 	defer nc.Close()
-	nc.SetErrorHandler(func(nc *nats.Conn, sub *nats.Subscription, err error) {
+	nc.SetErrorHandler(func(nc *gio.Conn, sub *gio.Subscription, err error) {
 		t.Fatalf("Client received an unexpected error: %v", err)
 	})
 
@@ -730,7 +730,7 @@ func TestConfigReloadDisableTokenAuthentication(t *testing.T) {
 	}
 
 	// Ensure connecting succeeds with no credentials.
-	conn, err := nats.Connect(addr)
+	conn, err := gio.Connect(addr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -748,22 +748,22 @@ func TestConfigReloadRotateUsersAuthentication(t *testing.T) {
 
 	// Ensure we can connect as a sanity check.
 	addr := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
-	nc, err := nats.Connect(addr, nats.UserInfo("alice", "foo"))
+	nc, err := gio.Connect(addr, gio.UserInfo("alice", "foo"))
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
 	defer nc.Close()
 	disconnected := make(chan struct{})
 	asyncErr := make(chan error)
-	nc.SetErrorHandler(func(nc *nats.Conn, sub *nats.Subscription, err error) {
+	nc.SetErrorHandler(func(nc *gio.Conn, sub *gio.Subscription, err error) {
 		asyncErr <- err
 	})
-	nc.SetDisconnectHandler(func(*nats.Conn) {
+	nc.SetDisconnectHandler(func(*gio.Conn) {
 		disconnected <- struct{}{}
 	})
 
 	// These credentials won't change.
-	nc2, err := nats.Connect(addr, nats.UserInfo("bob", "bar"))
+	nc2, err := gio.Connect(addr, gio.UserInfo("bob", "bar"))
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -781,12 +781,12 @@ func TestConfigReloadRotateUsersAuthentication(t *testing.T) {
 	}
 
 	// Ensure connecting fails.
-	if _, err := nats.Connect(addr, nats.UserInfo("alice", "foo")); err == nil {
+	if _, err := gio.Connect(addr, gio.UserInfo("alice", "foo")); err == nil {
 		t.Fatal("Expected connect to fail")
 	}
 
 	// Ensure connecting succeeds when using new credentials.
-	conn, err := nats.Connect(addr, nats.UserInfo("alice", "baz"))
+	conn, err := gio.Connect(addr, gio.UserInfo("alice", "baz"))
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -795,7 +795,7 @@ func TestConfigReloadRotateUsersAuthentication(t *testing.T) {
 	// Ensure the previous connection received an authorization error.
 	select {
 	case err := <-asyncErr:
-		if err != nats.ErrAuthorization {
+		if err != gio.ErrAuthorization {
 			t.Fatalf("Expected ErrAuthorization, got %v", err)
 		}
 	case <-time.After(2 * time.Second):
@@ -835,17 +835,17 @@ func TestConfigReloadEnableUsersAuthentication(t *testing.T) {
 
 	// Ensure we can connect as a sanity check.
 	addr := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
-	nc, err := nats.Connect(addr)
+	nc, err := gio.Connect(addr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
 	defer nc.Close()
 	disconnected := make(chan struct{})
 	asyncErr := make(chan error)
-	nc.SetErrorHandler(func(nc *nats.Conn, sub *nats.Subscription, err error) {
+	nc.SetErrorHandler(func(nc *gio.Conn, sub *gio.Subscription, err error) {
 		asyncErr <- err
 	})
-	nc.SetDisconnectHandler(func(*nats.Conn) {
+	nc.SetDisconnectHandler(func(*gio.Conn) {
 		disconnected <- struct{}{}
 	})
 
@@ -856,12 +856,12 @@ func TestConfigReloadEnableUsersAuthentication(t *testing.T) {
 	}
 
 	// Ensure connecting fails.
-	if _, err := nats.Connect(addr); err == nil {
+	if _, err := gio.Connect(addr); err == nil {
 		t.Fatal("Expected connect to fail")
 	}
 
 	// Ensure connecting succeeds when using new credentials.
-	conn, err := nats.Connect(addr, nats.UserInfo("alice", "foo"))
+	conn, err := gio.Connect(addr, gio.UserInfo("alice", "foo"))
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -870,7 +870,7 @@ func TestConfigReloadEnableUsersAuthentication(t *testing.T) {
 	// Ensure the previous connection received an authorization error.
 	select {
 	case err := <-asyncErr:
-		if err != nats.ErrAuthorization {
+		if err != gio.ErrAuthorization {
 			t.Fatalf("Expected ErrAuthorization, got %v", err)
 		}
 	case <-time.After(5 * time.Second):
@@ -896,12 +896,12 @@ func TestConfigReloadDisableUsersAuthentication(t *testing.T) {
 
 	// Ensure we can connect as a sanity check.
 	addr := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
-	nc, err := nats.Connect(addr, nats.UserInfo("alice", "foo"))
+	nc, err := gio.Connect(addr, gio.UserInfo("alice", "foo"))
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
 	defer nc.Close()
-	nc.SetErrorHandler(func(nc *nats.Conn, sub *nats.Subscription, err error) {
+	nc.SetErrorHandler(func(nc *gio.Conn, sub *gio.Subscription, err error) {
 		t.Fatalf("Client received an unexpected error: %v", err)
 	})
 
@@ -912,7 +912,7 @@ func TestConfigReloadDisableUsersAuthentication(t *testing.T) {
 	}
 
 	// Ensure connecting succeeds with no credentials.
-	conn, err := nats.Connect(addr)
+	conn, err := gio.Connect(addr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -929,13 +929,13 @@ func TestConfigReloadChangePermissions(t *testing.T) {
 	defer server.Shutdown()
 
 	addr := fmt.Sprintf("nats://%s:%d", opts.Host, opts.Port)
-	nc, err := nats.Connect(addr, nats.UserInfo("bob", "bar"))
+	nc, err := gio.Connect(addr, gio.UserInfo("bob", "bar"))
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
 	defer nc.Close()
 	asyncErr := make(chan error)
-	nc.SetErrorHandler(func(nc *nats.Conn, sub *nats.Subscription, err error) {
+	nc.SetErrorHandler(func(nc *gio.Conn, sub *gio.Subscription, err error) {
 		asyncErr <- err
 	})
 	// Ensure we can publish and receive messages as a sanity check.
@@ -945,7 +945,7 @@ func TestConfigReloadChangePermissions(t *testing.T) {
 	}
 	nc.Flush()
 
-	conn, err := nats.Connect(addr, nats.UserInfo("alice", "foo"))
+	conn, err := gio.Connect(addr, gio.UserInfo("alice", "foo"))
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -1107,7 +1107,7 @@ func TestConfigReloadEnableClusterAuthorization(t *testing.T) {
 	checkClusterFormed(t, srva, srvb)
 
 	srvaAddr := fmt.Sprintf("nats://%s:%d", srvaOpts.Host, srvaOpts.Port)
-	srvaConn, err := nats.Connect(srvaAddr)
+	srvaConn, err := gio.Connect(srvaAddr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -1122,7 +1122,7 @@ func TestConfigReloadEnableClusterAuthorization(t *testing.T) {
 	}
 
 	srvbAddr := fmt.Sprintf("nats://%s:%d", srvbOpts.Host, srvbOpts.Port)
-	srvbConn, err := nats.Connect(srvbAddr)
+	srvbConn, err := gio.Connect(srvbAddr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -1162,7 +1162,7 @@ func TestConfigReloadEnableClusterAuthorization(t *testing.T) {
 		}
 		srvbConn.Flush()
 	}
-	if _, err := sub.NextMsg(50 * time.Millisecond); err != nats.ErrTimeout {
+	if _, err := sub.NextMsg(50 * time.Millisecond); err != gio.ErrTimeout {
 		t.Fatalf("Expected ErrTimeout, got %v", err)
 	}
 
@@ -1208,7 +1208,7 @@ func TestConfigReloadDisableClusterAuthorization(t *testing.T) {
 	checkClusterFormed(t, srva, srvb)
 
 	srvaAddr := fmt.Sprintf("nats://%s:%d", srvaOpts.Host, srvaOpts.Port)
-	srvaConn, err := nats.Connect(srvaAddr)
+	srvaConn, err := gio.Connect(srvaAddr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -1224,7 +1224,7 @@ func TestConfigReloadDisableClusterAuthorization(t *testing.T) {
 	}
 
 	srvbAddr := fmt.Sprintf("nats://%s:%d", srvbOpts.Host, srvbOpts.Port)
-	srvbConn, err := nats.Connect(srvbAddr)
+	srvbConn, err := gio.Connect(srvbAddr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -1299,7 +1299,7 @@ func TestConfigReloadClusterRoutes(t *testing.T) {
 	defer srvc.Shutdown()
 
 	srvaAddr := fmt.Sprintf("nats://%s:%d", srvaOpts.Host, srvaOpts.Port)
-	srvaConn, err := nats.Connect(srvaAddr)
+	srvaConn, err := gio.Connect(srvaAddr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -1315,7 +1315,7 @@ func TestConfigReloadClusterRoutes(t *testing.T) {
 	}
 
 	srvbAddr := fmt.Sprintf("nats://%s:%d", srvbOpts.Host, srvbOpts.Port)
-	srvbConn, err := nats.Connect(srvbAddr)
+	srvbConn, err := gio.Connect(srvbAddr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -1351,7 +1351,7 @@ func TestConfigReloadClusterRoutes(t *testing.T) {
 	checkClusterFormed(t, srva, srvc)
 
 	srvcAddr := fmt.Sprintf("nats://%s:%d", srvcOpts.Host, srvcOpts.Port)
-	srvcConn, err := nats.Connect(srvcAddr)
+	srvcConn, err := gio.Connect(srvcAddr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -1388,7 +1388,7 @@ func TestConfigReloadClusterRemoveSolicitedRoutes(t *testing.T) {
 	checkClusterFormed(t, srva, srvb)
 
 	srvaAddr := fmt.Sprintf("nats://%s:%d", srvaOpts.Host, srvaOpts.Port)
-	srvaConn, err := nats.Connect(srvaAddr)
+	srvaConn, err := gio.Connect(srvaAddr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -1403,7 +1403,7 @@ func TestConfigReloadClusterRemoveSolicitedRoutes(t *testing.T) {
 	}
 
 	srvbAddr := fmt.Sprintf("nats://%s:%d", srvbOpts.Host, srvbOpts.Port)
-	srvbConn, err := nats.Connect(srvbAddr)
+	srvbConn, err := gio.Connect(srvbAddr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -1691,21 +1691,21 @@ func TestConfigReloadMaxConnections(t *testing.T) {
 
 	// Make two connections.
 	addr := fmt.Sprintf("nats://%s:%d", opts.Host, server.Addr().(*net.TCPAddr).Port)
-	nc1, err := nats.Connect(addr)
+	nc1, err := gio.Connect(addr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
 	defer nc1.Close()
 	closed := make(chan struct{}, 1)
-	nc1.SetDisconnectHandler(func(*nats.Conn) {
+	nc1.SetDisconnectHandler(func(*gio.Conn) {
 		closed <- struct{}{}
 	})
-	nc2, err := nats.Connect(addr)
+	nc2, err := gio.Connect(addr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
 	defer nc2.Close()
-	nc2.SetDisconnectHandler(func(*nats.Conn) {
+	nc2.SetDisconnectHandler(func(*gio.Conn) {
 		closed <- struct{}{}
 	})
 
@@ -1731,7 +1731,7 @@ func TestConfigReloadMaxConnections(t *testing.T) {
 	}
 
 	// Ensure new connections fail.
-	_, err = nats.Connect(addr)
+	_, err = gio.Connect(addr)
 	if err == nil {
 		t.Fatal("Expected error on connect")
 	}
@@ -1747,17 +1747,17 @@ func TestConfigReloadMaxPayload(t *testing.T) {
 	defer server.Shutdown()
 
 	addr := fmt.Sprintf("nats://%s:%d", opts.Host, server.Addr().(*net.TCPAddr).Port)
-	nc, err := nats.Connect(addr)
+	nc, err := gio.Connect(addr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
 	defer nc.Close()
 	closed := make(chan struct{})
-	nc.SetDisconnectHandler(func(*nats.Conn) {
+	nc.SetDisconnectHandler(func(*gio.Conn) {
 		closed <- struct{}{}
 	})
 
-	conn, err := nats.Connect(addr)
+	conn, err := gio.Connect(addr)
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
 	}
@@ -1791,7 +1791,7 @@ func TestConfigReloadMaxPayload(t *testing.T) {
 	}
 	nc.Flush()
 	_, err = sub.NextMsg(20 * time.Millisecond)
-	if err != nats.ErrTimeout {
+	if err != gio.ErrTimeout {
 		t.Fatalf("Expected ErrTimeout, got: %v", err)
 	}
 
