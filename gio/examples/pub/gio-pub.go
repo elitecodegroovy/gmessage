@@ -8,7 +8,7 @@ import (
 )
 
 func usage() {
-	log.Fatalf("Usage: publish [-s server (%s) -t topic_name -c topic's_content]  \n", gio.DefaultURL)
+	log.Fatalf("Usage: publish [-s server (%s) -t topic_name(主题) -c topic's_content（消息）]  \n", gio.DefaultURL)
 }
 
 func publishMsg() {
@@ -37,7 +37,7 @@ func publishMsg() {
 	if err := nc.LastError(); err != nil {
 		log.Fatal(err)
 	} else {
-		log.Printf("Published [%s] : %s\n", subj, reply)
+		log.Printf("完成发布 [%s] : %s\n", subj, reply)
 	}
 }
 

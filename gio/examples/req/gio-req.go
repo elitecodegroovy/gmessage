@@ -21,17 +21,17 @@ func main() {
 	flag.Usage = usage
 	flag.Parse()
 
-	//args := flag.Args()
-	//if len(args) < 2 {
-	//	usage()
-	//}
+	args := flag.Args()
+	if len(args) < 2 {
+		usage()
+	}
 
 	nc, err := gio.Connect(*urls)
 	if err != nil {
 		log.Fatalf("无法连接: %v\n", err)
 	}
 	defer nc.Close()
-	subj, payload := "test01", []byte("测试数据：内容")
+	subj, payload := args[0], []byte(args[1])
 
 	msg, err := nc.Request(subj, []byte(payload), 100*time.Millisecond)
 	if err != nil {
