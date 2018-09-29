@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-// Some sane defaults
+// 默认参数设置
 const (
 	DefaultGMessage    = "gmessage://192.168.1.225:6222,gmessage://192.168.1.224:6222,gmessage://192.168.1.226:6222"
 	DefaultNumMsgs     = 100
@@ -22,12 +22,14 @@ const (
 	DefaultMessageSize = 128
 )
 
+//提示语句
 func usage() {
 	log.Fatalf("用法: gio-bench [-s server (%s)] [--tls] [-np NUM_PUBLISHERS] [-ns NUM_SUBSCRIBERS] [-n NUM_MSGS] [-ms MESSAGE_SIZE] [-csv csvfile] <subject>(主题)\n", DefaultGMessage)
 }
 
 var benchmark *bench.Benchmark
 
+//启动性能执行程序
 func startDoBenchmark() {
 	var urls = flag.String("s", DefaultGMessage, "gmessage 服务器URL地址，多个地址以逗号分隔")
 	var tls = flag.Bool("tls", false, "是否启用TLS安全连接")
@@ -95,6 +97,7 @@ func startDoBenchmark() {
 	}
 }
 
+//发布者操作
 func runPublisher(startwg, donewg *sync.WaitGroup, opts gio.Options, numMsgs int, msgSize int) {
 	nc, err := opts.Connect()
 	if err != nil {
@@ -121,6 +124,7 @@ func runPublisher(startwg, donewg *sync.WaitGroup, opts gio.Options, numMsgs int
 	donewg.Done()
 }
 
+//订阅者操作
 func runSubscriber(startwg, donewg *sync.WaitGroup, opts gio.Options, numMsgs int, msgSize int) {
 	nc, err := opts.Connect()
 	if err != nil {
@@ -144,6 +148,7 @@ func runSubscriber(startwg, donewg *sync.WaitGroup, opts gio.Options, numMsgs in
 	startwg.Done()
 }
 
+//程序入口
 func main() {
 	startDoBenchmark()
 }
