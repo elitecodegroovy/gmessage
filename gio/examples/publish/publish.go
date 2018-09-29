@@ -12,9 +12,12 @@ func usage() {
 }
 
 func publishMsg() {
-	var urls = flag.String("s", "nats://192.168.1.225:6222", "The gmessage server URLs (separated by comma)")
-	var topic = flag.String("t", "topic01", "The topic name should be defined , default is 'topic' ")
-	var content = flag.String("c", "test...", "The topic's content should be specified,  , default is 'topic' ")
+	var urls = flag.String("s", "nats://192.168.1.225:6222",
+		"gmessage 服务器URL地址(使用逗号分隔多个地址)")
+	var topic = flag.String("t", "test01",
+		"主题名称定义，默认‘test01’")
+	var content = flag.String("c", "test...",
+		"主题的内容，默认'test...' ")
 
 	log.SetFlags(0)
 	flag.Usage = usage

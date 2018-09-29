@@ -18,7 +18,8 @@ func printMsg(m *gio.Msg, i int) {
 }
 
 func main() {
-	var urls = flag.String("s", "nats://192.168.1.225:6222", "The gmessage server URLs (separated by comma)")
+	var urls = flag.String("s", "nats://192.168.1.225:6222",
+		"gmessage 服务器URL地址(使用逗号分隔多个地址)")
 	var showTime = flag.Bool("t", false, "Display timestamps")
 
 	log.SetFlags(0)
@@ -35,7 +36,7 @@ func main() {
 		log.Fatalf("Can't connect: %v\n", err)
 	}
 
-	subj, queue, i := args[0], args[1], 0
+	subj, queue, i := "test01", "test-queue", 0
 
 	nc.QueueSubscribe(subj, queue, func(msg *gio.Msg) {
 		i++

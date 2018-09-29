@@ -12,7 +12,9 @@ func usage() {
 }
 
 func publishMsg() {
-	var urls = flag.String("s", "gmessage://192.168.1.225:6222", "The gmessage server URLs (separated by comma)")
+	var urls = flag.String("s",
+		"gmessage://192.168.1.225:6222,gmessage://192.168.1.226:6222,gmessage://192.168.1.224:6222",
+		"gmessage 服务器URL地址(使用逗号分隔多个地址)")
 	log.SetFlags(0)
 	flag.Usage = usage
 	flag.Parse()
@@ -27,7 +29,7 @@ func publishMsg() {
 		log.Fatalf("Can't connect: %v\n", err)
 	}
 
-	subj, reply := args[0], args[1]
+	subj, reply := "test01", "reply01"
 
 	nc.Publish(subj, []byte(reply))
 	nc.Flush()

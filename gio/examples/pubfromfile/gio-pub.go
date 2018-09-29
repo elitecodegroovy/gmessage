@@ -37,16 +37,16 @@ func doPublish(nc *gio.Conn, subj string) error {
 }
 
 func publishMsg(subj string) {
-	var urls = flag.String("s", "nats://192.168.1.225:6222", "The gmessage server URLs (separated by comma)")
+	var urls = flag.String("s", "nats://192.168.1.225:6222", "gmessage 服务器URL地址(使用逗号分隔多个地址)")
 
 	log.SetFlags(0)
-	//flag.Usage = usage
-	//flag.Parse()
+	flag.Usage = usage
+	flag.Parse()
 
-	//args := flag.Args()
-	//if len(args) < 2 {
-	//	usage()
-	//}
+	args := flag.Args()
+	if len(args) < 2 {
+		usage()
+	}
 
 	nc, err := gio.Connect(*urls)
 	if err != nil {

@@ -275,8 +275,7 @@ func (s *Server) Start() {
 		}
 	}
 
-	// Start monitoring if needed：
-	// core 1
+	// 核心功能： 1 监控服务
 	if err := s.StartMonitoring(); err != nil {
 		s.Fatalf("Can't start monitoring: %v", err)
 		return
@@ -286,7 +285,7 @@ func (s *Server) Start() {
 	// port to be opened and potential ephemeral port selected.
 	clientListenReady := make(chan struct{})
 
-	// Start up routing as well if needed.
+	// 核心功能：2 集群路由服务功能
 	if opts.Cluster.Port != 0 {
 		s.startGoRoutine(func() {
 			// core 2
@@ -294,7 +293,7 @@ func (s *Server) Start() {
 		})
 	}
 
-	// Pprof http endpoint for the profiler.
+	// Pprof http 终端调试服务
 	if opts.ProfPort != 0 {
 		s.StartProfiler()
 	}
@@ -303,7 +302,7 @@ func (s *Server) Start() {
 		s.logPorts()
 	}
 
-	//core 3: Wait for clients.
+	//核心功能： 3 循环接受客户端连接，并且实现推送数据
 	s.AcceptLoop(clientListenReady)
 }
 
