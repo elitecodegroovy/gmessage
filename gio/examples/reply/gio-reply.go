@@ -35,7 +35,7 @@ func doReply() {
 		log.Fatalf("无法连接: %v\n", err)
 	}
 
-	subj, reply, i := "test01", "reply01", 0
+	subj, reply, i := args[0], args[1], 0
 
 	nc.Subscribe(subj, func(msg *gio.Msg) {
 		i++

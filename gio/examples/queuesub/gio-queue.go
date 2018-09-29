@@ -36,7 +36,7 @@ func main() {
 		log.Fatalf("Can't connect: %v\n", err)
 	}
 
-	subj, queue, i := "test01", "test-queue", 0
+	subj, queue, i := args[0], args[1], 0
 
 	nc.QueueSubscribe(subj, queue, func(msg *gio.Msg) {
 		i++

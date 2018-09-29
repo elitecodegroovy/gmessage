@@ -29,7 +29,7 @@ func publishMsg() {
 		log.Fatalf("Can't connect: %v\n", err)
 	}
 
-	subj, reply := "test01", "reply01"
+	subj, reply := args[0], args[1]
 
 	nc.Publish(subj, []byte(reply))
 	nc.Flush()
