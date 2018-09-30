@@ -122,29 +122,29 @@ func setColoredLabelFormats(l *Logger) {
 	l.traceLabel = fmt.Sprintf(colorFormat, 33, "TRC")
 }
 
-// Noticef logs a notice statement
+// 打印通知方法
 func (l *Logger) Noticef(format string, v ...interface{}) {
 	l.logger.Printf(l.infoLabel+format, v...)
 }
 
-// Errorf logs an error statement
+// 打印错误方法
 func (l *Logger) Errorf(format string, v ...interface{}) {
 	l.logger.Printf(l.errorLabel+format, v...)
 }
 
-// Fatalf logs a fatal error
+// 打印致命错误
 func (l *Logger) Fatalf(format string, v ...interface{}) {
 	l.logger.Fatalf(l.fatalLabel+format, v...)
 }
 
-// Debugf logs a debug statement
+// 打印调试信息
 func (l *Logger) Debugf(format string, v ...interface{}) {
 	if l.debug {
 		l.logger.Printf(l.debugLabel+format, v...)
 	}
 }
 
-// Tracef logs a trace statement
+// 打印追踪信息
 func (l *Logger) Tracef(format string, v ...interface{}) {
 	if l.trace {
 		l.logger.Printf(l.traceLabel+format, v...)
