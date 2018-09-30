@@ -481,7 +481,7 @@ func (s *Server) AcceptLoop(clr chan struct{}) {
 		}
 		tmpDelay = ACCEPT_MIN_SLEEP
 		s.startGoRoutine(func() {
-			//Create one client with go routine.
+			//使用go routine 创建一个客户端.
 			s.createClient(conn)
 			s.grWG.Done()
 		})

@@ -994,7 +994,7 @@ func (s *Server) StartRouting(clientListenReady chan struct{}) {
 	// the possible ephemeral port to be selected.
 	<-clientListenReady
 
-	// Spin up the accept loop
+	// 固定接受循环
 	ch := make(chan struct{})
 	go s.routeAcceptLoop(ch)
 	<-ch
