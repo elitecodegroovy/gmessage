@@ -519,9 +519,8 @@ func (s *Server) sendLocalSubsToRoute(route *client) {
 	route.Debugf("Sent local subscriptions to route")
 }
 
-// Routine handler: create new routine
+// 路由操作：创建一个新路由
 func (s *Server) createRoute(conn net.Conn, rURL *url.URL) *client {
-	// Snapshot server options.
 	opts := s.getOpts()
 
 	didSolicit := rURL != nil
@@ -534,17 +533,17 @@ func (s *Server) createRoute(conn net.Conn, rURL *url.URL) *client {
 
 	c := &client{srv: s, nc: conn, opts: clientOpts{}, typ: ROUTER, route: r}
 
-	// Grab server variables
+	// 抓取服务变量
 	s.mu.Lock()
 	infoJSON := s.routeInfoJSON
 	authRequired := s.routeInfo.AuthRequired
 	tlsRequired := s.routeInfo.TLSRequired
 	s.mu.Unlock()
 
-	// Grab lock
+	// 先锁住
 	c.mu.Lock()
 
-	// Initialize
+	// 初始化客户端
 	c.initClient()
 
 	if didSolicit {
@@ -632,10 +631,10 @@ func (s *Server) createRoute(conn net.Conn, rURL *url.URL) *client {
 		c.setAuthTimer(ttl)
 	}
 
-	// Spin up the read loop.
+	// 固定路由读循环.
 	s.startGoRoutine(func() { c.readLoop() })
 
-	// Spin up the write loop.
+	// 固定路由写循环.
 	s.startGoRoutine(c.writeLoop)
 
 	if tlsRequired {
@@ -867,7 +866,7 @@ func (s *Server) broadcastUnSubscribe(sub *subscription) {
 	s.broadcastInterestToRoutes(sub, proto)
 }
 
-//Route Accept Loop
+//路由接受循环
 func (s *Server) routeAcceptLoop(ch chan struct{}) {
 	defer func() {
 		if ch != nil {
@@ -888,14 +887,14 @@ func (s *Server) routeAcceptLoop(ch chan struct{}) {
 	hp := net.JoinHostPort(opts.Cluster.Host, strconv.Itoa(port))
 	l, e := net.Listen("tcp", hp)
 	if e != nil {
-		s.Fatalf("Error listening on router port: %d - %v", opts.Cluster.Port, e)
+		s.Fatalf("错误监听路由端口: %d - %v", opts.Cluster.Port, e)
 		return
 	}
-	s.Noticef("Listening for route connections on %s",
+	s.Noticef("对%s监听路由连接 ",
 		net.JoinHostPort(opts.Cluster.Host, strconv.Itoa(l.Addr().(*net.TCPAddr).Port)))
 
 	s.mu.Lock()
-	// Check for TLSConfig
+	// 检测TLS配置
 	tlsReq := opts.Cluster.TLSConfig != nil
 	info := Info{
 		ID:           s.info.ID,
@@ -905,19 +904,18 @@ func (s *Server) routeAcceptLoop(ch chan struct{}) {
 		TLSVerify:    tlsReq,
 		MaxPayload:   s.info.MaxPayload,
 	}
-	// Set this if only if advertise is not disabled
+	// 当且仅当告知（advertise）未被激活，才会设置
 	if !opts.Cluster.NoAdvertise {
 		info.ClientConnectURLs = s.clientConnectURLs
 	}
-	// If we have selected a random port...
+	// 随机路由端口生成
 	if port == 0 {
-		// Write resolved port back to options. Real routine's port
+		// 真正的路由端口
 		opts.Cluster.Port = l.Addr().(*net.TCPAddr).Port
 	}
-	// Keep track of actual listen port. This will be needed in case of
-	// config reload.
+	// 保持追踪监控端口.
 	s.clusterActualPort = opts.Cluster.Port
-	// Check for Auth items
+	// 检测验证项
 	if opts.Cluster.Username != "" {
 		info.AuthRequired = true
 	}
@@ -961,7 +959,7 @@ func (s *Server) routeAcceptLoop(ch chan struct{}) {
 			s.grWG.Done()
 		})
 	}
-	s.Debugf("Router accept loop exiting..")
+	s.Debugf("路由接受循环退出.")
 	s.done <- true
 }
 
