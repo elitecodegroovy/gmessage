@@ -79,22 +79,22 @@ const (
 	INFO_ARG
 )
 
-//VIP operation: Proto parsing
-//TODO >> proto rules was define here.
+//TODO ... optimized the protocol.
+//协议算法：按照指定的规则解析消息操作项.
 func (c *client) parse(buf []byte) error {
 	var i int
 	var b byte
 
+	//协议操作的行大小：1024
 	mcl := MAX_CONTROL_LINE_SIZE
 	if c.srv != nil && c.srv.getOpts() != nil {
 		mcl = c.srv.getOpts().MaxControlLine
 	}
 
-	// snapshot this, and reset when we receive a
-	// proper CONNECT if needed.
+	// 当接受到一个CONNECT 协议操作时，依据需要重新设置
 	authSet := c.isAuthTimerSet()
 
-	// Move to loop instead of range syntax to allow jumping of i
+	// 移动循环，根据特殊符合进行跳转
 	for i = 0; i < len(buf); i++ {
 		b = buf[i]
 
@@ -188,7 +188,7 @@ func (c *client) parse(buf []byte) error {
 			}
 		case MSG_PAYLOAD:
 			if c.msgBuf != nil {
-				// copy as much as we can to the buffer and skip ahead.
+				// 尽可能多的复制，以便于我们能够去缓存和跳过头部
 				toCopy := c.pa.size - len(c.msgBuf)
 				avail := len(buf) - i
 				if avail < toCopy {
@@ -642,42 +642,38 @@ func (c *client) parse(buf []byte) error {
 		}
 	}
 
-	// Check for split buffer scenarios for any ARG state.
+	// 对于任意参数状态，检测分离缓存解决方案.
 	if c.state == SUB_ARG || c.state == UNSUB_ARG || c.state == PUB_ARG ||
 		c.state == MSG_ARG || c.state == MINUS_ERR_ARG ||
 		c.state == CONNECT_ARG || c.state == INFO_ARG {
-		// Setup a holder buffer to deal with split buffer scenario.
+		// 设置持有者缓冲区以处理分割缓冲区方案。
 		if c.argBuf == nil {
 			c.argBuf = c.scratch[:0]
 			c.argBuf = append(c.argBuf, buf[c.as:i-c.drop]...)
 		}
-		// Check for violations of control line length here. Note that this is not
-		// exact at all but the performance hit is too great to be precise, and
-		// catching here should prevent memory exhaustion attacks.
+		// 检查控制线长度是否违反。 请注意，事实并非如此
+		// 确切地说，但性能命中太大而不准确，并且在这里捕获应该防止内存耗尽攻击。
 		if len(c.argBuf) > mcl {
-			c.sendErr("Maximum Control Line Exceeded")
+			c.sendErr("超出最大控制线...")
 			c.closeConnection(MaxControlLineExceeded)
 			return ErrMaxControlLine
 		}
 	}
 
-	// Check for split msg
+	// 检测分离消息
 	if (c.state == MSG_PAYLOAD || c.state == MSG_END) && c.msgBuf == nil {
-		// We need to clone the pubArg if it is still referencing the
-		// read buffer and we are not able to process the msg.
+		// 我们需要克隆pubArg，如果它仍然引用读缓冲区，我们就无法处理msg。
 		if c.argBuf == nil {
-			// Works also for MSG_ARG, when message comes from ROUTE.
+			// 当消息来自ROUTE时，MSG_ARG 同样起作用。
 			c.clonePubArg()
 		}
 
-		// If we will overflow the scratch buffer, just create a
-		// new buffer to hold the split message.
+		// 如果我们将溢出暂存缓冲区，只需创建一个新的缓冲区来保存分割消息。
 		if c.pa.size > cap(c.scratch)-len(c.argBuf) {
 			lrem := len(buf[c.as:])
 
-			// Consider it a protocol error when the remaining payload
-			// is larger than the reported size for PUB. It can happen
-			// when processing incomplete messages from rogue clients.
+			// 当剩余有效负载大于PUB的报告大小时，请将其视为协议错误。
+			// 处理来自恶意客户端的不完整消息时会发生这种情况。
 			if lrem > c.pa.size+LEN_CR_LF {
 				goto parseErr
 			}
