@@ -14,9 +14,9 @@ func usage() {
 func publishMsg() {
 	var urls = flag.String("s", "nats://192.168.1.225:6222",
 		"gmessage 服务器URL地址(使用逗号分隔多个地址)")
-	var topic = flag.String("t", "test01",
-		"主题名称定义，默认‘test01’")
-	var content = flag.String("c", "test...",
+	var topic = flag.String("t", "test.123",
+		"主题名称定义，默认‘test.123’")
+	var content = flag.String("c", "test case.",
 		"主题的内容，默认'test...' ")
 
 	log.SetFlags(0)

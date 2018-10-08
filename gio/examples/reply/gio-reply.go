@@ -1,25 +1,24 @@
 package main
 
 import (
-	"flag"
-	"github.com/elitecodegroovy/gmessage/gio"
 	"log"
+	"github.com/elitecodegroovy/gmessage/gio"
+	"flag"
 	"runtime"
 )
 
+// NOTE: Use tls scheme for TLS, e.g. gio-rply -s tls://demo.nats.io:4443 foo hello
 func usage() {
-	log.Fatalf("用法: gio-rply [-s server][-t] <subject> <response>\n")
+	log.Fatalf("Usage: gio-rply [-s server][-t] <subject> <response>\n")
 }
 
 func printMsg(m *gio.Msg, i int) {
-	log.Printf("[#%d] 接受 [%s]: '%s'\n", i, m.Subject, string(m.Data))
+	log.Printf("[#%d] Received on [%s]: '%s'\n", i, m.Subject, string(m.Data))
 }
 
-func doReply() {
-	var urls = flag.String("s",
-		"gmessage://192.168.1.225:6222,gmessage://192.168.1.224:6222,gmessage://192.168.1.226:6222",
-		"gmessage 服务器URL地址，多个地址以逗号分隔")
-	var showTime = flag.Bool("t", false, "显示时间戳")
+func doReply(){
+	var urls = flag.String("s", "nats://192.168.1.225:6222", "The gio server URLs (separated by comma)")
+	var showTime = flag.Bool("t", false, "Display timestamps")
 
 	log.SetFlags(0)
 	flag.Usage = usage
@@ -32,7 +31,7 @@ func doReply() {
 
 	nc, err := gio.Connect(*urls)
 	if err != nil {
-		log.Fatalf("无法连接: %v\n", err)
+		log.Fatalf("Can't connect: %v\n", err)
 	}
 
 	subj, reply, i := args[0], args[1], 0
@@ -48,7 +47,7 @@ func doReply() {
 		log.Fatal(err)
 	}
 
-	log.Printf("监听主题 [%s]\n", subj)
+	log.Printf("Listening on [%s]\n", subj)
 	if *showTime {
 		log.SetFlags(log.LstdFlags)
 	}
