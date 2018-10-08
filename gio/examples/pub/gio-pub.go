@@ -26,7 +26,7 @@ func publishMsg() {
 
 	nc, err := gio.Connect(*urls)
 	if err != nil {
-		log.Fatalf("Can't connect: %v\n", err)
+		log.Fatalf("无法连接: %v\n", err)
 	}
 
 	subj, reply := args[0], args[1]

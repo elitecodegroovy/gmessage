@@ -76,18 +76,17 @@ func (p *Permissions) clone() *Permissions {
 	return clone
 }
 
-// configureAuthorization will do any setup needed for authorization.
-// Lock is assumed held.
+// 设置授权选项.
 func (s *Server) configureAuthorization() {
 	if s.opts == nil {
 		return
 	}
 
-	// Snapshot server options.
+	// 映像服务器可选项配置
 	opts := s.getOpts()
 
-	// Check for multiple users first
-	// This just checks and sets up the user map if we have multiple users.
+	// 首先验证多个用户
+	// 这仅仅是一个检测，并且建立一个用户map。
 	if opts.CustomClientAuthentication != nil {
 		s.info.AuthRequired = true
 	} else if opts.Users != nil {

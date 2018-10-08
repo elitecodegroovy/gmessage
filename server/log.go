@@ -27,32 +27,33 @@ type Logger interface {
 	Tracef(format string, v ...interface{})
 }
 
-// ConfigureLogger configures and sets the logger for the server.
+// 设置服务器的日志
 func (s *Server) ConfigureLogger() {
 	var (
 		log Logger
 
-		// Snapshot server options.
+		// 镜像服务操作参数
 		opts = s.getOpts()
 	)
 
 	syslog := opts.Syslog
 	if isWindowsService() && opts.LogFile == "" {
-		// Enable syslog if no log file is specified and we're running as a
-		// Windows service so that logs are written to the Windows event log.
+		// 设置系统日志标识
 		syslog = true
 	}
 
 	if opts.LogFile != "" {
+		//指定日志文件
 		log = srvlog.NewFileLogger(opts.LogFile, opts.Logtime, opts.Debug, opts.Trace, true)
 	} else if opts.RemoteSyslog != "" {
+		//指定远程系统日志
 		log = srvlog.NewRemoteSysLogger(opts.RemoteSyslog, opts.Debug, opts.Trace)
 	} else if syslog {
+		//指定系统日志文件
 		log = srvlog.NewSysLogger(opts.Debug, opts.Trace)
 	} else {
 		colors := true
-		// Check to see if stderr is being redirected and if so turn off color
-		// Also turn off colors if we're running on Windows where os.Stderr.Stat() returns an invalid handle-error
+		// 日志文字颜色设置
 		stat, err := os.Stderr.Stat()
 		if err != nil || (stat.Mode()&os.ModeCharDevice) == 0 {
 			colors = false
@@ -63,7 +64,7 @@ func (s *Server) ConfigureLogger() {
 	s.SetLogger(log, opts.Debug, opts.Trace)
 }
 
-// SetLogger sets the logger of the server
+//设置服务的日志
 func (s *Server) SetLogger(logger Logger, debugFlag, traceFlag bool) {
 	if debugFlag {
 		atomic.StoreInt32(&s.logging.debug, 1)
@@ -77,9 +78,7 @@ func (s *Server) SetLogger(logger Logger, debugFlag, traceFlag bool) {
 	}
 	s.logging.Lock()
 	if s.logging.logger != nil {
-		// Check to see if the logger implements io.Closer.  This could be a
-		// logger from another process embedding the NATS server or a dummy
-		// test logger that may not implement that interface.
+		// 检测日志是否实现io.Closer.
 		if l, ok := s.logging.logger.(io.Closer); ok {
 			if err := l.Close(); err != nil {
 				s.Errorf("Error closing logger: %v", err)
@@ -117,28 +116,28 @@ func (s *Server) ReOpenLogFile() {
 	}
 }
 
-// Noticef logs a notice statement
+// 记录通知语句
 func (s *Server) Noticef(format string, v ...interface{}) {
 	s.executeLogCall(func(logger Logger, format string, v ...interface{}) {
 		logger.Noticef(format, v...)
 	}, format, v...)
 }
 
-// Errorf logs an error
+// 记录错误
 func (s *Server) Errorf(format string, v ...interface{}) {
 	s.executeLogCall(func(logger Logger, format string, v ...interface{}) {
 		logger.Errorf(format, v...)
 	}, format, v...)
 }
 
-// Fatalf logs a fatal error
+// 记录致命错误
 func (s *Server) Fatalf(format string, v ...interface{}) {
 	s.executeLogCall(func(logger Logger, format string, v ...interface{}) {
 		logger.Fatalf(format, v...)
 	}, format, v...)
 }
 
-// Debugf logs a debug statement
+// 记录调试错误
 func (s *Server) Debugf(format string, v ...interface{}) {
 	if atomic.LoadInt32(&s.logging.debug) == 0 {
 		return
@@ -149,7 +148,7 @@ func (s *Server) Debugf(format string, v ...interface{}) {
 	}, format, v...)
 }
 
-// Tracef logs a trace statement
+// 记录追踪信息
 func (s *Server) Tracef(format string, v ...interface{}) {
 	if atomic.LoadInt32(&s.logging.trace) == 0 {
 		return
@@ -160,6 +159,7 @@ func (s *Server) Tracef(format string, v ...interface{}) {
 	}, format, v...)
 }
 
+// 内容日志调用方法
 func (s *Server) executeLogCall(f func(logger Logger, format string, v ...interface{}), format string, args ...interface{}) {
 	s.logging.RLock()
 	defer s.logging.RUnlock()
